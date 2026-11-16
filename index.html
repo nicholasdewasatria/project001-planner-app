@@ -376,6 +376,15 @@ textarea.inp { padding: var(--s-sm); min-height: 5rem; resize: vertical; line-he
 .pad-for { flex: none; max-width: 30%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--t-2xs); color: var(--c-ink-2); }
 @media (max-width: 560px) { .pad-for { display: none; } }
 
+/* akun Google (versi aplikasi) */
+.gbtn { position: relative; }
+.gbtn::after { content: ""; position: absolute; top: 7px; right: 7px; width: 8px; height: 8px; border-radius: 50%; background: transparent; box-shadow: 0 0 0 2px var(--c-bg); }
+.gbtn[data-st="ok"]::after { background: var(--c-blue-hi); }
+.gbtn[data-st="busy"]::after { background: var(--c-ink-2); animation: dot 1s infinite; }
+.gbtn[data-st="expired"]::after, .gbtn[data-st="error"]::after { background: var(--c-warn); }
+.gbtn[data-st="offline"]::after { background: var(--c-ink-2); }
+a.more-row { color: inherit; text-decoration: none; }
+
 /* kelola budget */
 .bset { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem auto auto; gap: var(--s-xs); align-items: center; padding: var(--s-sm) 0; }
 .bset + .bset { border-top: 1px solid var(--c-line); }
@@ -667,6 +676,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
   <symbol id="i-sketch" viewBox="0 0 24 24"><path d="M3.5 16.5c2.2-6.5 4.2-9.5 6-9.5 2.2 0 1 6.5 3.2 6.5 1.8 0 2.8-5 5.8-5"/><path d="M4 20.5h16"/></symbol>
   <symbol id="i-clear" viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="15" rx="3"/><path d="m9.5 9.5 5 5M14.5 9.5l-5 5"/></symbol>
   <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5a2 2 0 0 1 2-2h2l1.5-2h5l1.5 2h2a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18.5h10.5a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7.3 9.6 4.5 4.5 0 0 0 7 18.5z"/></symbol>
   <symbol id="i-apps" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M2.5 7.5A2.5 2.5 0 0 1 5 5h4l2.2 2.2H19a2.5 2.5 0 0 1 2.5 2.5v7.8A2.5 2.5 0 0 1 19 20H5a2.5 2.5 0 0 1-2.5-2.5z"/></symbol>
 </svg>
@@ -690,6 +700,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
       <button type="button" data-pane="web" aria-pressed="false">Web</button>
     </div>
     <div class="top-r">
+      <button class="iconbtn gbtn" type="button" id="gbtn" data-act="gpanel" data-st="off" aria-label="Akun Google" hidden><svg class="ic"><use href="#i-cloud"/></svg></button>
       <button class="iconbtn" type="button" id="eye" data-act="eye" aria-pressed="false" aria-label="Sembunyikan angka uang"></button>
       <button class="iconbtn" type="button" id="set-btn" data-act="settings" aria-label="Pengaturan"><svg class="ic"><use href="#i-sliders"/></svg></button>
     </div>
@@ -911,10 +922,11 @@ function applyBlob(o) {
 }
 function loadData() { try { const raw = localStorage.getItem(DKEY); return raw ? applyBlob(JSON.parse(raw, revive)) : null; } catch (e) { return null; } }
 let SDT;
-function saveData() {
+function saveData(noCloud) {
   if (!APP) return;
   clearTimeout(SDT);
   SDT = setTimeout(() => { try { localStorage.setItem(DKEY, JSON.stringify(dataBlob())); } catch (e) { toast('Penyimpanan HP penuh. Ekspor data, lalu hapus coretan berfoto yang lama'); } }, 300);
+  if (!noCloud && typeof gQueue === 'function') gQueue();
 }
 let S = APP ? (loadData() || emptyData()) : seed();
 
@@ -1538,6 +1550,7 @@ function padSave() {
   const title = cap(raw.replace(/#[\p{L}\d_]+/gu, ' ').replace(/\s+/g, ' ').trim()) || `Coretan ${new Date().getDate()} ${MONTHS[new Date().getMonth()].slice(0, 3)} ${hm(new Date())}`;
   let sk = PAD.id ? S.sketches.find(x => x.id === PAD.id) : null;
   if (!sk) { sk = { id: nid(), at: new Date() }; S.sketches.push(sk); }
+  sk.rev = Date.now();
   Object.assign(sk, { title, tags, bw: PAD.bw, bh: PAD.bh, strokes: PAD.strokes, bg: PAD.bg, png: null, at: sk.at || new Date() });
   sk.png = padPng(sk, $('#pad-bg'));
   PAD.dirty = false; padClose(true);
@@ -1829,7 +1842,8 @@ const themeSeg = cls => `<div class="seg ${cls}" role="group" aria-label="Tema">
 function settingsHTML() {
   return `<section class="pn-sec"><h3>Tema</h3>${themeSeg('')}<p class="hint">Otomatis mengikuti mode gelap atau terang di HP dan laptop.</p></section>
   <section class="pn-sec"><h3>Integrasi</h3><div>
-    <div class="set">${ico('sheet')}<div><b>Google Sheets</b><small>Catatan, to-do, keuangan, rutinitas</small></div>${okPill.replace('CHECK', ico('check'))}</div>
+    ${APP ? `<div class="set">${ico('cloud')}<div><b>Akun Google</b><small>${G.email ? esc(G.email) + ' · ' + esc(gStText()) : 'Belum masuk. Data hanya di HP ini'}</small></div><button class="btn btn-quiet btn-sm" type="button" data-act="gpanel">${G.email ? 'Atur' : 'Masuk'}</button></div>`
+      : `<div class="set">${ico('sheet')}<div><b>Google Sheets</b><small>Catatan, to-do, keuangan, rutinitas</small></div>${okPill.replace('CHECK', ico('check'))}</div>`}
     <div class="set">${ico('month')}<div><b>Google Calendar</b><small>Jadwal dan pengingat</small></div>${okPill.replace('CHECK', ico('check'))}</div>
     <div class="set">${ico('tg')}<div><b>Telegram${tgOn() ? '' : '<span class="part">Part 2</span>'}</b><small>${tgOn() ? 'Tersambung · @project001_planner_bot' : 'Catat lewat chat dan terima pengingat'}</small></div><button class="btn btn-quiet btn-sm" type="button" data-act="tg">${tgOn() ? 'Atur' : 'Lihat'}</button></div>
   </div></section>
@@ -1878,6 +1892,7 @@ function renderOnb() {
   if (k === 'google' && APP) {
     title = 'Selamat datang di project001-Planner';
     body = `<p class="lead">Jadwal, to-do, catatan, fokus, dan keuangan di satu tempat.</p><div>${[['folder', 'Untuk sekarang: di HP ini', 'Semua yang kamu catat tersimpan di browser HP ini dan tetap jalan tanpa internet. Cadangkan lewat Pengaturan › Data › Ekspor.'], ['sheet', 'Nanti: akun Google kamu', 'Setelah backend aktif, data pindah ke Google Sheets, Calendar, dan Drive milikmu sendiri.']].map(([ic, n, d]) => `<div class="set">${ico(ic)}<div><b>${n}</b><small>${d}</small></div><span></span></div>`).join('')}</div>`;
+    body += G.email ? `<p class="hint">Masuk sebagai ${esc(G.email)}.</p>` : '<div class="acts"><button class="btn btn-quiet btn-sm" type="button" data-act="gsignin">Masuk dengan Google (opsional)</button></div><p class="hint">Bisa juga nanti lewat ikon awan di kanan atas.</p>';
     OB.google = true;
   } else if (k === 'google') {
     title = 'Selamat datang di project001-Planner';
@@ -1911,6 +1926,171 @@ function renderOnb() {
   $('#onb-card').innerHTML = `<div class="onb-top"><div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-folder" fill="#1B60CB"/></svg><b>project001-Planner</b></div>${k !== 'selesai' ? '<button class="lnk small" type="button" data-act="obskip">Lewati</button>' : ''}</div>
     <div class="onb-bar" aria-hidden="true">${steps.map((_, j) => `<i class="${j <= OB.i ? 'on' : ''}"></i>`).join('')}</div>
     ${folder(`Langkah ${OB.i + 1} dari ${steps.length}`, `<p class="onb-h" id="onb-t">${title}</p>${body}<div class="acts onb-acts">${OB.i ? '<button class="btn btn-quiet" type="button" data-act="obback">Kembali</button>' : ''}<button class="btn btn-primary" type="button" data-act="obnext" ${OB.busy ? 'disabled' : ''}>${next}</button></div>`)}`;
+}
+/* ---------- Google (versi aplikasi): login + sinkron ke Drive dan Sheets milik pengguna ----------
+ * Sumber utama: data.json di folder Drive "project001-Planner" (dibuat app, izin drive.file).
+ * Spreadsheet "project001-Planner" = salinan tabel yang diperbarui tiap sinkron (satu arah, app → Sheets).
+ * Coretan: PNG di folder "project001-Planner/Coretan". */
+const G_CLIENT = '44025909302-nopjgibksf0cfoijphb7daf27pqosmp7.apps.googleusercontent.com';
+const G_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const G_SCOPES = 'openid email profile ' + G_DRIVE_SCOPE + ' https://www.googleapis.com/auth/calendar.app.created';
+const GKEY = 'p001-g', DRIVE = 'https://www.googleapis.com/drive/v3/files', UPL = 'https://www.googleapis.com/upload/drive/v3/files', SHEETS = 'https://sheets.googleapis.com/v4/spreadsheets';
+const FOLDER_MIME = 'application/vnd.google-apps.folder', SHEET_MIME = 'application/vnd.google-apps.spreadsheet';
+const TABS = ['Catatan', 'Todo', 'Transaksi', 'Budget', 'Rutinitas', 'Centang', 'Jadwal', 'Fokus', 'Coretan'];
+const G = (() => { try { return JSON.parse(localStorage.getItem(GKEY) || 'null') || {}; } catch (e) { return {}; } })();
+let GST = 'off', gTC = null, gTimer = null, gBusy = false, gAgain = false;
+const gSave = () => { try { localStorage.setItem(GKEY, JSON.stringify(G)); } catch (e) { /* abaikan */ } };
+const gOn = () => APP && !!G.email;
+const gValid = () => !!G.token && G.exp > Date.now() + 30000;
+const gKey = b => JSON.stringify({ S: b.S, b: b.budget, n: b.nodaily });
+const gWhen = () => G.lastSync ? when(new Date(G.lastSync)).toLowerCase() : '';
+function gStText() { return { off: 'Belum masuk. Data hanya ada di HP ini.', busy: 'Sedang sinkron…', ok: 'Tersinkron ' + gWhen(), expired: 'Sesi login habis. Masuk lagi untuk lanjut sinkron.', error: 'Sinkron gagal' + (G.err ? ': ' + G.err : '') + '. Data aman di HP ini.', offline: 'Offline. Sinkron otomatis saat online.' }[GST] || ''; }
+function gSet(st) {
+  GST = st;
+  const b = $('#gbtn'); if (b) { b.dataset.st = G.email ? st : 'off'; b.setAttribute('aria-label', 'Akun Google: ' + gStText()); b.title = gStText(); }
+  if (APP) $('.links').innerHTML = ico(G.email ? 'cloud' : 'folder', 'ic-s') + (G.email ? (st === 'ok' ? 'Tersinkron ke Google Drive' : gStText()) : 'Data tersimpan di perangkat ini');
+  if (PANEL === 'g' && $('#panel').classList.contains('open')) $('#panel-b').innerHTML = gHTML();
+  if (PANEL === 'set' && $('#panel').classList.contains('open')) { const pb = $('#panel-b'), y = pb.scrollTop; pb.innerHTML = settingsHTML(); pb.scrollTop = y; }
+}
+function gLoad() {
+  return new Promise((res, rej) => {
+    if (window.google && google.accounts && google.accounts.oauth2) return res();
+    let el = document.getElementById('gsi');
+    if (!el) { el = document.createElement('script'); el.id = 'gsi'; el.src = 'https://accounts.google.com/gsi/client'; el.async = true; document.head.appendChild(el); }
+    el.addEventListener('load', () => res(), { once: true }); el.addEventListener('error', () => { el.remove(); rej(new Error('gsi')); }, { once: true });
+  });
+}
+async function gSignIn() {
+  if (!navigator.onLine) { toast('Butuh internet untuk masuk dengan Google'); return; }
+  try { await gLoad(); } catch (e) { toast('Gagal memuat login Google. Coba lagi'); return; }
+  if (!gTC) gTC = google.accounts.oauth2.initTokenClient({ client_id: G_CLIENT, scope: G_SCOPES, callback: gGotToken, error_callback: err => { gSet(G.email ? (gValid() ? 'ok' : 'expired') : 'off'); if (!err || err.type !== 'popup_closed') toast('Login Google tidak selesai'); } });
+  gSet('busy');
+  gTC.requestAccessToken(G.email ? { prompt: '', login_hint: G.email } : { prompt: 'consent' });
+}
+async function gGotToken(r) {
+  if (!r || r.error || !r.access_token) { G.err = (r && r.error) || 'tanpa token'; gSet(G.email ? 'error' : 'off'); toast('Login Google gagal'); return; }
+  if (!google.accounts.oauth2.hasGrantedAllScopes(r, G_DRIVE_SCOPE)) { gSet(G.email ? 'error' : 'off'); toast('Izin Google Drive belum dicentang. Masuk lagi dan centang izinnya'); return; }
+  G.token = r.access_token; G.exp = Date.now() + (+r.expires_in || 3600) * 1000;
+  try {
+    const u = await gApi('GET', 'https://www.googleapis.com/oauth2/v3/userinfo');
+    if (G.email && G.email !== u.email) { G.ids = {}; G.syncKey = null; G.lastSync = 0; }
+    const first = !G.email; G.email = u.email; G.name = u.name || u.email; G.err = ''; gSave();
+    if (first) toast('Masuk sebagai ' + u.email + '. Menyiapkan Google Drive…');
+    await gSync(true);
+  } catch (e) { gFail(e); }
+}
+async function gApi(method, url, body, type, asText) {
+  const h = { Authorization: 'Bearer ' + G.token }; let b = body;
+  if (body !== undefined && !(body instanceof Blob) && typeof body !== 'string') { h['Content-Type'] = 'application/json'; b = JSON.stringify(body); }
+  else if (type) h['Content-Type'] = type;
+  const r = await fetch(url, { method, headers: h, body: b });
+  if (r.status === 401) { const e = new Error('sesi habis'); e.auth = true; throw e; }
+  if (!r.ok) { const e = new Error(r.status + ' ' + (await r.text()).replace(/\s+/g, ' ').slice(0, 140)); e.status = r.status; throw e; }
+  if (asText) return r.text();
+  return (r.headers.get('content-type') || '').includes('json') ? r.json() : r.text();
+}
+async function gFind(q) { const r = await gApi('GET', DRIVE + '?q=' + encodeURIComponent(q + ' and trashed=false') + '&fields=files(id,name)&spaces=drive&pageSize=5'); return r.files && r.files[0]; }
+async function gFolder(name, parent) {
+  const f = await gFind(`name='${name}' and mimeType='${FOLDER_MIME}'` + (parent ? ` and '${parent}' in parents` : '')); if (f) return f.id;
+  return (await gApi('POST', DRIVE + '?fields=id', { name, mimeType: FOLDER_MIME, ...(parent ? { parents: [parent] } : {}) })).id;
+}
+async function gUpload(name, mime, data, parent, id) {
+  if (id) { try { return await gApi('PATCH', UPL + '/' + id + '?uploadType=media&fields=id', data, mime); } catch (e) { if (e.status !== 404) throw e; } }
+  const bd = 'p001' + Date.now().toString(36), meta = JSON.stringify({ name, parents: [parent] });
+  const body = new Blob([`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${bd}\r\nContent-Type: ${mime}\r\n\r\n`, data, `\r\n--${bd}--`]);
+  return gApi('POST', UPL + '?uploadType=multipart&fields=id', body, 'multipart/related; boundary=' + bd);
+}
+async function gSetup() {
+  const ids = G.ids = G.ids || {};
+  if (!ids.folder) ids.folder = await gFolder('project001-Planner');
+  if (!ids.sk) ids.sk = await gFolder('Coretan', ids.folder);
+  if (!ids.data) { const x = await gFind(`name='data.json' and '${ids.folder}' in parents`); if (x) ids.data = x.id; }
+  if (!ids.sheet) {
+    const x = await gFind(`name='project001-Planner' and mimeType='${SHEET_MIME}' and '${ids.folder}' in parents`);
+    if (x) ids.sheet = x.id;
+    else {
+      const sh = await gApi('POST', SHEETS, { properties: { title: 'project001-Planner', timeZone: 'Asia/Jakarta' }, sheets: TABS.map(t => ({ properties: { title: t } })) });
+      ids.sheet = sh.spreadsheetId;
+      try { await gApi('PATCH', DRIVE + '/' + ids.sheet + '?addParents=' + ids.folder + '&removeParents=root&fields=id', {}); } catch (e) { /* tetap di Drive utama, tidak masalah */ }
+    }
+  }
+  gSave();
+}
+const gFmt = d => d instanceof Date && !isNaN(d) ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}` : '';
+function gTables() {
+  return {
+    Catatan: [['id', 'waktu', 'teks', 'tag', 'sumber', 'coretan'], ...S.notes.map(n => [n.id, gFmt(n.at), n.text, n.tags.join(' '), n.src, (n.sk || []).join(' ')])],
+    Todo: [['id', 'teks', 'tenggat', 'selesai', 'selesai_pada', 'sumber', 'coretan'], ...S.todos.map(t => [t.id, t.text, gFmt(t.due), t.done ? 'ya' : '', gFmt(t.doneAt), t.src, (t.sk || []).join(' ')])],
+    Transaksi: [['id', 'waktu', 'jenis', 'kategori', 'jumlah', 'catatan', 'sumber'], ...S.tx.map(t => [t.id, gFmt(t.at), t.type === 'in' ? 'masuk' : 'keluar', t.cat, t.amt, t.note, t.src])],
+    Budget: [['kategori', 'budget_bulanan', 'dihitung_batas_harian'], ...Object.keys(BUDGET).map(k => [k, BUDGET[k], inDaily(k) ? 'ya' : 'tidak'])],
+    Rutinitas: [['id', 'nama', 'mulai', 'durasi_menit', 'hari', 'streak', 'rekor'], ...S.routines.map(r => [r.id, r.name, r.start, r.dur, daysLabel(r.days), streakOf(r.name), habitOf(r.name).best])],
+    Centang: [['tanggal', 'rutinitas'], ...Object.entries(S.habits).flatMap(([n, h]) => Object.keys(h.days || {}).sort().map(d => [d, n]))],
+    Jadwal: [['id', 'judul', 'mulai', 'selesai', 'kalender', 'status'], ...S.events.filter(e => !isRoutine(e)).map(e => [e.id, e.title, gFmt(e.start), gFmt(e.end), e.cal, e.done === true ? 'selesai' : e.done === false ? 'dilewati' : ''])],
+    Fokus: [['tugas', 'menit', 'selesai'], ...S.sessions.map(x => [x.task, x.min, gFmt(x.end)])],
+    Coretan: [['id', 'judul', 'tag', 'waktu', 'file_drive'], ...S.sketches.map(k => [k.id, k.title, k.tags.join(' '), gFmt(k.at), k.driveId ? 'https://drive.google.com/file/d/' + k.driveId + '/view' : ''])]
+  };
+}
+async function gPush() {
+  for (const k of S.sketches) {
+    if (k.driveId && k.driveRev === (k.rev || 0)) continue;
+    const png = await (await fetch(k.png || (k.png = padPng(k)))).blob();
+    k.driveId = (await gUpload(k.title.replace(/[\\/:*?"<>|]/g, ' ').trim() + '.png', 'image/png', png, G.ids.sk, k.driveId)).id; k.driveRev = k.rev || 0;
+  }
+  for (const id of (S.driveTrash || []).splice(0)) { try { await gApi('PATCH', DRIVE + '/' + id + '?fields=id', { trashed: true }); } catch (e) { /* sudah tidak ada */ } }
+  const blob = dataBlob();
+  G.ids.data = (await gUpload('data.json', 'application/json', JSON.stringify(blob), G.ids.folder, G.ids.data)).id;
+  const T = gTables();
+  await gApi('POST', `${SHEETS}/${G.ids.sheet}/values:batchClear`, { ranges: TABS.map(t => `${t}!A:Z`) });
+  await gApi('POST', `${SHEETS}/${G.ids.sheet}/values:batchUpdate`, { valueInputOption: 'RAW', data: TABS.map(t => ({ range: `${t}!A1`, values: T[t] })) });
+  G.syncKey = gKey(blob); G.lastSync = blob.savedAt.getTime(); gSave(); saveData(true);
+}
+async function gSync(pull) {
+  if (!gOn()) return;
+  if (gBusy) { gAgain = true; return; }
+  if (!navigator.onLine) { gSet('offline'); return; }
+  if (!gValid()) { gSet('expired'); return; }
+  gBusy = true; gSet('busy');
+  try {
+    await gSetup();
+    let pushed = false;
+    if (pull && G.ids.data) {
+      const remote = JSON.parse(await gApi('GET', DRIVE + '/' + G.ids.data + '?alt=media', undefined, undefined, true), revive);
+      const local = dataBlob(), lk = gKey(local), rk = gKey(remote), rt = remote.savedAt instanceof Date ? remote.savedAt.getTime() : 0;
+      const localBlank = isBlank() && !S.routines.length && !S.sketches.length;
+      if (rk !== lk) {
+        const takeRemote = localBlank || lk === G.syncKey || (rt > (G.lastSync || 0) && rt > local.savedAt.getTime() - 1);
+        if (takeRemote && !(rt <= (G.lastSync || 0) && lk !== G.syncKey)) {
+          if (!localBlank && lk !== G.syncKey) { try { localStorage.setItem(DKEY + '-cadangan', JSON.stringify(local)); } catch (e) { /* abaikan */ } toast('Data dari perangkat lain dipakai. Salinan HP ini disimpan sebagai cadangan'); }
+          S = applyBlob(remote); syncRoutines(); G.syncKey = rk; G.lastSync = rt; gSave(); render(); saveData(true);
+        } else { await gPush(); pushed = true; }
+      } else { G.syncKey = rk; G.lastSync = Math.max(G.lastSync || 0, rt); gSave(); }
+    }
+    if (!pushed) { const k = gKey(dataBlob()); if (k !== G.syncKey || !G.ids.data || S.sketches.some(x => !x.driveId || x.driveRev !== (x.rev || 0))) await gPush(); }
+    G.err = ''; gSet('ok');
+  } catch (e) { gFail(e); }
+  gBusy = false;
+  if (gAgain) { gAgain = false; gQueue(); }
+}
+function gFail(e) { gBusy = false; G.err = e && e.auth ? '' : String((e && e.message) || e).slice(0, 120); gSave(); gSet(e && e.auth ? 'expired' : 'error'); }
+function gQueue() { if (!gOn()) return; clearTimeout(gTimer); gTimer = setTimeout(() => gSync(false), 4000); }
+function gSignOut() {
+  try { if (window.google && google.accounts && G.token) google.accounts.oauth2.revoke(G.token, () => {}); } catch (e) { /* abaikan */ }
+  Object.keys(G).forEach(k => delete G[k]); gSave(); gSet('off'); toast('Keluar dari Google. Data tetap ada di HP ini');
+}
+function gHTML() {
+  if (!G.email) return `<div class="tg-st">${ico('cloud')}<div><b>Masuk dengan Google</b><small>Data disimpan di Google Drive dan Sheets milikmu sendiri, dan bisa dibuka dari HP lain atau laptop.</small></div></div>
+    <div class="acts"><button class="btn btn-primary btn-sm" type="button" data-act="gsignin">Masuk dengan Google</button></div>
+    <section class="pn-sec"><h3>Yang dibuat di akun Google kamu</h3><div>
+      <div class="set">${ico('folder')}<div><b>Folder "project001-Planner"</b><small>Berisi data.json (data utama) dan folder Coretan (gambar PNG)</small></div><span></span></div>
+      <div class="set">${ico('sheet')}<div><b>Spreadsheet "project001-Planner"</b><small>Tab Catatan, Todo, Transaksi, Budget, Rutinitas, Centang, Jadwal, Fokus, Coretan</small></div><span></span></div>
+    </div><p class="hint">App hanya bisa membuka file yang dibuatnya sendiri, bukan seluruh Drive kamu. Selama uji coba, login berlaku sekitar 7 hari, setelah itu cukup masuk lagi.</p></section>`;
+  const ids = G.ids || {};
+  return `<div class="tg-st ${GST === 'ok' ? 'on' : ''}">${ico('cloud')}<div><b>${esc(G.email)}</b><small>${esc(gStText())}</small></div></div>
+    <div class="acts">${GST === 'expired' || GST === 'error' ? '<button class="btn btn-primary btn-sm" type="button" data-act="gsignin">Masuk lagi</button>' : `<button class="btn btn-primary btn-sm" type="button" data-act="gsyncnow" ${GST === 'busy' ? 'disabled' : ''}>Sinkron sekarang</button>`}<button class="btn btn-quiet btn-sm" type="button" data-act="gout">Keluar</button></div>
+    <section class="pn-sec"><h3>File di Google Drive</h3><div class="more-list" style="margin-top:0">
+      ${ids.sheet ? `<a class="more-row" href="https://docs.google.com/spreadsheets/d/${ids.sheet}/edit" target="_blank" rel="noopener">${ico('sheet')}<span>Spreadsheet project001-Planner<small>tabel</small></span>${ico('arrow')}</a>` : ''}
+      ${ids.folder ? `<a class="more-row" href="https://drive.google.com/drive/folders/${ids.folder}" target="_blank" rel="noopener">${ico('folder')}<span>Folder project001-Planner<small>data.json + Coretan</small></span>${ico('arrow')}</a>` : ''}
+    </div><p class="hint">Data utama ada di data.json dan ikut ke semua perangkat yang masuk dengan akun ini. Spreadsheet diperbarui otomatis setiap sinkron. Mengedit langsung di Spreadsheet belum masuk kembali ke app.</p></section>`;
 }
 function openNote(id) {
   const n = S.notes.find(x => x.id === id); if (!n) return;
@@ -2001,10 +2181,16 @@ document.addEventListener('click', e => {
     toast('Cadangan diunduh: ' + name); return;
   }
   if (act === 'dimport') { $('#d-file').click(); return; }
+  if (act === 'gpanel') return openPanel('Akun Google', gHTML(), 'g');
+  if (act === 'gsignin') { gSignIn(); return; }
+  if (act === 'gsyncnow') { gSync(true); return; }
+  if (act === 'gout') { if (a.dataset.armed !== '1') { a.dataset.armed = '1'; a.textContent = 'Yakin keluar?'; setTimeout(() => { if (a.isConnected) { a.dataset.armed = ''; a.textContent = 'Keluar'; } }, 4000); return; } gSignOut(); return; }
   if (act === 'dwipe') {
     if (a.dataset.armed !== '1') { a.dataset.armed = '1'; a.textContent = 'Yakin? Tekan lagi'; setTimeout(() => { if (a.isConnected) { a.dataset.armed = ''; a.textContent = 'Hapus semua data'; } }, 4000); return; }
     try { localStorage.removeItem(DKEY); } catch (e) { /* abaikan */ }
-    S = emptyData(); chat.length = 0; QCI = null; closePanel(); render(); toast('Semua data di HP ini sudah dihapus'); return;
+    S = emptyData(); chat.length = 0; QCI = null; closePanel();
+    if (gOn()) { G.syncKey = null; G.lastSync = 0; gSave(); render(); toast('Data di HP ini dihapus. Data di Google Drive tetap aman dan dimuat ulang'); gSync(true); return; }
+    render(); toast('Semua data di HP ini sudah dihapus'); return;
   }
   if (act === 'qcopen') return openSheet('qc');
   if (act === 'more') return SHEET === 'more' ? closeSheet() : openSheet('more');
@@ -2032,7 +2218,7 @@ document.addEventListener('click', e => {
   }
   if (act === 'padclose') return padClose(false);
   if (act === 'padsave') return padSave();
-  if (act === 'paddel') { const sk = S.sketches.find(x => x.id === PAD.id); S.sketches = S.sketches.filter(x => x.id !== PAD.id); [...S.notes, ...S.todos].forEach(x => { if (x.sk) x.sk = x.sk.filter(v => v !== PAD.id); }); padClose(true); render(); toast(`Coretan dihapus${sk ? ': ' + sk.title : ''}`); return; }
+  if (act === 'paddel') { const sk = S.sketches.find(x => x.id === PAD.id); if (sk && sk.driveId) (S.driveTrash = S.driveTrash || []).push(sk.driveId); S.sketches = S.sketches.filter(x => x.id !== PAD.id); [...S.notes, ...S.todos].forEach(x => { if (x.sk) x.sk = x.sk.filter(v => v !== PAD.id); }); padClose(true); render(); toast(`Coretan dihapus${sk ? ': ' + sk.title : ''}`); return; }
   if (act === 'padtool') { PAD.tool = a.dataset.k; padTools(); return; }
   if (act === 'padcol') { PAD.color = a.dataset.k; PAD.tool = 'pen'; padTools(); return; }
   if (act === 'padsize') { PAD.size = PAD.size > 3 ? 3 : 7; padTools(); return; }
@@ -2168,7 +2354,14 @@ V = VIEWS.includes(h0) ? h0 : 'hari-ini';
 if (h0 !== location.hash.slice(1)) setHash(h0);
 if (VIEWS.includes(h0)) $('#stage').dataset.pane = 'web';
 applySet();
-if (APP) { $('.mock').hidden = true; $('.links').innerHTML = ico('folder', 'ic-s') + 'Data tersimpan di perangkat ini'; $('#by').textContent = 'Web app'; }
+if (APP) {
+  $('.mock').hidden = true; $('#by').textContent = 'Web app'; $('#gbtn').hidden = false;
+  gSet(G.email ? (navigator.onLine ? (gValid() ? 'ok' : 'expired') : 'offline') : 'off');
+  if (navigator.onLine) gLoad().catch(() => { /* dimuat lagi saat tombol masuk ditekan */ });
+  if (gOn() && gValid()) gSync(true);
+  addEventListener('online', () => { if (gOn()) gSync(true); });
+  addEventListener('offline', () => { if (gOn()) gSet('offline'); });
+}
 $('#d-file').addEventListener('change', e => {
   const file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return;
   file.text().then(t => { S = applyBlob(JSON.parse(t, revive)); syncRoutines(); closePanel(); render(); toast('Data dipulihkan dari ' + file.name); })
