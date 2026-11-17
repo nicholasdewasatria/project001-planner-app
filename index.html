@@ -1039,7 +1039,7 @@ const fmtN = v => v.toLocaleString('id-ID', { maximumFractionDigits: 2 });
 const numOf = s => { try { return calc(s); } catch (e) { return NaN; } };
 
 /* ---------- pembaca pesan bot ---------- */
-const CATS = { Makan: ['makan', 'kopi', 'nasi', 'soto', 'bakso', 'minum', 'sarapan', 'roti', 'jajan', 'traktir', 'gofood', 'mie'], Transport: ['bensin', 'grab', 'gojek', 'parkir', 'tol', 'ojek', 'krl', 'kereta', 'taksi'], Tagihan: ['listrik', 'pulsa', 'internet', 'wifi', 'pdam', 'bpjs', 'cicilan', 'tagihan'], Belanja: ['belanja', 'beli', 'indomaret', 'alfamart', 'shopee', 'tokopedia'], Hiburan: ['nonton', 'game', 'netflix', 'spotify', 'streaming', 'bioskop'] };
+const CATS = { Makan: ['makan', 'kopi', 'nasi', 'soto', 'bakso', 'minum', 'sarapan', 'roti', 'jajan', 'traktir', 'gofood', 'grabfood', 'shopeefood', 'mie', 'es krim', 'eskrim', 'es teh', 'teh', 'boba', 'snack', 'cemilan', 'camilan', 'martabak', 'ayam', 'burger', 'pizza', 'sate', 'gorengan', 'buah', 'susu', 'kue'], Transport: ['bensin', 'grab', 'gojek', 'parkir', 'tol', 'ojek', 'krl', 'kereta', 'taksi'], Tagihan: ['listrik', 'pulsa', 'internet', 'wifi', 'pdam', 'bpjs', 'cicilan', 'tagihan'], Belanja: ['belanja', 'beli', 'indomaret', 'alfamart', 'shopee', 'tokopedia'], Hiburan: ['nonton', 'game', 'netflix', 'spotify', 'streaming', 'bioskop'] };
 const INCOME = ['gaji', 'bonus', 'thr', 'freelance', 'dibayar', 'pemasukan'];
 function catOf(t) {
   const l = t.toLowerCase();
@@ -1109,9 +1109,9 @@ let typing = false;
 function reply(fn) { typing = true; renderChat(); setTimeout(() => { typing = false; fn(); }, 420); }
 
 const SUGG = [['makan 35rb nasi padang', 'keuangan'], ['/batas 150rb', 'keuangan'], ['/fokus konfigurasi PBX klien X', 'fokus'], ['catat port SIP klien X 5080 #pbx', 'catatan'], ['besok 9 pagi meeting klien X 1 jam', 'jadwal'], ['ingatkan follow up invoice', 'todo'], ['/streak', 'jadwal'], ['/mendatang', 'jadwal'], ['/cari vpn', 'catatan'], ['sisa budget makan?', 'keuangan'], ['=15jt/12', 'kalkulator'], ['/ringkasan'], ['/bantuan']];
-const QSUGG = [['makan 35rb nasi padang', 'keuangan'], ['besok 9 pagi meeting klien X 1 jam', 'jadwal'], ['ingatkan follow up invoice besok 10:00', 'todo'], ['catat port SIP klien X 5080 #pbx', 'catatan'], ['/fokus konfigurasi PBX klien X', 'fokus'], ['/mendatang', 'jadwal'], ['/cari vpn', 'catatan'], ['=15jt/12', 'kalkulator'], ['/batas 150rb', 'keuangan']];
+const QSUGG = [['beli es krim 10rb', 'keuangan'], ['reminder meeting besok jam 10', 'todo'], ['habit baru minum air jam 7 setiap hari', 'jadwal'], ['besok 9 pagi meeting klien X 1 jam', 'jadwal'], ['catat port SIP klien X 5080 #pbx', 'catatan'], ['/fokus konfigurasi PBX klien X', 'fokus'], ['/mendatang', 'jadwal'], ['/cari vpn', 'catatan'], ['=15jt/12', 'kalkulator'], ['/batas 150rb', 'keuangan']];
 const chips = list => list.filter(([, k]) => !k || on(k)).map(([s]) => `<button type="button" data-sugg="${esc(s)}">${esc(s)}</button>`).join('');
-const QMODE = { todo: [['kirim laporan jumat 15:00'], ['telepon vendor besok 10:00'], ['beli tinta printer'], ['perpanjang SIM bulan depan']], note: [['port SIP klien X 5080 #pbx'], ['ide konten tutorial sngrep #ide'], ['wifi tamu kantor: lantai 2 #kantor'], ['buku bagus: Atomic Habits #baca']] };
+const QMODE = { todo: [['kirim laporan jumat 15:00'], ['reminder meeting besok jam 10'], ['beli es krim 10rb'], ['habit baru baca buku jam 21']], note: [['port SIP klien X 5080 #pbx'], ['ide konten tutorial sngrep #ide'], ['wifi tamu kantor: lantai 2 #kantor'], ['buku bagus: Atomic Habits #baca']] };
 const renderSugg = () => { $('#sugg').innerHTML = chips(SUGG); $('#qc-sugg').innerHTML = chips(qcCtx() ? QMODE[qcCtx().replace('-today', '')] : QSUGG); };
 const isSm = () => matchMedia('(max-width: 560px)').matches;
 let SHEET = '', QCTX = null; /* lembar bawah yang terbuka; mode Tulis cepat di HP (todo/note) */
@@ -1169,8 +1169,15 @@ function handle(text, src = 'Telegram', force = null) {
   const l = t.toLowerCase();
   reply(() => {
     SRC = src;
-    if ((force === 'todo' || force === 'todo-today') && !/^[\/=]/.test(t)) return addTodo(t, parseWhen(t), force === 'todo-today');
-    if (force === 'note' && !/^[\/=]/.test(t)) return addNote(t.replace(/^catat:?\s*/i, ''));
+    const cmd = /^[\/=]/.test(t);
+    const habit = !cmd && t.match(/^\s*(?:tolong\s+)?(?:(?:buat|bikin|tambah)\w*\s+)?(?:habit|kebiasaan|rutinitas)(?:\s+baru)?\b\s*:?\s*(.*)$/i);
+    if (habit) return addHabit(habit[1]);
+    const isRem = !cmd && /\b(reminder|pengingat|ingatkan|ingetin|remind)\b/i.test(t);
+    const money = !cmd && !/^catat\b/i.test(t) && parseAmt(t);
+    if (money && !money.bare && !isRem) return addTx(t, money);
+    if (isRem) return addTodo(t, parseWhen(t), force === 'todo-today', true);
+    if ((force === 'todo' || force === 'todo-today') && !cmd) return addTodo(t, parseWhen(t), force === 'todo-today');
+    if (force === 'note' && !cmd) return addNote(t.replace(/^catat:?\s*/i, ''));
     if (/^\/(start|bantuan|help)/.test(l)) return help();
     if (/^\/ringkasan/.test(l)) return summary();
     if (/^\/?batas\b/.test(l)) return limitReply(t);
@@ -1193,9 +1200,11 @@ function handle(text, src = 'Telegram', force = null) {
 function help() {
   botSay(`Kirim apa saja, saya pilah sendiri:<ul>
 <li>Catatan: tulis biasa, tambah <code>#tag</code></li>
-<li>To-do: <code>ingatkan follow up invoice</code></li>
+<li>To-do: <code>kirim laporan jumat 15:00</code></li>
+<li>Pengingat: <code>reminder meeting besok jam 10</code></li>
+<li>Habit baru: <code>habit baru minum air jam 7 setiap hari</code></li>
 <li>Jadwal: <code>besok 9 pagi meeting 1 jam</code></li>
-<li>Uang: <code>makan 35rb nasi padang</code></li>
+<li>Uang: <code>beli es krim 10rb</code></li>
 <li>Batas harian: <code>/batas 150rb</code></li>
 <li>Streak rutinitas: <code>/streak</code></li>
 <li>Yang akan datang: <code>/mendatang</code></li>
@@ -1203,19 +1212,47 @@ function help() {
 <li>Cari: <code>/cari vpn</code></li>
 <li>Hitung: <code>=15jt/12</code></li></ul>Perintah lain: <code>/ringkasan</code>, <code>/budget</code>.`);
 }
+function addHabit(raw) {
+  const rest = String(raw || '').trim();
+  if (!rest) { botSay('Habit apa yang mau dibangun? Contoh: <code>habit baru minum air jam 7 setiap hari</code> atau <code>habit baru olahraga jam 6 senin-jumat</code>.', [[{ t: 'Kelola rutinitas', a: 'rut' }]]); return; }
+  const low = ' ' + rest.toLowerCase() + ' ';
+  let days = [0, 1, 2, 3, 4, 5, 6];
+  if (/\b(senin\s*-\s*jumat|senin sampai jumat|hari kerja|weekdays?)\b/.test(low)) days = [1, 2, 3, 4, 5];
+  else if (/\b(akhir pekan|weekend|sabtu\s*(dan|&|-)\s*minggu)\b/.test(low)) days = [0, 6];
+  else if (!/\b(setiap|tiap)\s+hari\b/.test(low)) {
+    const map = [['minggu', 0], ['senin', 1], ['selasa', 2], ['rabu', 3], ['kamis', 4], ['jumat', 5], ['sabtu', 6]];
+    const found = map.filter(([k]) => new RegExp('\\b' + k + '\\b').test(low)).map(([, v]) => v);
+    if (found.length) days = [...new Set(found)].sort();
+  }
+  const w = parseWhen(' ' + rest + ' ');
+  const start = w && w.hasTime ? pad(w.date.getHours()) + ':' + pad(w.date.getMinutes()) : '06:00';
+  const dur = w && /\d+(?:[.,]5)?\s*(menit|jam)\b/.test(low) ? w.dur : 30;
+  const DAYW = /\b(setiap|tiap)\s+hari\b|\bsenin\s*-\s*jumat\b|\bsenin sampai jumat\b|\bhari kerja\b|\bweekdays?\b|\bakhir pekan\b|\bweekend\b|\b(minggu|senin|selasa|rabu|kamis|jumat|sabtu)\b|\b(setiap|tiap)\b|\d+(?:[.,]5)?\s*menit\b/gi;
+  const name = cap(cleanCmd((w ? w.title : rest).replace(DAYW, ' ').replace(/[,&-]+/g, ' ').replace(/\s+/g, ' ').trim())) || 'Habit baru';
+  if (S.routines.some(r => r.name.toLowerCase() === name.toLowerCase())) { botSay(`Habit <b>${esc(name)}</b> sudah ada.`, [[{ t: 'Kelola rutinitas', a: 'rut' }]]); return; }
+  const r = { id: nid(), name, start, dur, days };
+  S.routines.push(r); syncRoutines(); refresh();
+  botSay(`Habit baru: <b>${esc(name)}</b><br>${start}, ${daysLabel(days)}. Centang tiap hari supaya streak jalan.${hiddenNote('jadwal', 'Jadwal')}`, [[{ t: 'Kelola rutinitas', a: 'rut' }, { t: 'Batalkan', a: 'delhabit:' + r.id }]]);
+  toast('Habit baru ditambahkan');
+}
 function addNote(text) {
   const n = { id: nid(), text: text.replace(/\s+/g, ' ').trim(), tags: tagsOf(text), src: SRC, at: new Date() };
   S.notes.unshift(n); refresh();
   botSay(`Tersimpan di Catatan${n.tags.length ? ' dengan tag ' + n.tags.map(x => `<span class="hash">#${esc(x)}</span>`).join(' ') : ''}.${hiddenNote('catatan', 'Catatan')}`, [[{ t: 'Jadikan to-do', a: 'note2todo:' + n.id }, { t: 'Batalkan', a: 'delnote:' + n.id }]]);
   toast('Catatan baru masuk ke tab Catatan');
 }
-function addTodo(text, w, today) {
-  let title = w ? w.title : text;
-  title = cap(title.replace(/^(ingatkan|ingetin|todo|to-do|tugas)\s*/i, '').replace(/^untuk\s+/i, '').trim() || text);
+const CMD_HEAD = /^(tolong|buat(?:lah|kan)?|bikin(?:in|kan)?|tambah(?:kan)?|reminder|pengingat|ingatkan|ingetin|remind(?:\s+me)?|aku|saya|untuk|utk|buat|todo|to-do|tugas|baru)\s+/i;
+function cleanCmd(x) { let v = String(x).trim(), g = 0; while (CMD_HEAD.test(v + ' ') && g++ < 8) v = (v + ' ').replace(CMD_HEAD, '').trim(); return v; }
+function addTodo(text, w, today, rem) {
+  const title = cap(cleanCmd(w ? w.title : text) || cleanCmd(text) || text);
   const due = w ? w.date : today ? at(0, 23, 59) : null;
-  const td = { id: nid(), text: title, due, done: false, src: SRC, ...(!w && today ? { allDay: true } : {}) };
+  const td = { id: nid(), text: title, due, done: false, src: SRC, ...(!w && today ? { allDay: true } : {}), ...(rem ? { rem: true } : {}) };
   S.todos.push(td); refresh();
-  botSay(`To-do baru: <b>${esc(title)}</b>${due ? `<br>Tenggat: ${when(due)}${tgOn() ? '' : '<br><span class="muted">Pengingat muncul lewat notifikasi Google Calendar di HP.</span>'}` : '<br>Tanpa tenggat.'}${hiddenNote('todo', 'To-do')}`, [[{ t: 'Ingatkan besok 09:00', a: 'todoTomorrow:' + td.id }, { t: 'Batalkan', a: 'deltodo:' + td.id }]]);
+  if (rem) {
+    botSay(due ? `Pengingat dibuat: <b>${esc(title)}</b><br>${td.allDay ? dayLabel(due) : when(due)} · notifikasi lewat ${tgOn() ? 'Telegram dan ' : ''}Google Calendar.${hiddenNote('todo', 'To-do')}` : `Pengingat dibuat: <b>${esc(title)}</b><br>Belum ada waktu. Kapan diingatkan?`, due ? [[{ t: 'Batalkan', a: 'deltodo:' + td.id }]] : [[{ t: 'Besok 09:00', a: 'todoTomorrow:' + td.id }, { t: 'Batalkan', a: 'deltodo:' + td.id }]]);
+    toast('Pengingat dibuat'); return;
+  }
+  botSay(`To-do baru: <b>${esc(title)}</b>${due ? (td.allDay ? `<br>${dayLabel(due)}` : `<br>Tenggat: ${when(due)}${tgOn() ? '' : '<br><span class="muted">Pengingat muncul lewat notifikasi Google Calendar di HP.</span>'}`) : '<br>Tanpa tenggat.'}${hiddenNote('todo', 'To-do')}`, [[{ t: 'Ingatkan besok 09:00', a: 'todoTomorrow:' + td.id }, { t: 'Batalkan', a: 'deltodo:' + td.id }]]);
   toast('To-do baru masuk ke Hari ini');
 }
 function addEvent(w) {
@@ -1293,6 +1330,8 @@ function botAct(a, i) {
   const id = +v;
   const say = (h, kb) => reply(() => botSay(h, kb));
   if (k === 'go') { go(v); renderChat(); return; }
+  if (k === 'rut') { renderChat(); RED = null; openPanel('Rutinitas', rutHTML(), 'rut'); return; }
+  if (k === 'delhabit') { const r = S.routines.find(x => x.id === id); if (r) { S.routines = S.routines.filter(x => x !== r); syncRoutines(); refresh(); } return say('Habit dibatalkan.'); }
   if (k === 'search') { NQ = v; go('catatan'); renderChat(); return; }
   if (k === 'todo') { go('hari-ini'); renderChat(); return; }
   if (k === 'focusAsk') { renderChat(); return say('Mau fokus ke apa? Ketik misalnya <code>/fokus konfigurasi PBX klien X</code>.'); }
@@ -1621,7 +1660,8 @@ function padSave() {
     fr.readAsDataURL(file);
   });
 })();
-const tdMeta = t => t.done ? 'Selesai' + (t.doneAt ? ' ' + (isToday(t.doneAt) ? hm(t.doneAt) : when(t.doneAt).toLowerCase()) : '') : !t.due ? 'Tanpa tenggat' : t.allDay ? (isToday(t.due) ? 'Hari ini' : dayLabel(t.due)) : isToday(t.due) ? hm(t.due) : when(t.due);
+const tdMeta = t => (t.rem && !t.done ? 'Pengingat · ' : '') + tdMeta0(t);
+const tdMeta0 = t => t.done ? 'Selesai' + (t.doneAt ? ' ' + (isToday(t.doneAt) ? hm(t.doneAt) : when(t.doneAt).toLowerCase()) : '') : !t.due ? 'Tanpa tenggat' : t.allDay ? (isToday(t.due) ? 'Hari ini' : dayLabel(t.due)) : isToday(t.due) ? hm(t.due) : when(t.due);
 function taskTodo(t) {
   const late = !t.done && t.due && t.due < new Date();
   return `<li class="task${t.done ? ' done' : ''}${late ? ' late' : ''}"><button class="ck ${t.done ? 'on' : ''}" data-act="toggle" data-id="${t.id}" aria-label="${t.done ? 'Batal selesai' : 'Tandai selesai'}: ${esc(t.text)}">${ico('check')}</button><button class="tbtn" type="button" data-act="tdopen" data-id="${t.id}"><span class="tt">${esc(t.text)}</span><span class="tm2">${tdMeta(t)}${attCount(t)}</span></button>${late ? `<button class="tact" type="button" data-act="snooze" data-id="${t.id}">Besok</button>` : '<span></span>'}</li>`;
