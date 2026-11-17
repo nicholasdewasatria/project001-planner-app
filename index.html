@@ -5,7 +5,7 @@
 <title>project001-Planner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Planner harian: jadwal, to-do, catatan, coretan, fokus, dan keuangan.">
-<meta name="theme-color" content="#0E0E10" data-def="#0E0E10" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0B0B0D" data-def="#0B0B0D" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#F2F2EF" data-def="#F2F2EF" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
@@ -28,15 +28,15 @@
 /* Folder Noir: gelap (bawaan) + terang. Tema: Otomatis ikut sistem, atau dipaksa lewat <html data-theme="dark|light">. */
 :root {
   color-scheme: dark;
-  --c-bg: #0E0E10; --c-chat: #121215; --c-surface: #18181C; --c-surface-2: #24242A; --c-line: #2B2B32;
+  --c-bg: #0B0B0D; --c-chat: #111114; --c-surface: #1F1F24; --c-surface-2: #2C2C33; --c-line: #3A3A42;
   --c-ink: #FFFFFF; --c-ink-2: #B5B5BD; --c-blue: #1B60CB; --c-blue-hi: #4A88E8; --c-yellow: #FFBD00;
-  --c-hab: #D95926; --c-fok: #A0A0AB; --c-card-noir: #1D1D23; --c-pill-on: #3A3A44; --c-ink-3: #84848D;
+  --c-hab: #D95926; --c-fok: #A0A0AB; --c-card-noir: #26262D; --c-pill-on: #44444F; --c-ink-3: #8A8A94; --c-noir-edge: rgb(255 255 255 / 0.10);
   --c-on-yellow: #020202; --c-on-yellow-2: rgb(2 2 2 / 0.74); --c-on-yellow-line: rgb(2 2 2 / 0.16); --c-on-yellow-fill: rgb(2 2 2 / 0.07);
   --c-on-blue-2: rgb(255 255 255 / 0.82); --c-on-blue-line: rgb(255 255 255 / 0.28);
   --c-fill: rgb(255 255 255 / 0.05); --c-fill-2: rgb(255 255 255 / 0.09); --c-outline: rgb(255 255 255 / 0.46);
   --c-hatch: rgb(255 255 255 / 0.12); --c-clear: rgb(0 0 0 / 0); --c-blue-wash: rgb(27 96 203 / 0.18); --c-yellow-wash: rgb(255 189 0 / 0.11);
   --c-solid: #141418; --c-edge: rgb(255 255 255 / 0.14); --c-scrim: rgb(2 2 2 / 0.6); --c-shadow: rgb(0 0 0 / 0.55);
-  --c-on-blue: #FFFFFF; --c-noir: #020202; --c-warn: #FFBD00; --c-green: #2FBF71; --c-nav: rgb(24 24 28 / 0.96);
+  --c-on-blue: #FFFFFF; --c-noir: #020202; --c-warn: #FFBD00; --c-green: #2FBF71; --c-nav: rgb(31 31 36 / 0.96);
   --hatch: repeating-linear-gradient(135deg, var(--c-hatch) 0 1px, var(--c-clear) 1px 7px);
   --mask-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 12h12.5M13 7l5 5-5 5'/%3E%3C/svg%3E");
   --mask-solid: linear-gradient(#000 0 0);
@@ -52,7 +52,7 @@
     color-scheme: light;
     --c-bg: #F2F2EF; --c-chat: #EAEAE6; --c-surface: #FFFFFF; --c-surface-2: #EEEEEA; --c-line: #DCDCD5;
     --c-ink: #0B0B0D; --c-ink-2: #5A5A61; --c-blue-hi: #1B56B8; --c-warn: #8A5F00; --c-green: #1A9E5C;
-    --c-hab: #EB6834; --c-fok: #0B0B0D; --c-card-noir: #0B0B0D; --c-pill-on: #0B0B0D; --c-ink-3: #8E8E95;
+    --c-hab: #EB6834; --c-fok: #0B0B0D; --c-card-noir: #0B0B0D; --c-pill-on: #0B0B0D; --c-ink-3: #8E8E95; --c-noir-edge: transparent;
     --c-fill: rgb(0 0 0 / 0.04); --c-fill-2: rgb(0 0 0 / 0.07); --c-outline: rgb(0 0 0 / 0.40);
     --c-hatch: rgb(0 0 0 / 0.11); --c-blue-wash: rgb(27 96 203 / 0.13); --c-yellow-wash: rgb(255 189 0 / 0.2);
     --c-solid: #FFFFFF; --c-edge: rgb(0 0 0 / 0.10); --c-scrim: rgb(20 20 24 / 0.32); --c-shadow: rgb(20 20 30 / 0.16); --c-nav: rgb(255 255 255 / 0.96);
@@ -62,7 +62,7 @@
     color-scheme: light;
     --c-bg: #F2F2EF; --c-chat: #EAEAE6; --c-surface: #FFFFFF; --c-surface-2: #EEEEEA; --c-line: #DCDCD5;
     --c-ink: #0B0B0D; --c-ink-2: #5A5A61; --c-blue-hi: #1B56B8; --c-warn: #8A5F00; --c-green: #1A9E5C;
-    --c-hab: #EB6834; --c-fok: #0B0B0D; --c-card-noir: #0B0B0D; --c-pill-on: #0B0B0D; --c-ink-3: #8E8E95;
+    --c-hab: #EB6834; --c-fok: #0B0B0D; --c-card-noir: #0B0B0D; --c-pill-on: #0B0B0D; --c-ink-3: #8E8E95; --c-noir-edge: transparent;
     --c-fill: rgb(0 0 0 / 0.04); --c-fill-2: rgb(0 0 0 / 0.07); --c-outline: rgb(0 0 0 / 0.40);
     --c-hatch: rgb(0 0 0 / 0.11); --c-blue-wash: rgb(27 96 203 / 0.13); --c-yellow-wash: rgb(255 189 0 / 0.2);
     --c-solid: #FFFFFF; --c-edge: rgb(0 0 0 / 0.10); --c-scrim: rgb(20 20 24 / 0.32); --c-shadow: rgb(20 20 30 / 0.16); --c-nav: rgb(255 255 255 / 0.96);
@@ -111,7 +111,7 @@ button { cursor: pointer; }
 .seg { display: inline-flex; flex-wrap: wrap; gap: var(--s-2xs); padding: var(--s-2xs); border-radius: var(--r-pill); box-shadow: inset 0 0 0 1px var(--c-line); max-width: 100%; }
 .seg button { min-height: 2.25rem; padding: 0 var(--s-md); border: 0; border-radius: var(--r-pill); background: var(--c-clear); font-size: var(--t-sm); font-weight: 500; color: var(--c-ink-2); white-space: nowrap; transition: background-color var(--fast) var(--ease), color var(--fast) var(--ease); }
 .seg button:hover { color: var(--c-ink); background: var(--c-fill-2); }
-.seg button[aria-pressed="true"] { background: var(--c-ink); color: var(--c-bg); }
+.seg button[aria-pressed="true"] { background: var(--c-pill-on); color: #fff; }
 .f-blue .seg { box-shadow: inset 0 0 0 1px var(--c-on-blue-line); }
 .f-blue .seg button { color: var(--c-on-blue-2); }
 .f-blue .seg button[aria-pressed="true"] { background: var(--c-on-blue); color: var(--c-noir); }
@@ -811,7 +811,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .hm-wk button[aria-current="date"] { background: var(--c-pill-on); box-shadow: none; color: rgb(255 255 255 / 0.66); }
 .hm-wk button[aria-current="date"] b { color: #fff; }
 .hm-wk button:focus-visible { outline: 2px solid var(--c-blue-hi); }
-.hm-prog { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; margin-top: var(--s-sm); padding: 14px 16px; border-radius: 20px; background: var(--c-card-noir); color: #fff; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; --c-fok-r: #FFFFFF; }
+.hm-prog { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; margin-top: var(--s-sm); padding: 14px 16px; border-radius: 20px; background: var(--c-card-noir); box-shadow: inset 0 0 0 1px var(--c-noir-edge); color: #fff; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; --c-fok-r: #FFFFFF; }
 :root:not([data-theme="light"]) .hm-prog { --c-fok-r: var(--c-fok); }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .hm-prog { --c-fok-r: #FFFFFF; } }
 :root[data-theme="light"] .hm-prog { --c-fok-r: #FFFFFF; }
