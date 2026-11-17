@@ -5,7 +5,7 @@
 <title>project001-Planner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Planner harian: jadwal, to-do, catatan, coretan, fokus, dan keuangan.">
-<meta name="theme-color" content="#020202" data-def="#020202" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0E0E10" data-def="#0E0E10" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#F2F2EF" data-def="#F2F2EF" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
@@ -20,22 +20,27 @@
 <body>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 300; font-display: swap; src: url(fonts/inter-latin-300.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/inter-latin-400.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/inter-latin-500.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/inter-latin-600.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/inter-latin-700.woff2) format("woff2"); }
 /* Folder Noir: gelap (bawaan) + terang. Tema: Otomatis ikut sistem, atau dipaksa lewat <html data-theme="dark|light">. */
 :root {
   color-scheme: dark;
-  --c-bg: #020202; --c-chat: #070708; --c-surface: #0E0E10; --c-surface-2: #17171A; --c-line: #26262B;
-  --c-ink: #FFFFFF; --c-ink-2: #B5B5BD; --c-blue: #1B60CB; --c-blue-hi: #7CA6EC; --c-yellow: #FFBD00;
+  --c-bg: #0E0E10; --c-chat: #121215; --c-surface: #18181C; --c-surface-2: #24242A; --c-line: #2B2B32;
+  --c-ink: #FFFFFF; --c-ink-2: #B5B5BD; --c-blue: #1B60CB; --c-blue-hi: #4A88E8; --c-yellow: #FFBD00;
+  --c-hab: #D95926; --c-fok: #A0A0AB; --c-card-noir: #1D1D23; --c-pill-on: #3A3A44; --c-ink-3: #84848D;
   --c-on-yellow: #020202; --c-on-yellow-2: rgb(2 2 2 / 0.74); --c-on-yellow-line: rgb(2 2 2 / 0.16); --c-on-yellow-fill: rgb(2 2 2 / 0.07);
   --c-on-blue-2: rgb(255 255 255 / 0.82); --c-on-blue-line: rgb(255 255 255 / 0.28);
   --c-fill: rgb(255 255 255 / 0.05); --c-fill-2: rgb(255 255 255 / 0.09); --c-outline: rgb(255 255 255 / 0.46);
   --c-hatch: rgb(255 255 255 / 0.12); --c-clear: rgb(0 0 0 / 0); --c-blue-wash: rgb(27 96 203 / 0.18); --c-yellow-wash: rgb(255 189 0 / 0.11);
   --c-solid: #141418; --c-edge: rgb(255 255 255 / 0.14); --c-scrim: rgb(2 2 2 / 0.6); --c-shadow: rgb(0 0 0 / 0.55);
-  --c-on-blue: #FFFFFF; --c-noir: #020202; --c-warn: #FFBD00; --c-green: #2FBF71; --c-nav: rgb(18 18 22 / 0.96);
+  --c-on-blue: #FFFFFF; --c-noir: #020202; --c-warn: #FFBD00; --c-green: #2FBF71; --c-nav: rgb(24 24 28 / 0.96);
   --hatch: repeating-linear-gradient(135deg, var(--c-hatch) 0 1px, var(--c-clear) 1px 7px);
   --mask-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 12h12.5M13 7l5 5-5 5'/%3E%3C/svg%3E");
   --mask-solid: linear-gradient(#000 0 0);
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", system-ui, sans-serif;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
   --r-folder: 20px; --r-tab: 16px; --r-inner: 12px; --r-pill: 999px;
   --s-2xs: 4px; --s-xs: 8px; --s-sm: 12px; --s-md: 16px; --s-lg: 24px; --s-xl: 40px;
   --t-2xs: 0.75rem; --t-xs: 0.8125rem; --t-sm: 0.9375rem; --t-md: 1.0625rem; --t-lg: 1.25rem;
@@ -47,6 +52,7 @@
     color-scheme: light;
     --c-bg: #F2F2EF; --c-chat: #EAEAE6; --c-surface: #FFFFFF; --c-surface-2: #EEEEEA; --c-line: #DCDCD5;
     --c-ink: #0B0B0D; --c-ink-2: #5A5A61; --c-blue-hi: #1B56B8; --c-warn: #8A5F00; --c-green: #1A9E5C;
+    --c-hab: #EB6834; --c-fok: #0B0B0D; --c-card-noir: #0B0B0D; --c-pill-on: #0B0B0D; --c-ink-3: #8E8E95;
     --c-fill: rgb(0 0 0 / 0.04); --c-fill-2: rgb(0 0 0 / 0.07); --c-outline: rgb(0 0 0 / 0.40);
     --c-hatch: rgb(0 0 0 / 0.11); --c-blue-wash: rgb(27 96 203 / 0.13); --c-yellow-wash: rgb(255 189 0 / 0.2);
     --c-solid: #FFFFFF; --c-edge: rgb(0 0 0 / 0.10); --c-scrim: rgb(20 20 24 / 0.32); --c-shadow: rgb(20 20 30 / 0.16); --c-nav: rgb(255 255 255 / 0.96);
@@ -56,6 +62,7 @@
     color-scheme: light;
     --c-bg: #F2F2EF; --c-chat: #EAEAE6; --c-surface: #FFFFFF; --c-surface-2: #EEEEEA; --c-line: #DCDCD5;
     --c-ink: #0B0B0D; --c-ink-2: #5A5A61; --c-blue-hi: #1B56B8; --c-warn: #8A5F00; --c-green: #1A9E5C;
+    --c-hab: #EB6834; --c-fok: #0B0B0D; --c-card-noir: #0B0B0D; --c-pill-on: #0B0B0D; --c-ink-3: #8E8E95;
     --c-fill: rgb(0 0 0 / 0.04); --c-fill-2: rgb(0 0 0 / 0.07); --c-outline: rgb(0 0 0 / 0.40);
     --c-hatch: rgb(0 0 0 / 0.11); --c-blue-wash: rgb(27 96 203 / 0.13); --c-yellow-wash: rgb(255 189 0 / 0.2);
     --c-solid: #FFFFFF; --c-edge: rgb(0 0 0 / 0.10); --c-scrim: rgb(20 20 24 / 0.32); --c-shadow: rgb(20 20 30 / 0.16); --c-nav: rgb(255 255 255 / 0.96);
@@ -437,7 +444,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .nav ul { pointer-events: auto; list-style: none; margin: 0; padding: var(--s-2xs); display: flex; gap: 2px; border-radius: var(--r-pill); background: var(--c-nav); box-shadow: inset 0 0 0 1px var(--c-edge), 0 24px 48px -20px var(--c-shadow); max-width: 100%; }
 .nav a { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 5.25rem; padding: var(--s-xs) var(--s-sm); border-radius: var(--r-pill); color: var(--c-ink-2); text-decoration: none; font-size: var(--t-2xs); font-weight: 500; line-height: 1.2; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .nav a:hover { color: var(--c-ink); background: var(--c-fill-2); }
-.nav a[aria-current="page"] { color: var(--c-on-blue); background: var(--c-blue); }
+.nav a[aria-current="page"] { color: #fff; background: var(--c-pill-on); }
 
 /* panel + toast */
 .scrim { position: fixed; inset: 0; z-index: 40; background: var(--c-scrim); opacity: 0; visibility: hidden; transition: opacity var(--slow) var(--ease), visibility 0s linear var(--slow); }
@@ -607,8 +614,10 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
   .mnav-in { pointer-events: auto; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; gap: 2px; padding: var(--s-2xs); border-radius: var(--r-pill); background: var(--c-nav); box-shadow: inset 0 0 0 1px var(--c-edge), 0 24px 48px -20px var(--c-shadow); }
   .mnav-in > a, .mnav-in > button:not(.fab) { all: unset; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; padding: var(--s-xs) 2px; border-radius: var(--r-pill); color: var(--c-ink-2); font-size: var(--t-2xs); font-weight: 500; line-height: 1.2; text-align: center; cursor: pointer; }
   .mnav-in > a span, .mnav-in > button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .mnav-in > a[aria-current="page"], .mnav-in > button.cur { color: var(--c-ink); background: var(--c-surface-2); }
-  .mnav-in > a[aria-current="page"] .ic, .mnav-in > button.cur .ic { color: var(--c-blue-hi); }
+  .mnav-in > a[aria-current="page"], .mnav-in > button.cur { color: #fff; background: var(--c-pill-on); }
+  .mnav-in > a .ic, .mnav-in > button:not(.fab) .ic { display: none; }
+  .mnav-in > a, .mnav-in > button:not(.fab) { font-size: var(--t-xs) !important; padding: 11px 2px !important; }
+
   .mnav-in > a:focus-visible, .mnav-in > button:focus-visible { outline: 2px solid var(--c-blue-hi); }
   .fab { justify-self: center; display: grid; place-items: center; width: 3.25rem; height: 3.25rem; border: 0; border-radius: 50%; background: var(--c-blue); color: var(--c-on-blue); }
   .fab .ic { width: 24px; height: 24px; stroke-width: 2.2; }
@@ -789,6 +798,66 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .evp-hero .days7 span { width: 1.6rem; height: 1.6rem; font-size: 9px; }
 .evp-stat { font-size: var(--t-xs); color: var(--c-ink-2); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+/* ---------- v2.0 Beranda tenang (palet dasar: tinta + biru, oranye habit, hijau uang, kuning jatuh tempo) ---------- */
+.hm { max-width: 34rem; margin: 0 auto; }
+.hm-hello { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-sm); color: var(--c-ink-2); font-size: var(--t-xs); margin-top: var(--s-2xs); }
+.hm-hello b { color: var(--c-ink); font-weight: 500; }
+.hm-wk { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: var(--s-sm); }
+.hm-wk button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; justify-items: center; gap: 2px; padding: 8px 0 7px; border-radius: 14px; background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-line); font-size: 0.6875rem; font-weight: 500; color: var(--c-ink-3); }
+.hm-wk button b { font-size: 0.9375rem; font-weight: 500; color: var(--c-ink); font-variant-numeric: tabular-nums; }
+.hm-wk button i { width: 4px; height: 4px; border-radius: 50%; background: var(--c-blue); }
+.hm-wk button i.n { background: transparent; }
+.hm-wk button[aria-current="date"] { background: var(--c-pill-on); box-shadow: none; color: rgb(255 255 255 / 0.66); }
+.hm-wk button[aria-current="date"] b { color: #fff; }
+.hm-wk button:focus-visible { outline: 2px solid var(--c-blue-hi); }
+.hm-prog { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; margin-top: var(--s-sm); padding: 14px 16px; border-radius: 20px; background: var(--c-card-noir); color: #fff; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; --c-fok-r: #FFFFFF; }
+:root:not([data-theme="light"]) .hm-prog { --c-fok-r: var(--c-fok); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .hm-prog { --c-fok-r: #FFFFFF; } }
+:root[data-theme="light"] .hm-prog { --c-fok-r: #FFFFFF; }
+.hm-prog .rw { display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; gap: 9px; align-items: center; font-size: var(--t-xs); padding: 3px 0; }
+.hm-prog .rw i { width: 9px; height: 9px; border-radius: 3px; }
+.hm-prog .rw span { color: rgb(255 255 255 / 0.66); }
+.hm-prog .rw b { font-weight: 500; font-variant-numeric: tabular-nums; }
+.hm-prog .ft { font-size: var(--t-2xs); color: rgb(255 255 255 / 0.62); border-top: 1px solid rgb(255 255 255 / 0.14); padding-top: 7px; margin-top: 4px; }
+.hm-prog:focus-visible { outline: 2px solid var(--c-blue-hi); outline-offset: 2px; }
+.hm-card { margin-top: var(--s-sm); padding: 14px 16px; border-radius: 20px; background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-line); }
+.hm-next { display: grid; gap: 4px; cursor: pointer; }
+.hm-next .k { font-size: var(--t-2xs); font-weight: 600; color: var(--c-blue-hi); }
+.hm-next .t { font-size: var(--t-md); font-weight: 500; letter-spacing: -0.01em; }
+.hm-next .r2 { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.hm-chip { padding: 3px 10px; border-radius: var(--r-pill); font-size: var(--t-2xs); font-weight: 500; background: var(--c-surface-2); color: var(--c-ink-2); }
+.hm-go { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px 7px 11px; border: 0; border-radius: var(--r-pill); background: var(--c-blue); color: #fff; font-weight: 600; font-size: var(--t-xs); }
+.hm-go .ic { width: 12px; height: 12px; }
+.hm-f { display: flex; gap: 6px; margin-top: var(--s-md); overflow-x: auto; scrollbar-width: none; }
+.hm-f button { flex: none; padding: 7px 12px; border: 0; border-radius: var(--r-pill); background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-line); font-size: var(--t-xs); color: var(--c-ink-2); }
+.hm-f button b { color: var(--c-ink); font-weight: 600; margin-right: 3px; font-variant-numeric: tabular-nums; }
+.hm-f button[aria-pressed="true"] { background: var(--c-pill-on); color: rgb(255 255 255 / 0.66); box-shadow: none; }
+.hm-f button[aria-pressed="true"] b { color: #fff; }
+.hm-t { list-style: none; margin: var(--s-xs) 0 0; padding: 0; display: grid; gap: 8px; }
+.hm-t li { padding: 10px 10px 10px 14px; border-radius: 18px; background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-line); display: grid; grid-template-columns: auto minmax(0, 1fr) 32px; gap: 12px; align-items: center; }
+.hm-t .tbtn { all: unset; cursor: pointer; display: grid; gap: 1px; min-width: 0; }
+.hm-t .tt { font-size: var(--t-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-t .tm2 { font-size: var(--t-2xs); color: var(--c-ink-3); }
+.hm-t .late .tm2, .hm-t li.late .tm2 { color: var(--c-warn); }
+.hm-t li.done .tt { color: var(--c-ink-3); text-decoration: line-through; }
+.hm-t .arr { width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--c-surface-2); display: grid; place-items: center; color: var(--c-ink-2); }
+.hm-t .arr .ic { width: 14px; height: 14px; }
+.hm-mini { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: var(--s-sm); }
+.hm-mini > button { all: unset; box-sizing: border-box; cursor: pointer; padding: 13px 14px; border-radius: 18px; background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-line); display: grid; gap: 3px; min-width: 0; }
+.hm-mini .k { font-size: var(--t-2xs); color: var(--c-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hm-mini .v { font-size: 1.3125rem; font-weight: 500; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; }
+.hm-mini .v small { font-size: var(--t-xs); font-weight: 400; color: var(--c-ink-2); letter-spacing: 0; margin-left: 3px; }
+.hm-mini .v.g { color: var(--c-green); }
+.hm-mini .v.w { color: var(--c-warn); }
+.hm-bar { height: 5px; border-radius: 3px; background: var(--c-surface-2); overflow: hidden; margin-top: 6px; }
+.hm-bar i { display: block; height: 100%; border-radius: 3px; background: var(--c-green); }
+.hm-sq { display: flex; gap: 4px; margin-top: 6px; }
+.hm-sq i { width: 14px; height: 14px; border-radius: 4px; background: var(--c-surface-2); }
+.hm-sq i.ok { background: var(--c-hab); }
+.hm-sq i.td { background: none; box-shadow: inset 0 0 0 1.5px var(--c-hab); }
+.hm-empty { padding: 16px; text-align: center; color: var(--c-ink-2); font-size: var(--t-xs); }
+.tdv { margin-bottom: var(--s-md); }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -882,7 +951,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
       <div id="view"></div>
       <nav class="nav" aria-label="Menu">
         <ul>
-          <li><a href="#hari-ini" data-v="hari-ini"><svg class="ic"><use href="#i-sun"/></svg>Hari ini</a></li>
+          <li><a href="#hari-ini" data-v="hari-ini"><svg class="ic"><use href="#i-sun"/></svg>Home</a></li>
           <li><a href="#kalender" data-v="kalender"><svg class="ic"><use href="#i-month"/></svg>Kalender</a></li>
           <li><a href="#todo" data-v="todo"><svg class="ic"><use href="#i-check"/></svg>To-do</a></li>
           <li><a href="#catatan" data-v="catatan"><svg class="ic"><use href="#i-note"/></svg>Catatan</a></li>
@@ -1258,7 +1327,7 @@ function closeSheet() {
   SHEET = ''; QCTX = null; delete document.documentElement.dataset.sheet; $('#sscrim').classList.remove('open'); $('#more').hidden = true; setQcPh(); renderMNav();
   const b = document.querySelector(was === 'qc' ? '#mnav .fab' : '#mnav [data-act="more"]'); if (b && isSm()) b.focus();
 }
-const MV = { 'hari-ini': ['Hari ini', 'sun'], todo: ['To-do', 'check'], keuangan: ['Keuangan', 'wallet'], kalender: ['Kalender', 'month'], catatan: ['Catatan', 'note'], fokus: ['Fokus', 'timer'], statistik: ['Statistik', 'chart'] };
+const MV = { 'hari-ini': ['Home', 'sun'], todo: ['To-do', 'check'], keuangan: ['Uang', 'wallet'], kalender: ['Kalender', 'month'], catatan: ['Catatan', 'note'], fokus: ['Fokus', 'timer'], statistik: ['Statistik', 'chart'] };
 function mnavSplit() { const p = ['hari-ini', 'todo', 'keuangan', 'kalender', 'catatan', 'fokus', 'statistik'].filter(v => v === 'hari-ini' || on(v)); return { main: p.slice(0, 3), rest: p.slice(3) }; }
 function renderMNav() {
   const el = $('#mnav'); if (!el) return;
@@ -1568,8 +1637,61 @@ function vToday() {
   const doneRows = [...done.map(row), ...doneOther.map(taskTodo)];
   if (doneRows.length) parts.push(`<section class="tsec"><button class="tsec-t" type="button" data-act="tdone" aria-expanded="${TDONE}">Selesai <span class="n">${doneRows.length}</span>${ico('chev', 'ic-s')}</button>${TDONE ? `<ul class="tlist">${doneRows.join('')}</ul>` : ''}</section>`);
   const foot = [showTd && '<button class="lnk small" type="button" data-go="todo">Semua to-do</button>', on('kalender') && '<button class="lnk small" type="button" data-go="kalender">Kalender</button>', showEv && '<button class="lnk small" type="button" data-act="rut">Rutinitas</button>'].filter(Boolean).join('');
-  return `<div class="focus-col"><div class="vh"><div><h1>${greet}</h1><p class="lead">${sub}</p>${hid.length ? `<p class="hint" style="margin-top:var(--s-xs)">Disembunyikan: ${hid.join(', ')}. <button class="lnk small" data-act="settings">Atur</button></p>` : ''}</div></div>
-    ${prog}${parts.join('')}${foot ? `<div class="tfoot">${foot}</div>` : ''}</div>`;
+  return `<div class="focus-col"><div class="vh"><div><h1>To-do</h1><p class="lead">${sub}</p>${hid.length ? `<p class="hint" style="margin-top:var(--s-xs)">Disembunyikan: ${hid.join(', ')}. <button class="lnk small" data-act="settings">Atur</button></p>` : ''}</div></div>
+    ${tdvSeg()}${prog}${parts.join('')}${foot ? `<div class="tfoot">${foot}</div>` : ''}</div>`;
+}
+
+/* ---------- Beranda (v2.0) ---------- */
+let HF = 'semua';
+const FOCUS_GOAL = 100; /* menit fokus per hari (4 sesi) */
+function hmRings(sz, list) {
+  const c = sz / 2, w = sz * 0.1, gap = 3; let o = '';
+  list.forEach(([p, col, lab], i) => { const r = c - w / 2 - i * (w + gap), L = 2 * Math.PI * r, q = Math.max(0, Math.min(1, p || 0)); o += `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${col}" stroke-opacity="0.22" stroke-width="${w}"/>${q > 0 ? `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${(L * q).toFixed(1)} ${L.toFixed(1)}" transform="rotate(-90 ${c} ${c})"><title>${lab}: ${Math.round(q * 100)}%</title></circle>` : ''}`; });
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" role="img" aria-label="Cincin hari ini">${o}</svg>`;
+}
+function homeTodos() { return S.todos.filter(t => (t.due && isToday(t.due)) || (t.done && t.doneAt && isToday(t.doneAt)) || (!t.done && t.due && dayDiff(t.due) < 0)); }
+function vHome() {
+  const now = new Date(), h = now.getHours();
+  const greet = h < 11 ? 'Selamat pagi' : h < 15 ? 'Selamat siang' : h < 18 ? 'Selamat sore' : 'Selamat malam';
+  const nm = gOn() && G.name ? ', ' + esc(String(G.name).split(/[\s@]/)[0]) : '';
+  const d0 = day0(), mon = new Date(d0); mon.setDate(d0.getDate() - ((d0.getDay() + 6) % 7));
+  const wk = [...Array(7)].map((_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); const it = itemsOn(d), has = it.ev.length + it.td.length > 0, cur = dk(d) === dk(now);
+    return `<button type="button" data-act="hmday" data-k="${dk(d)}" ${cur ? 'aria-current="date"' : ''} aria-label="${dayFull(d)}">${DAYS_S[d.getDay()]}<b>${d.getDate()}</b><i class="${has ? '' : 'n'}"></i></button>`; }).join('');
+  const showTd = on('todo'), showEv = on('jadwal');
+  const tds = showTd ? homeTodos() : [], tdDone = tds.filter(t => t.done).length;
+  const late = tds.filter(t => !t.done && t.due && dayDiff(t.due) < 0);
+  const rts = showEv ? routinesOn(now) : [], rtDone = rts.filter(r => r.ok).length;
+  const fm = on('fokus') ? focusMin() : 0;
+  const left = [tds.length - tdDone > 0 && `${tds.length - tdDone} to-do`, on('fokus') && FOCUS_GOAL - fm > 0 && `${Math.round(FOCUS_GOAL - fm)} m fokus`, rts.length - rtDone > 0 && `${rts.length - rtDone} rutinitas`].filter(Boolean);
+  const prog = `<button class="hm-prog" type="button" data-act="hmgo" data-v="todo">${hmRings(96, [[tds.length ? tdDone / tds.length : 0, 'var(--c-blue)', 'To-do'], [fm / FOCUS_GOAL, 'var(--c-fok-r)', 'Fokus'], [rts.length ? rtDone / rts.length : 0, 'var(--c-hab)', 'Rutinitas']])}
+    <div><div class="rw"><i style="background:var(--c-blue)"></i><span>To-do</span><b>${tdDone}/${tds.length}</b></div>
+    <div class="rw"><i style="background:var(--c-fok-r)"></i><span>Fokus</span><b>${fmtDur(fm) || '0 m'}</b></div>
+    <div class="rw"><i style="background:var(--c-hab)"></i><span>Rutinitas</span><b>${rtDone}/${rts.length}</b></div>
+    <div class="ft">${left.length ? 'Lagi: ' + left.join(' · ') : 'Semua cincin tertutup hari ini'}</div></div></button>`;
+  /* berikutnya: jadwal hari ini yang belum lewat, lalu to-do hari ini yang berjam */
+  const ev = showEv ? S.events.filter(e => isToday(e.start) && e.end > now && e.done == null).sort((a, b) => a.start - b.start)[0] : null;
+  const td = !ev && showTd ? S.todos.filter(t => !t.done && t.due && isToday(t.due) && !t.allDay && t.due > now).sort((a, b) => a.due - b.due)[0] : null;
+  let next = '';
+  if (ev) { const nowE = ev.start <= now; next = `<div class="hm-card hm-next" data-act="evopen" data-id="${ev.id}" role="button" tabindex="0"><span class="k">${nowE ? 'Sekarang' : 'Berikutnya'} · ${hm(ev.start)}</span><span class="t">${esc(ev.title)}</span><div class="r2"><span class="hm-chip">${fmtDur(Math.round((ev.end - ev.start) / 60000))}</span><span class="hm-chip">${esc(ev.cal)}</span>${on('fokus') ? `<button class="hm-go" type="button" data-act="hmfocus" data-t="${esc(ev.title)}">${ico('play')}Fokus</button>` : ''}</div></div>`; }
+  else if (td) next = `<div class="hm-card hm-next" data-act="tdopen" data-id="${td.id}" role="button" tabindex="0"><span class="k">Berikutnya · ${hm(td.due)}</span><span class="t">${esc(td.text)}</span><div class="r2"><span class="hm-chip">To-do</span>${on('fokus') ? `<button class="hm-go" type="button" data-act="hmfocus" data-t="${esc(td.text)}">${ico('play')}Fokus</button>` : ''}</div></div>`;
+  /* tugas */
+  let tasks = '';
+  if (showTd) {
+    const open = tds.filter(t => !t.done);
+    const F = [['semua', tds.length, 'Semua'], ['todo', open.length, 'To-do'], ['selesai', tdDone, 'Selesai'], ['telat', late.length, 'Terlambat']];
+    const list = (HF === 'todo' ? open : HF === 'selesai' ? tds.filter(t => t.done) : HF === 'telat' ? late : tds).slice().sort((a, b) => (a.done - b.done) || ((a.due || 9e15) - (b.due || 9e15)));
+    const row = t => { const lt = !t.done && t.due && t.due < now; return `<li class="${t.done ? 'done' : ''}${lt ? ' late' : ''}"><button class="ck ${t.done ? 'on' : lt ? 'due' : ''}" data-act="toggle" data-id="${t.id}" aria-label="${t.done ? 'Batal selesai' : 'Tandai selesai'}: ${esc(t.text)}">${ico('check')}</button><button class="tbtn" type="button" data-act="tdopen" data-id="${t.id}"><span class="tt">${esc(t.text)}</span><span class="tm2">${tdMeta(t)}</span></button><button class="arr" type="button" data-act="tdopen" data-id="${t.id}" aria-label="Buka">${ico('chev')}</button></li>`; };
+    tasks = `<div class="hm-f" role="group" aria-label="Saring tugas">${F.map(([k, c, l]) => `<button type="button" data-act="hf" data-k="${k}" aria-pressed="${HF === k}"><b>${c}</b>${l}</button>`).join('')}</div>
+      ${list.length ? `<ul class="hm-t">${list.slice(0, 5).map(row).join('')}</ul>${list.length > 5 ? `<button class="lnk small" type="button" data-act="hmgo" data-v="todo" style="margin-top:var(--s-xs)">Lihat ${list.length - 5} lainnya</button>` : ''}` : `<div class="hm-card hm-empty">${tds.length ? 'Tidak ada di saringan ini.' : 'Belum ada to-do hari ini. Ketuk + untuk menambah.'}</div>`}`;
+  }
+  /* kartu mini */
+  const minis = [];
+  if (on('keuangan') && SET.daily.on) { const lim = SET.daily.limit, l = lim - todayOut(); minis.push(`<button type="button" data-act="hmgo" data-v="keuangan"><span class="k">Jatah hari ini</span><span class="v ${l >= 0 ? 'g' : 'w'} num">${SET.hideAmt ? '••••' : (l < 0 ? '−' : '') + shortN(Math.abs(l))}</span><div class="hm-bar"><i style="width:${Math.max(0, Math.min(100, l / lim * 100)).toFixed(0)}%"></i></div></button>`); }
+  if (showEv && S.routines.length) { const r = S.routines[0], hb = habitOf(r.name), st = streakOf(r.name);
+    const sq = [...Array(7)].map((_, i) => { const d = at(i - 6, 0), ok = !!hb.days[dk(d)]; return `<i class="${ok ? 'ok' : i === 6 ? 'td' : ''}"></i>`; }).join('');
+    minis.push(`<button type="button" data-act="rut"><span class="k">${esc(r.name)}</span><span class="v num">${st}<small>hari</small></span><div class="hm-sq" aria-label="7 hari terakhir">${sq}</div></button>`); }
+  return `<div class="hm"><div class="hm-hello"><span>${greet}${nm}</span><b>${DAYS_T[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}</b></div>
+    <div class="hm-wk">${wk}</div>${(showTd || showEv) ? prog : ''}${next}${tasks}${minis.length ? `<div class="hm-mini">${minis.join('')}</div>` : ''}</div>`;
 }
 function evRow(e) {
   const now = new Date(), nowE = e.start <= now && e.end > now, past = e.end <= now, d = e.done === true, skip = e.done === false, due = past && e.done == null;
@@ -1834,7 +1956,10 @@ function todoRow(t) {
   const late = !t.done && t.due && t.due < new Date(), soon = !t.done && t.due && (late || isToday(t.due));
   return `<li class="row ${t.done ? 'done' : ''}"><button class="ck ${t.done ? 'on' : ''}" data-act="toggle" data-id="${t.id}" aria-label="${t.done ? 'Batal selesai' : 'Tandai selesai'}: ${esc(t.text)}">${ico('check')}</button><button class="tbtn" type="button" data-act="tdopen" data-id="${t.id}"><span class="t1">${esc(t.text)}</span><span class="t2">${t.done ? 'Selesai' + (t.doneAt ? ' ' + when(t.doneAt).toLowerCase() : '') : t.due ? when(t.due) : 'Tanpa tenggat'}${srcS(t.src)}${attCount(t)}</span></button>${soon ? `<button class="pill plain" type="button" data-act="snooze" data-id="${t.id}">Besok</button>` : '<span></span>'}</li>`;
 }
+let TDV = 'hari';
+const tdvSeg = () => `<div class="seg seg-s tdv" role="group" aria-label="Tampilan to-do">${[['hari', 'Hari ini'], ['semua', 'Semua to-do']].map(([k, n]) => `<button type="button" data-act="tdv" data-k="${k}" aria-pressed="${TDV === k}">${n}</button>`).join('')}</div>`;
 function vTodo() {
+  if (TDV === 'hari') return vToday();
   const dd = t => dayDiff(t.due);
   const open = S.todos.filter(t => !t.done);
   const late = open.filter(t => t.due && dd(t) < 0).sort((a, b) => a.due - b.due);
@@ -1850,7 +1975,7 @@ function vTodo() {
   else if (TDF === 'semua' && doneL.length) doneH = `<section class="tsec"><button class="tsec-t" type="button" data-act="tdall" aria-expanded="${TDALL}">Selesai <span class="n">${doneL.length}</span>${ico('chev', 'ic-s')}</button>${TDALL ? `<ul class="tlist">${doneL.slice(0, 30).map(taskTodo).join('')}</ul>` : ''}</section>`;
   const none = !open.length && !doneL.length ? '<div class="empty" style="margin-top:var(--s-lg)"><b>Belum ada to-do</b>Tambah lewat kolom di atas, misalnya: kirim laporan jumat 15:00.</div>'
     : !secs && !doneH ? '<div class="empty" style="margin-top:var(--s-lg)"><b>Kosong untuk saringan ini</b>Coba saringan lain.</div>' : '';
-  return `<div class="focus-col"><div class="vh"><div><h1>To-do</h1><p class="lead">${open.length} terbuka${late.length ? ' · ' + late.length + ' terlambat' : ''}</p></div></div>${seg}${secs}${doneH}${none}</div>`;
+  return `<div class="focus-col"><div class="vh"><div><h1>To-do</h1><p class="lead">${open.length} terbuka${late.length ? ' · ' + late.length + ' terlambat' : ''}</p></div></div>${tdvSeg()}${seg}${secs}${doneH}${none}</div>`;
 }
 function attachHTML(kind, it) {
   const ids = it.sk || [], list = ids.map(id => S.sketches.find(k => k.id === id)).filter(Boolean), others = S.sketches.filter(k => !ids.includes(k.id));
@@ -2005,7 +2130,7 @@ function key(k) {
 /* ---------- render + navigasi ---------- */
 function render() {
   if (V !== 'hari-ini' && !on(V)) { V = 'hari-ini'; setHash('hari-ini'); }
-  viewEl.innerHTML = V === 'hari-ini' ? vToday() : V === 'kalender' ? vCal() : V === 'todo' ? vTodo() : V === 'catatan' ? vNotes() : V === 'fokus' ? vFocus() : V === 'statistik' ? vStats() : vMoney();
+  viewEl.innerHTML = V === 'hari-ini' ? vHome() : V === 'kalender' ? vCal() : V === 'todo' ? vTodo() : V === 'catatan' ? vNotes() : V === 'fokus' ? vFocus() : V === 'statistik' ? vStats() : vMoney();
   document.querySelectorAll('.nav a').forEach(a => { a.setAttribute('aria-current', a.dataset.v === V ? 'page' : 'false'); a.parentElement.hidden = a.dataset.v !== 'hari-ini' && !on(a.dataset.v); });
   if (V === 'catatan') renderNoteList();
   if (V === 'keuangan' && on('kalkulator') && CT !== 'biasa') calcTool();
@@ -2381,6 +2506,11 @@ document.addEventListener('click', e => {
   const a = e.target.closest('[data-act]'); if (!a) return;
   const id = +a.dataset.id, act = a.dataset.act;
   if (act === 'close') return closePanel();
+  if (act === 'hf') { HF = a.dataset.k; return render(); }
+  if (act === 'tdv') { TDV = a.dataset.k; return render(); }
+  if (act === 'hmgo') return go(a.dataset.v);
+  if (act === 'hmday') { CSEL = a.dataset.k; const kd = keyDate(CSEL), n0 = new Date(); CMO = (kd.getFullYear() - n0.getFullYear()) * 12 + kd.getMonth() - n0.getMonth(); return go(on('kalender') ? 'kalender' : 'todo'); }
+  if (act === 'hmfocus') { e.stopPropagation(); startTimer('fokus', a.dataset.t); return go('fokus'); }
   if (act === 'evdone') {
     const ev = S.events.find(x => x.id === id); if (!ev) return;
     const r = setEventDone(ev, ev.done === true ? null : true); render();
