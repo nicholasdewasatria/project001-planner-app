@@ -708,6 +708,76 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .fset .iconbtn { width: 2.25rem; height: 2.25rem; }
 .qc-sh:has(#qc-mode:not(:empty)) > b { display: none; }
 .qc-sh #qc-mode { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
+/* ---------- v1.8: kartu biasa (tanpa bentuk map) ---------- */
+.folder { background: var(--f-bg); border-radius: var(--r-folder); box-shadow: inset 0 0 0 1px var(--f-line); overflow: hidden; }
+.f-surface { filter: none; }
+.f-blue, .f-yellow { box-shadow: none; }
+.f-tab { align-self: stretch; max-width: none; min-height: 0; padding: var(--s-md) var(--s-lg) 0; background: none; border-radius: 0; }
+.f-tab::after { display: none; }
+.f-tab h2 { font-size: var(--t-md); }
+.f-body { background: none; border-radius: 0; padding: var(--s-sm) var(--s-lg) var(--s-lg); }
+.f-open { top: var(--s-sm); right: var(--s-sm); }
+@media (max-width: 560px) { .f-tab { padding: var(--s-md) var(--s-md) 0; } .f-body { padding: var(--s-sm) var(--s-md) var(--s-md); } }
+
+/* ---------- Statistik ---------- */
+.st-wrap { max-width: 56rem; margin: 0 auto; }
+.st-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-sm); margin-bottom: var(--s-lg); }
+.st-tile { padding: var(--s-md); border-radius: var(--r-inner); background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-line); min-width: 0; }
+.st-tile .l { display: block; font-size: var(--t-2xs); color: var(--c-ink-2); }
+.st-tile b { display: block; margin-top: 2px; font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem); font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-tile small { display: block; font-size: var(--t-2xs); color: var(--c-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-lg); }
+.st-grid .wide { grid-column: 1 / -1; }
+@media (max-width: 860px) { .st-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .st-grid { grid-template-columns: minmax(0, 1fr); } }
+.vz-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-sm); margin-bottom: var(--s-sm); }
+.vz-head p { font-size: var(--t-xs); color: var(--c-ink-2); }
+.vz { --vz-bar: #1B60CB; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-xs); }
+:root:not([data-theme="light"]) .vz { --vz-bar: #4F8BE8; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .vz { --vz-bar: #1B60CB; } }
+:root[data-theme="dark"] .vz { --vz-bar: #4F8BE8; }
+.vz-y { display: flex; flex-direction: column; justify-content: space-between; height: 9rem; padding-bottom: 1.25rem; font-size: 11px; color: var(--c-ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+.vz-plot { position: relative; height: 9rem; }
+.vz-plot::before, .vz-plot::after { content: ""; position: absolute; left: 0; right: 0; height: 1px; background: var(--c-line); }
+.vz-plot::before { top: 0.4em; }
+.vz-plot::after { bottom: 1.25rem; }
+.vz-cols { position: absolute; inset: 0.4em 0 0 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 2px; }
+.vz-c { display: grid; grid-template-rows: minmax(0, 1fr) 1.25rem; justify-items: center; min-width: 0; }
+.vz-bar { all: unset; box-sizing: border-box; position: relative; width: 100%; max-width: 24px; height: 100%; cursor: default; }
+.vz-bar i { position: absolute; left: 0; right: 0; bottom: 0; height: var(--h); min-height: 2px; border-radius: 4px 4px 0 0; background: var(--vz-bar); transition: filter var(--fast) var(--ease); }
+.vz-bar.zero i { background: var(--c-line); }
+.vz-bar b { position: absolute; left: 50%; bottom: calc(var(--h) + 4px); transform: translateX(-50%); font-size: 11px; font-weight: 500; color: var(--c-ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.vz-bar:hover i, .vz-bar:focus-visible i { filter: brightness(1.25); }
+.vz-bar:focus-visible { outline: 2px solid var(--c-blue-hi); outline-offset: 2px; border-radius: 4px; }
+.vz-x { align-self: end; font-size: 11px; color: var(--c-ink-2); }
+.vz-x.today { color: var(--c-ink); font-weight: 600; }
+.vz-table { display: none; width: 100%; border-collapse: collapse; font-size: var(--t-xs); font-variant-numeric: tabular-nums; }
+.vz-table th, .vz-table td { padding: 6px 0; border-bottom: 1px solid var(--c-line); text-align: left; }
+.vz-table td:last-child, .vz-table th:last-child { text-align: right; }
+.vz-table th { font-weight: 500; color: var(--c-ink-2); }
+.show-table .vz, .show-table .hm, .show-table .hb { display: none; }
+.show-table .vz-table { display: table; }
+.hb { display: grid; gap: var(--s-sm); }
+.hb-row { display: grid; grid-template-columns: minmax(0, 8rem) minmax(0, 1fr) auto; gap: var(--s-sm); align-items: center; font-size: var(--t-sm); }
+.hb-row .k { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hb-track { position: relative; height: 12px; }
+.hb-track i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--w); min-width: 2px; border-radius: 0 4px 4px 0; background: var(--c-blue); }
+.hb-row .v { font-size: var(--t-xs); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+.hb-row .v small { display: block; color: var(--c-ink-2); }
+.hb-row .v .warn { color: var(--c-warn); }
+.hm { display: grid; gap: var(--s-md); }
+.hm-row { display: grid; gap: 6px; }
+.hm-top { display: flex; justify-content: space-between; gap: var(--s-sm); font-size: var(--t-sm); }
+.hm-top span { color: var(--c-ink-2); font-size: var(--t-xs); white-space: nowrap; }
+.hm-cells { display: grid; grid-template-columns: repeat(30, minmax(0, 1fr)); gap: 2px; }
+.hm-cells button { all: unset; box-sizing: border-box; height: 14px; border-radius: 3px; background: var(--c-fill-2); cursor: default; }
+.hm-cells button.ok { background: var(--c-blue); }
+.hm-cells button.off { background: var(--hatch); box-shadow: inset 0 0 0 1px var(--c-line); }
+.hm-cells button.today { box-shadow: inset 0 0 0 1.5px var(--c-blue-hi); }
+.hm-cells button:focus-visible { outline: 2px solid var(--c-blue-hi); outline-offset: 1px; }
+.vtip { position: fixed; z-index: 70; pointer-events: none; padding: 6px 10px; border-radius: 8px; background: var(--c-solid); box-shadow: inset 0 0 0 1px var(--c-edge), 0 10px 24px -10px var(--c-shadow); font-size: var(--t-xs); line-height: 1.35; white-space: nowrap; opacity: 0; transform: translate(-50%, -100%); transition: opacity var(--fast) var(--ease); }
+.vtip.show { opacity: 1; }
+.vtip b { display: block; font-size: var(--t-sm); font-weight: 600; }
+.vtip span { color: var(--c-ink-2); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>
 
@@ -744,6 +814,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
   <symbol id="i-clear" viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="15" rx="3"/><path d="m9.5 9.5 5 5M14.5 9.5l-5 5"/></symbol>
   <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5a2 2 0 0 1 2-2h2l1.5-2h5l1.5 2h2a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></symbol>
   <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18.5h10.5a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7.3 9.6 4.5 4.5 0 0 0 7 18.5z"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20h16"/><rect x="6" y="11" width="3" height="6" rx="1"/><rect x="10.5" y="6" width="3" height="11" rx="1"/><rect x="15" y="13" width="3" height="4" rx="1"/></symbol>
   <symbol id="i-apps" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M2.5 7.5A2.5 2.5 0 0 1 5 5h4l2.2 2.2H19a2.5 2.5 0 0 1 2.5 2.5v7.8A2.5 2.5 0 0 1 19 20H5a2.5 2.5 0 0 1-2.5-2.5z"/></symbol>
 </svg>
@@ -807,6 +878,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
           <li><a href="#catatan" data-v="catatan"><svg class="ic"><use href="#i-note"/></svg>Catatan</a></li>
           <li><a href="#fokus" data-v="fokus"><svg class="ic"><use href="#i-timer"/></svg><span id="nav-fokus">Fokus</span></a></li>
           <li><a href="#keuangan" data-v="keuangan"><svg class="ic"><use href="#i-wallet"/></svg>Keuangan</a></li>
+          <li><a href="#statistik" data-v="statistik"><svg class="ic"><use href="#i-chart"/></svg>Statistik</a></li>
         </ul>
       </nav>
       <nav class="mnav" id="mnav" aria-label="Menu"></nav>
@@ -836,6 +908,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 </div>
 <div class="onb" id="onb" role="dialog" aria-modal="true" aria-labelledby="onb-t" hidden><div class="onb-card" id="onb-card"></div></div>
 <input type="file" id="d-file" accept="application/json,.json" hidden>
+<div class="vtip" id="vtip" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status"><svg class="ic"><use href="#i-check"/></svg><span></span></div>
 
 <script>
@@ -874,7 +947,8 @@ const MODS = [
   ['catatan', 'Catatan', 'note', 'Menu Catatan dan catatan terbaru'],
   ['fokus', 'Fokus', 'timer', 'Pomodoro dan rangkuman fokus'],
   ['keuangan', 'Keuangan', 'wallet', 'Transaksi, budget, batas harian'],
-  ['kalkulator', 'Hitung', 'calc', 'Kalkulator, cicilan, bagi tagihan di halaman Keuangan']
+  ['kalkulator', 'Hitung', 'calc', 'Kalkulator, cicilan, bagi tagihan di halaman Keuangan'],
+  ['statistik', 'Statistik', 'chart', 'Grafik to-do, fokus, habit, dan pengeluaran']
 ];
 const SET_DEF = () => ({ show: Object.fromEntries(MODS.map(m => [m[0], true])), hideAmt: false, daily: { on: true, limit: 150000 }, tg: { on: false, notif: {} }, theme: 'auto' });
 let SET = (() => { const d = SET_DEF(); try { const v = JSON.parse(localStorage.getItem('p001-set') || 'null'); if (v) return { show: { ...d.show, ...(v.show || {}) }, hideAmt: !!v.hideAmt, daily: { ...d.daily, ...(v.daily || {}) }, tg: { on: !!(v.tg && v.tg.on), notif: { ...((v.tg && v.tg.notif) || {}) } }, theme: ['dark', 'light'].includes(v.theme) ? v.theme : 'auto' }; } catch (e) { /* tanpa penyimpanan */ } return d; })();
@@ -1002,7 +1076,14 @@ function saveData(noCloud) {
   SDT = setTimeout(() => { try { localStorage.setItem(DKEY, JSON.stringify(dataBlob())); } catch (e) { toast('Penyimpanan HP penuh. Ekspor data, lalu hapus coretan berfoto yang lama'); } }, 300);
   if (!noCloud && typeof gQueue === 'function') gQueue();
 }
-let S = APP ? (loadData() || emptyData()) : withFolders(seed());
+function withHistory(o) { /* data contoh: to-do selesai + sesi fokus di hari-hari sebelumnya */
+  const done = [[-1, 3], [-2, 2], [-3, 4], [-4, 1], [-5, 0], [-6, 2], [-8, 3], [-9, 2], [-10, 1], [-11, 3], [-12, 2], [-13, 0]];
+  const names = ['Balas email klien', 'Cek tiket helpdesk', 'Backup konfigurasi router', 'Update inventaris laptop', 'Rekap absensi', 'Rapikan kabel rak'];
+  done.forEach(([d, n]) => { for (let i = 0; i < n; i++) o.todos.push({ id: nid(), text: names[(i + d * -1) % names.length], due: at(d, 10 + i), done: true, doneAt: at(d, 11 + i * 2, 15), src: 'Web' }); });
+  [[-1, 4], [-2, 2], [-3, 5], [-4, 3], [-5, 0], [-6, 1], [-7, 2], [-8, 4], [-9, 3], [-10, 2], [-11, 4], [-12, 1], [-13, 0]].forEach(([d, n]) => { for (let i = 0; i < n; i++) o.sessions.push({ task: i % 2 ? 'Tiket inventory' : 'Konfigurasi PBX klien Sinar Jaya', min: 25, end: at(d, 9 + i, 30) }); });
+  return o;
+}
+let S = APP ? (loadData() || emptyData()) : withHistory(withFolders(seed()));
 if (!S.noteFolders) S.noteFolders = defaultFolders();
 
 /* ---------- hitung ---------- */
@@ -1167,8 +1248,8 @@ function closeSheet() {
   SHEET = ''; QCTX = null; delete document.documentElement.dataset.sheet; $('#sscrim').classList.remove('open'); $('#more').hidden = true; setQcPh(); renderMNav();
   const b = document.querySelector(was === 'qc' ? '#mnav .fab' : '#mnav [data-act="more"]'); if (b && isSm()) b.focus();
 }
-const MV = { 'hari-ini': ['Hari ini', 'sun'], todo: ['To-do', 'check'], keuangan: ['Keuangan', 'wallet'], kalender: ['Kalender', 'month'], catatan: ['Catatan', 'note'], fokus: ['Fokus', 'timer'] };
-function mnavSplit() { const p = ['hari-ini', 'todo', 'keuangan', 'kalender', 'catatan', 'fokus'].filter(v => v === 'hari-ini' || on(v)); return { main: p.slice(0, 3), rest: p.slice(3) }; }
+const MV = { 'hari-ini': ['Hari ini', 'sun'], todo: ['To-do', 'check'], keuangan: ['Keuangan', 'wallet'], kalender: ['Kalender', 'month'], catatan: ['Catatan', 'note'], fokus: ['Fokus', 'timer'], statistik: ['Statistik', 'chart'] };
+function mnavSplit() { const p = ['hari-ini', 'todo', 'keuangan', 'kalender', 'catatan', 'fokus', 'statistik'].filter(v => v === 'hari-ini' || on(v)); return { main: p.slice(0, 3), rest: p.slice(3) }; }
 function renderMNav() {
   const el = $('#mnav'); if (!el) return;
   const { main, rest } = mnavSplit();
@@ -1441,7 +1522,7 @@ function beep() {
 /* ---------- tampilan web ---------- */
 /* di dalam iframe Apps Script, history API bisa ditolak: jangan sampai merusak navigasi */
 const setHash = h => { try { history.replaceState(null, '', '#' + h); } catch (e) { /* abaikan */ } };
-const VIEWS = ['hari-ini', 'kalender', 'todo', 'catatan', 'fokus', 'keuangan'];
+const VIEWS = ['hari-ini', 'kalender', 'todo', 'catatan', 'fokus', 'keuangan', 'statistik'];
 const alias = v => (v === 'kalkulator' || v === 'hitung') ? 'keuangan' : v; /* Hitung sekarang bagian dari Keuangan */
 let TDF = 'semua', TDALL = false, CALCF = false, KT = 'ringkas';
 let CMO = 0, CSEL = dk(new Date());
@@ -1703,6 +1784,42 @@ function taskEvent(e) {
   return `<li class="task${d || skip ? ' done' : ''}"><button class="ck ${d ? 'on' : due ? 'due' : ''}" data-act="evdone" data-id="${e.id}" aria-pressed="${d}" aria-label="${d ? 'Batal tandai selesai' : 'Tandai selesai'}: ${esc(e.title)}">${ico('check')}</button><div><span class="tt">${esc(e.title)}</span><span class="tm2">${hm(e.start)}–${hm(e.end)} · ${isRoutine(e) ? (st ? st + ' hari beruntun' : 'Rutinitas') : esc(e.cal)}${skip ? ' · dilewati' : ''}${due ? '<span class="sr"> · belum dicentang</span>' : ''}</span></div>${nowE && !d && !skip ? '<span class="pill now">Sekarang</span>' : '<span></span>'}</li>`;
 }
 let TDONE = false;
+/* ---------- Statistik: grafik satu warna, tooltip per batang/sel, tampilan tabel ---------- */
+const niceMax = v => { if (!(v > 0)) return 1; const p = 10 ** Math.floor(Math.log10(v)), n = v / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p; };
+const lastDays = n => [...Array(n)].map((_, i) => at(i - n + 1, 0));
+function colChart(data, fmt, unit) {
+  const top = niceMax(Math.max(0, ...data.map(d => d.v))), peak = data.reduce((a, b) => (b.v > a.v ? b : a), data[0]);
+  return `<div class="vz"><div class="vz-y" aria-hidden="true"><span>${fmt(top)}</span><span>0</span></div><div class="vz-plot"><div class="vz-cols">${data.map((d, i) => { const last = i === data.length - 1, lab = (d === peak && d.v) || last; return `<div class="vz-c"><button type="button" class="vz-bar${d.v ? '' : ' zero'}" style="--h:${(d.v / top * 100).toFixed(1)}%" data-tip="${esc(fmt(d.v) + unit)}|${esc(d.full)}" aria-label="${esc(d.full)}: ${esc(fmt(d.v) + unit)}"><i></i>${lab ? `<b>${esc(fmt(d.v))}</b>` : ''}</button><span class="vz-x${last ? ' today' : ''}">${esc(d.label)}</span></div>`; }).join('')}</div></div></div>`;
+}
+const vzTable = (cols, rows) => `<table class="vz-table"><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+const vzCard = (title, sub, body, table, cls = '') => `<section class="folder f-surface ${cls}"><div class="f-tab"><h2>${title}</h2></div><div class="f-body"><div class="vz-head"><p>${sub}</p><button class="lnk small" type="button" data-act="vtab" aria-pressed="false">Tabel</button></div>${body}${table}</div></section>`;
+function vStats() {
+  const D7 = lastDays(7), D14 = lastDays(14), dl = d => ({ label: DAYS_S[d.getDay()], full: `${DAYS_T[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}` });
+  const doneOn = d => S.todos.filter(t => t.done && t.doneAt && day0(t.doneAt).getTime() === d.getTime()).length;
+  const focusOn = d => S.sessions.filter(x => day0(x.end).getTime() === d.getTime()).reduce((a, x) => a + x.min, 0);
+  const td7 = D7.map(d => ({ ...dl(d), v: doneOn(d) })), tdPrev = D14.slice(0, 7).reduce((a, d) => a + doneOn(d), 0), tdSum = td7.reduce((a, x) => a + x.v, 0);
+  const fo7 = D7.map(d => ({ ...dl(d), v: focusOn(d) })), foSum = fo7.reduce((a, x) => a + x.v, 0);
+  const D30 = lastDays(30);
+  const hab = S.routines.map(r => { const h = habitOf(r.name); let sch = 0, ok = 0; D30.forEach((d, i) => { const k = dk(d), on0 = r.days.includes(d.getDay()), done = !!h.days[k]; if (on0 && i < 29) sch++; if (done && on0 && i < 29) ok++; }); return { r, h, pct: sch ? Math.round(ok / sch * 100) : 0, st: streakOf(r.name) }; });
+  const habPct = hab.length ? Math.round(hab.reduce((a, x) => a + x.pct, 0) / hab.length) : 0;
+  const mt = monthTx().filter(t => t.type === 'out'), outSum = mt.reduce((a, t) => a + t.amt, 0);
+  const byCat = Object.entries(mt.reduce((m, t) => (m[t.cat] = (m[t.cat] || 0) + t.amt, m), {})).sort((a, b) => b[1] - a[1]);
+  const cMax = byCat.length ? byCat[0][1] : 1, money = n => SET.hideAmt ? '••••' : shortN(n);
+  const tiles = [
+    on('todo') && ['To-do selesai', String(tdSum), '7 hari · minggu lalu ' + tdPrev],
+    on('fokus') && ['Fokus', fmtDur(foSum), '7 hari · ' + Math.round(foSum / 25) + ' sesi'],
+    on('jadwal') && hab.length && ['Habit tercapai', habPct + '%', '30 hari · ' + hab.length + ' habit'],
+    on('keuangan') && ['Keluar', SET.hideAmt ? '••••' : shortN(outSum), MONTHS[new Date().getMonth()]]
+  ].filter(Boolean);
+  const cards = [];
+  if (on('todo')) cards.push(vzCard('To-do selesai', '7 hari terakhir', colChart(td7, v => String(v), ' to-do'), vzTable(['Hari', 'Selesai'], td7.map(d => [d.full, d.v]))));
+  if (on('fokus')) cards.push(vzCard('Waktu fokus', '7 hari terakhir, menit', colChart(fo7, v => String(v), ' menit'), vzTable(['Hari', 'Menit'], fo7.map(d => [d.full, d.v]))));
+  if (on('jadwal') && hab.length) cards.push(vzCard('Habit', '30 hari terakhir · kotak garis = libur', `<div class="hm">${hab.map(({ r, h, pct, st }) => `<div class="hm-row"><div class="hm-top"><b style="font-weight:500">${esc(r.name)}</b><span>${pct}% · streak ${st} · rekor ${h.best}</span></div><div class="hm-cells">${D30.map((d, i) => { const k = dk(d), ok = !!h.days[k], off = !r.days.includes(d.getDay()), lab = `${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}`, stt = ok ? 'selesai' : off ? 'libur' : i === 29 ? 'belum' : 'terlewat'; return `<button type="button" class="${ok ? 'ok' : off ? 'off' : ''}${i === 29 ? ' today' : ''}" data-tip="${stt}|${esc(r.name)} · ${lab}" aria-label="${esc(r.name)} ${lab}: ${stt}"></button>`; }).join('')}</div></div>`).join('')}</div>`, vzTable(['Habit', 'Tercapai 30 hari'], hab.map(x => [x.r.name, x.pct + '%'])), 'wide'));
+  if (on('keuangan')) cards.push(vzCard('Pengeluaran per kategori', MONTHS[new Date().getMonth()] + ' · total ' + money(outSum), byCat.length ? `<div class="hb">${byCat.map(([c, v]) => { const b = BUDGET[c], over = b && v > b; return `<div class="hb-row"><span class="k">${esc(c)}</span><div class="hb-track" data-tip="${esc(money(v))}|${esc(c)}${b ? ' · budget ' + esc(money(b)) : ''}" tabindex="0" aria-label="${esc(c)}: ${esc(money(v))}"><i style="--w:${(v / cMax * 100).toFixed(1)}%"></i></div><span class="v">${money(v)}${b ? `<small${over ? ' class="warn"' : ''}>${over ? 'lewat budget' : Math.round(v / b * 100) + '% budget'}</small>` : ''}</span></div>`; }).join('')}</div>` : '<div class="empty"><b>Belum ada pengeluaran bulan ini</b>Catat lewat kolom atas, misalnya: beli es krim 10rb.</div>', vzTable(['Kategori', 'Jumlah'], byCat.map(([c, v]) => [c, money(v)])), 'wide'));
+  return `<div class="st-wrap"><div class="vh"><div><h1>Statistik</h1><p class="lead">Ringkasan produktivitas kamu</p></div></div>
+    ${tiles.length ? `<div class="st-tiles">${tiles.map(([l, v, sub]) => `<div class="st-tile"><span class="l">${l}</span><b>${v}</b><small>${sub}</small></div>`).join('')}</div>` : ''}
+    ${cards.length ? `<div class="st-grid">${cards.join('')}</div>` : '<div class="empty"><b>Semua bagian disembunyikan</b>Tampilkan lagi lewat Pengaturan.</div>'}</div>`;
+}
 function todoRow(t) {
   const late = !t.done && t.due && t.due < new Date(), soon = !t.done && t.due && (late || isToday(t.due));
   return `<li class="row ${t.done ? 'done' : ''}"><button class="ck ${t.done ? 'on' : ''}" data-act="toggle" data-id="${t.id}" aria-label="${t.done ? 'Batal selesai' : 'Tandai selesai'}: ${esc(t.text)}">${ico('check')}</button><button class="tbtn" type="button" data-act="tdopen" data-id="${t.id}"><span class="t1">${esc(t.text)}</span><span class="t2">${t.done ? 'Selesai' + (t.doneAt ? ' ' + when(t.doneAt).toLowerCase() : '') : t.due ? when(t.due) : 'Tanpa tenggat'}${srcS(t.src)}${attCount(t)}</span></button>${soon ? `<button class="pill plain" type="button" data-act="snooze" data-id="${t.id}">Besok</button>` : '<span></span>'}</li>`;
@@ -1878,7 +1995,7 @@ function key(k) {
 /* ---------- render + navigasi ---------- */
 function render() {
   if (V !== 'hari-ini' && !on(V)) { V = 'hari-ini'; setHash('hari-ini'); }
-  viewEl.innerHTML = V === 'hari-ini' ? vToday() : V === 'kalender' ? vCal() : V === 'todo' ? vTodo() : V === 'catatan' ? vNotes() : V === 'fokus' ? vFocus() : vMoney();
+  viewEl.innerHTML = V === 'hari-ini' ? vToday() : V === 'kalender' ? vCal() : V === 'todo' ? vTodo() : V === 'catatan' ? vNotes() : V === 'fokus' ? vFocus() : V === 'statistik' ? vStats() : vMoney();
   document.querySelectorAll('.nav a').forEach(a => { a.setAttribute('aria-current', a.dataset.v === V ? 'page' : 'false'); a.parentElement.hidden = a.dataset.v !== 'hari-ini' && !on(a.dataset.v); });
   if (V === 'catatan') renderNoteList();
   if (V === 'keuangan' && on('kalkulator') && CT !== 'biasa') calcTool();
@@ -2324,6 +2441,7 @@ document.addEventListener('click', e => {
   if (act === 'empty') { S = emptyData(); chat.length = 0; QCI = null; render(); toast('Data dikosongkan. Begini tampilan pengguna baru'); return; }
   if (act === 'snooze') { const t = S.todos.find(x => x.id === id); if (t) { t.due = at(1, 9); render(); toast('Ditunda ke besok 09:00'); } return; }
   if (act === 'note') return openNote(id);
+  if (act === 'vtab') { const card = a.closest('.folder'); const onT = !card.classList.contains('show-table'); card.classList.toggle('show-table', onT); a.setAttribute('aria-pressed', onT); a.textContent = onT ? 'Grafik' : 'Tabel'; return; }
   if (act === 'nf') { NF = a.dataset.k; render(); const b = document.querySelector(`#view [data-act="nf"][data-k="${NF}"]`); if (b) b.focus(); return; }
   if (act === 'fdpanel') return openPanel('Folder catatan', fdHTML(), 'fd');
   if (act === 'fddel') { if (a.dataset.armed !== '1') { a.dataset.armed = '1'; a.setAttribute('aria-label', 'Tekan lagi untuk hapus folder'); a.style.boxShadow = 'inset 0 0 0 1.5px var(--c-warn)'; toast('Tekan × sekali lagi untuk menghapus folder'); return; } const k = a.dataset.k, nm = fdName(k); S.noteFolders = S.noteFolders.filter(x => x.id !== k); S.notes.forEach(n => { if (n.fd === k) n.fd = null; }); if (NF === k) NF = 'semua'; $('#panel-b').innerHTML = fdHTML(); render(); toast(`Folder ${nm} dihapus. Catatannya pindah ke Tanpa folder`); return; }
@@ -2460,7 +2578,7 @@ document.addEventListener('keydown', e => {
     if (k) { e.preventDefault(); key(k); }
   }
 });
-$('#reset').addEventListener('click', () => { S = withFolders(seed()); syncRoutines(); chat.length = 0; QCI = null; setMode('fokus'); T.task = 'Update dokumentasi VM server dev'; seedChat(); render(); toast('Data contoh dikembalikan'); });
+$('#reset').addEventListener('click', () => { S = withHistory(withFolders(seed())); syncRoutines(); chat.length = 0; QCI = null; setMode('fokus'); T.task = 'Update dokumentasi VM server dev'; seedChat(); render(); toast('Data contoh dikembalikan'); });
 
 /* ---------- percakapan awal ---------- */
 function seedChat() {
@@ -2502,6 +2620,15 @@ if (APP) {
   addEventListener('online', () => { if (gOn()) gSync(true); });
   addEventListener('offline', () => { if (gOn()) gSet('offline'); });
 }
+(() => { /* tooltip grafik: nilai di depan, label di belakang; textContent (bukan innerHTML) */
+  const tip = $('#vtip');
+  const show = el => { const [v, l] = el.dataset.tip.split('|'); tip.textContent = ''; const b = document.createElement('b'); b.textContent = v; const sp = document.createElement('span'); sp.textContent = l || ''; tip.append(b, sp); const r = el.getBoundingClientRect(); tip.style.left = Math.min(innerWidth - 80, Math.max(80, r.left + r.width / 2)) + 'px'; tip.style.top = (r.top - 6) + 'px'; tip.classList.add('show'); };
+  const hide = () => tip.classList.remove('show');
+  document.addEventListener('pointerover', e => { const el = e.target.closest('[data-tip]'); if (el) show(el); });
+  document.addEventListener('pointerout', e => { if (e.target.closest('[data-tip]')) hide(); });
+  document.addEventListener('focusin', e => { const el = e.target.closest('[data-tip]'); if (el) show(el); else hide(); });
+  addEventListener('scroll', hide, { passive: true });
+})();
 $('#d-file').addEventListener('change', e => {
   const file = e.target.files && e.target.files[0]; e.target.value = ''; if (!file) return;
   file.text().then(t => { S = applyBlob(JSON.parse(t, revive)); syncRoutines(); closePanel(); render(); toast('Data dipulihkan dari ' + file.name); })
