@@ -660,6 +660,37 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .strk-c .n { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; min-width: 3.25rem; }
 .strk-c .n small { font-size: var(--t-2xs); font-weight: 400; letter-spacing: 0; color: var(--c-ink-2); margin-left: 3px; }
 @media (max-width: 560px) { .mtiles { gap: var(--s-xs); margin-bottom: var(--s-md); } .mtile { padding: var(--s-sm); } .strk-c .days7 span { width: 1rem; height: 1rem; font-size: 0; } }
+/* ---------- v1.5: daftar tugas minimalis ---------- */
+.focus-col { max-width: 44rem; margin: 0 auto; }
+@media (min-width: 561px) { .qc-wrap { max-width: 44rem; margin-left: auto; margin-right: auto; } }
+#qc-chip:empty { display: none; }
+#qc-chip .pill { min-height: 1.75rem; }
+@media (max-width: 560px) { #qc-chip { display: none; } }
+.prog-line { display: flex; align-items: center; gap: var(--s-sm); margin: calc(-1 * var(--s-xs)) 0 var(--s-md); font-size: var(--t-xs); color: var(--c-ink-2); }
+.prog-line .bar { flex: 1; max-width: 10rem; height: 4px; }
+.tsec { margin-top: var(--s-lg); }
+.tsec > h3, .tsec-t { display: flex; align-items: baseline; gap: var(--s-xs); font-size: var(--t-xs); font-weight: 500; color: var(--c-ink-2); margin: 0 0 var(--s-2xs); }
+.tsec .n { font-variant-numeric: tabular-nums; }
+.tsec.late > h3 { color: var(--c-warn); }
+.tsec-t { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: var(--s-xs); font-size: var(--t-xs); font-weight: 500; color: var(--c-ink-2); cursor: pointer; padding: var(--s-2xs) 0; }
+.tsec-t .ic { transition: transform var(--fast) var(--ease); }
+.tsec-t[aria-expanded="true"] .ic { transform: rotate(90deg); }
+.tsec-t:focus-visible { outline: 2px solid var(--c-blue-hi); }
+.tlist { list-style: none; margin: 0; padding: 0; }
+.task { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--s-sm); align-items: center; padding: var(--s-sm) 0; border-bottom: 1px solid var(--c-line); }
+.task .tt { display: block; font-size: var(--t-md); line-height: 1.35; }
+.task .tm2 { display: block; font-size: var(--t-xs); color: var(--c-ink-2); margin-top: 2px; }
+.task.late .tm2 { color: var(--c-warn); }
+.task.done .tt { text-decoration: line-through; color: var(--c-ink-2); }
+.tact { all: unset; box-sizing: border-box; padding: 4px var(--s-sm); border-radius: var(--r-pill); box-shadow: inset 0 0 0 1px var(--c-line); font-size: var(--t-2xs); color: var(--c-ink-2); cursor: pointer; white-space: nowrap; }
+.tact:hover { color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-outline); }
+.tact:focus-visible { outline: 2px solid var(--c-blue-hi); }
+.tdone-all { display: flex; align-items: center; gap: var(--s-xs); padding: var(--s-lg) 0; color: var(--c-ink-2); font-size: var(--t-sm); }
+.tdone-all .ic { color: var(--c-blue-hi); }
+.tfoot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2xs) var(--s-md); margin-top: var(--s-lg); }
+.tfoot .lnk { color: var(--c-ink-2); text-decoration: none; font-size: var(--t-xs); }
+.tfoot .lnk:hover { color: var(--c-ink); text-decoration: underline; }
+.seg-f { margin-bottom: var(--s-xs); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>
 
@@ -746,7 +777,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
       <div class="qc-wrap" id="qc-wrap">
         <div class="grab" aria-hidden="true"></div>
         <div class="qc-sh"><b>Tulis cepat</b><span id="qc-mode"></span><button class="iconbtn" type="button" data-act="sheetx" aria-label="Tutup Tulis cepat"><svg class="ic"><use href="#i-x"/></svg></button></div>
-        <form class="qc" id="qc"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg><label for="qc-in" class="sr">Tulis cepat</label><input class="inp" id="qc-in" autocomplete="off" placeholder="Tulis cepat… makan 35rb, besok jam 9 rapat, catat ide"><button class="send" type="submit" aria-label="Simpan"><svg class="ic"><use href="#i-send"/></svg></button></form>
+        <form class="qc" id="qc"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg><span id="qc-chip"></span><label for="qc-in" class="sr">Tulis cepat</label><input class="inp" id="qc-in" autocomplete="off" placeholder="Tulis cepat… makan 35rb, besok jam 9 rapat, catat ide"><button class="send" type="submit" aria-label="Simpan"><svg class="ic"><use href="#i-send"/></svg></button></form>
         <div class="qc-sugg" id="qc-sugg" aria-label="Contoh"></div>
         <div id="qc-out" aria-live="polite" hidden></div>
       </div>
@@ -1081,15 +1112,28 @@ const SUGG = [['makan 35rb nasi padang', 'keuangan'], ['/batas 150rb', 'keuangan
 const QSUGG = [['makan 35rb nasi padang', 'keuangan'], ['besok 9 pagi meeting klien X 1 jam', 'jadwal'], ['ingatkan follow up invoice besok 10:00', 'todo'], ['catat port SIP klien X 5080 #pbx', 'catatan'], ['/fokus konfigurasi PBX klien X', 'fokus'], ['/mendatang', 'jadwal'], ['/cari vpn', 'catatan'], ['=15jt/12', 'kalkulator'], ['/batas 150rb', 'keuangan']];
 const chips = list => list.filter(([, k]) => !k || on(k)).map(([s]) => `<button type="button" data-sugg="${esc(s)}">${esc(s)}</button>`).join('');
 const QMODE = { todo: [['kirim laporan jumat 15:00'], ['telepon vendor besok 10:00'], ['beli tinta printer'], ['perpanjang SIM bulan depan']], note: [['port SIP klien X 5080 #pbx'], ['ide konten tutorial sngrep #ide'], ['wifi tamu kantor: lantai 2 #kantor'], ['buku bagus: Atomic Habits #baca']] };
-const renderSugg = () => { $('#sugg').innerHTML = chips(SUGG); $('#qc-sugg').innerHTML = chips(SHEET === 'qc' && QCTX ? QMODE[QCTX] : QSUGG); };
+const renderSugg = () => { $('#sugg').innerHTML = chips(SUGG); $('#qc-sugg').innerHTML = chips(qcCtx() ? QMODE[qcCtx().replace('-today', '')] : QSUGG); };
 const isSm = () => matchMedia('(max-width: 560px)').matches;
 let SHEET = '', QCTX = null; /* lembar bawah yang terbuka; mode Tulis cepat di HP (todo/note) */
 const QCPH = { todo: 'To-do baru… kirim laporan jumat 15:00', note: 'Catatan… port SIP klien X 5080 #pbx' };
-function setQcPh() { const i = $('#qc-in'); if (!i) return; renderSugg(); i.placeholder = SHEET === 'qc' && QCTX ? QCPH[QCTX] : isSm() ? 'Tulis apa saja… makan 35rb' : 'Tulis cepat… makan 35rb, besok jam 9 rapat, catat ide'; const m = $('#qc-mode'); if (m) m.innerHTML = SHEET === 'qc' && QCTX ? `<button class="pill" type="button" data-act="qcmode" aria-label="Hapus mode ${QCTX === 'todo' ? 'To-do' : 'Catatan'}">${QCTX === 'todo' ? 'To-do' : 'Catatan'} ${ico('x')}</button>${QCTX === 'note' ? ` <button class="pill" type="button" data-act="padnew">${ico('sketch')}Coretan</button>` : ''}` : ''; }
+let QCOFF = false; /* laptop: mode konteks dimatikan sampai pindah halaman */
+function qcCtx() {
+  if (SHEET === 'qc') return QCTX;
+  if (isSm() || QCOFF) return null;
+  return V === 'hari-ini' && on('todo') ? 'todo-today' : V === 'todo' && on('todo') ? 'todo' : V === 'catatan' && on('catatan') && NT === 'catatan' ? 'note' : null;
+}
+function setQcPh() {
+  const i = $('#qc-in'); if (!i) return; renderSugg();
+  const c = qcCtx(), base = c && c.replace('-today', ''), label = base === 'todo' ? 'To-do' : 'Catatan';
+  i.placeholder = base ? (c === 'todo-today' ? 'Tambah to-do hari ini…' : QCPH[base]) : isSm() ? 'Tulis apa saja… makan 35rb' : 'Tulis cepat… makan 35rb, besok jam 9 rapat, catat ide';
+  const pill = base ? `<button class="pill" type="button" data-act="qcmode" aria-label="Hapus mode ${label}, tulis bebas">${label} ${ico('x')}</button>` : '';
+  const m = $('#qc-mode'); if (m) m.innerHTML = SHEET === 'qc' ? pill + (base === 'note' ? ` <button class="pill" type="button" data-act="padnew">${ico('sketch')}Coretan</button>` : '') : '';
+  const d = $('#qc-chip'); if (d) d.innerHTML = SHEET === 'qc' ? '' : pill;
+}
 function openSheet(k) {
   if (PANEL) closePanel();
   SHEET = k; document.documentElement.dataset.sheet = k; $('#sscrim').classList.add('open');
-  if (k === 'qc') { QCTX = V === 'todo' && on('todo') ? 'todo' : V === 'catatan' && on('catatan') ? 'note' : null; QCI = null; renderQC(); setQcPh(); setTimeout(() => $('#qc-in').focus(), 60); }
+  if (k === 'qc') { QCTX = V === 'hari-ini' && on('todo') ? 'todo-today' : V === 'todo' && on('todo') ? 'todo' : V === 'catatan' && on('catatan') ? 'note' : null; QCI = null; renderQC(); setQcPh(); setTimeout(() => $('#qc-in').focus(), 60); }
   if (k === 'more') { renderMore(); $('#more').hidden = false; const b = $('#more .iconbtn'); if (b) b.focus(); }
   renderMNav();
 }
@@ -1125,7 +1169,7 @@ function handle(text, src = 'Telegram', force = null) {
   const l = t.toLowerCase();
   reply(() => {
     SRC = src;
-    if (force === 'todo' && !/^[\/=]/.test(t)) return addTodo(t, parseWhen(t));
+    if ((force === 'todo' || force === 'todo-today') && !/^[\/=]/.test(t)) return addTodo(t, parseWhen(t), force === 'todo-today');
     if (force === 'note' && !/^[\/=]/.test(t)) return addNote(t.replace(/^catat:?\s*/i, ''));
     if (/^\/(start|bantuan|help)/.test(l)) return help();
     if (/^\/ringkasan/.test(l)) return summary();
@@ -1165,11 +1209,11 @@ function addNote(text) {
   botSay(`Tersimpan di Catatan${n.tags.length ? ' dengan tag ' + n.tags.map(x => `<span class="hash">#${esc(x)}</span>`).join(' ') : ''}.${hiddenNote('catatan', 'Catatan')}`, [[{ t: 'Jadikan to-do', a: 'note2todo:' + n.id }, { t: 'Batalkan', a: 'delnote:' + n.id }]]);
   toast('Catatan baru masuk ke tab Catatan');
 }
-function addTodo(text, w) {
+function addTodo(text, w, today) {
   let title = w ? w.title : text;
   title = cap(title.replace(/^(ingatkan|ingetin|todo|to-do|tugas)\s*/i, '').replace(/^untuk\s+/i, '').trim() || text);
-  const due = w ? w.date : null;
-  const td = { id: nid(), text: title, due, done: false, src: SRC };
+  const due = w ? w.date : today ? at(0, 23, 59) : null;
+  const td = { id: nid(), text: title, due, done: false, src: SRC, ...(!w && today ? { allDay: true } : {}) };
   S.todos.push(td); refresh();
   botSay(`To-do baru: <b>${esc(title)}</b>${due ? `<br>Tenggat: ${when(due)}${tgOn() ? '' : '<br><span class="muted">Pengingat muncul lewat notifikasi Google Calendar di HP.</span>'}` : '<br>Tanpa tenggat.'}${hiddenNote('todo', 'To-do')}`, [[{ t: 'Ingatkan besok 09:00', a: 'todoTomorrow:' + td.id }, { t: 'Batalkan', a: 'deltodo:' + td.id }]]);
   toast('To-do baru masuk ke Hari ini');
@@ -1340,49 +1384,31 @@ const folder = (title, body, cls = 'f-surface', extra = '') => `<section class="
 function vToday() {
   const now = new Date(), h = now.getHours();
   const greet = h < 11 ? 'Selamat pagi' : h < 15 ? 'Selamat siang' : h < 18 ? 'Selamat sore' : 'Selamat malam';
-  const evs = S.events.filter(e => isToday(e.start)).sort((a, b) => a.start - b.start);
-  const od = overdue();
-  const open = S.todos.filter(t => !t.done && !od.includes(t)).sort((a, b) => (a.due || 9e15) - (b.due || 9e15));
-  const doneT = S.todos.filter(t => t.done);
-  const fm = focusMin();
-  const outToday = S.tx.filter(t => t.type === 'out' && isToday(t.at)).reduce((a, t) => a + t.amt, 0);
-  const blue = `<section class="folder f-blue hide-sm"><div class="f-tab"><h2>Fokus hari ini</h2></div><div class="f-body">
-    <a class="f-open" href="#fokus" aria-label="Buka Fokus">${ico('arrow')}</a>
-    <p class="f-cap">${T.running ? `Sedang ${MODES[T.mode].label.toLowerCase()}: ${esc(T.task)}` : `${todaySessions().length} sesi selesai · target 4 jam`}</p>
-    <span class="f-big" style="margin-top:var(--s-lg)">${T.running ? `<span data-clock>${fmtClock(T.left)}</span>` : fmtDur(fm)}</span>
-    <div class="acts" style="margin-top:var(--s-lg)">${T.running ? `<button class="btn btn-quiet btn-sm" data-act="pause">Jeda</button>` : `<button class="btn btn-primary btn-sm" data-act="quickfocus">Mulai fokus 25 menit</button>`}</div>
-  </div></section>`;
-  const yellow = od.length ? `<section class="folder f-yellow"><div class="f-tab"><h2>Lewat tenggat<span class="cnt">${od.length}</span></h2></div><div class="f-body">
-    <ul class="rows">${od.map(t => `<li class="row"><button class="ck" data-act="toggle" data-id="${t.id}" aria-label="Tandai selesai">${ico('check')}</button><div><span class="t1">${esc(t.text)}</span><span class="t2">${when(t.due)}${srcL(t.src)}</span></div><button class="pill plain" data-act="snooze" data-id="${t.id}">Besok</button></li>`).join('')}</ul>
-  </div></section>` : folder('Lewat tenggat', '<div class="empty"><b>Tidak ada yang lewat tenggat</b>Semua to-do masih aman.</div>', 'f-surface hide-sm');
-  const doneN = evs.filter(e => e.done === true).length;
-  const jadwal = folder('Jadwal', `${evs.length ? `<div class="jprog"><span><b>${doneN} dari ${evs.length}</b> selesai</span><div class="bar"><i style="width:${doneN / evs.length * 100}%"></i></div></div>` : ''}<ul class="rows">${evs.map(evRow).join('') || '<li><div class="empty"><b>Tidak ada jadwal</b>Ketik di Tulis cepat: besok 9 pagi meeting 1 jam.</div></li>'}</ul>${on('kalender') ? '<div class="more"><button class="lnk" data-go="kalender">Buka kalender</button></div>' : ''}`, 'f-surface o-1');
-  const todo = folder(`To-do<span class="cnt">${open.length}</span>`, `<ul class="rows lim-sm">${open.map(t => `<li class="row"><button class="ck" data-act="toggle" data-id="${t.id}" aria-label="Tandai selesai">${ico('check')}</button><div><span class="t1">${esc(t.text)}</span><span class="t2">${t.due ? when(t.due) : 'Tanpa tenggat'}${srcS(t.src)}</span></div><span></span></li>`).join('')}
-    ${doneT.filter(t => !t.doneAt || isToday(t.doneAt)).map(t => `<li class="row done"><button class="ck on" data-act="toggle" data-id="${t.id}" aria-label="Batal selesai">${ico('check')}</button><div><span class="t1">${esc(t.text)}</span><span class="t2">Selesai</span></div><span></span></li>`).join('')}</ul>
-    ${!open.length && !doneT.length ? '<div class="empty" style="margin-top:var(--s-xs)"><b>Belum ada to-do</b>Tambah di atas, atau ketik di Tulis cepat: ingatkan bayar listrik besok.</div>' : ''}
-    <div class="more"><button class="lnk" data-go="todo">Semua to-do</button></div>`, 'f-surface o-2');
-  const keu = folder(SET.daily.on ? 'Jatah hari ini' : 'Uang hari ini', dailyBody(false) + `<div class="more"><button class="lnk" data-go="keuangan">Buka Keuangan</button></div>`, 'f-surface hide-sm');
-  const notes = folder('Catatan terbaru', `<ul class="rows">${S.notes.slice(0, 3).map(n => noteRow(n)).join('') || '<li><div class="empty"><b>Belum ada catatan</b>Ketik apa saja di Tulis cepat, tambahkan #tag.</div></li>'}</ul><div class="more"><button class="lnk" data-go="catatan">Semua catatan</button></div>`);
-  const lead = `${DAYS_T[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+  const showEv = on('jadwal'), showTd = on('todo');
+  const late = showTd ? S.todos.filter(t => !t.done && t.due && dayDiff(t.due) < 0).sort((a, b) => a.due - b.due) : [];
+  const items = [
+    ...(showEv ? S.events.filter(e => isToday(e.start)).map(e => ({ k: 'e', at: e.start, e })) : []),
+    ...(showTd ? S.todos.filter(t => t.due && isToday(t.due)).map(t => ({ k: 't', at: t.due, t })) : [])
+  ].sort((a, b) => a.at - b.at);
+  const isDone = x => x.k === 'e' ? x.e.done != null : x.t.done;
+  const open = items.filter(x => !isDone(x)), done = items.filter(isDone);
+  const doneOther = showTd ? S.todos.filter(t => t.done && t.doneAt && isToday(t.doneAt) && !(t.due && isToday(t.due))) : [];
+  const row = x => x.k === 'e' ? taskEvent(x.e) : taskTodo(x.t);
+  const sub = [`${DAYS_T[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`, on('keuangan') && SET.daily.on && `jatah ${SET.hideAmt ? '••••' : shortN(Math.max(0, SET.daily.limit - todayOut()))}`, on('fokus') && focusMin() && `fokus ${fmtDur(focusMin())}`].filter(Boolean).join(' · ');
   const hid = MODS.filter(m => !on(m[0])).map(m => m[1]);
-  const colA = [on('jadwal') && jadwal, on('jadwal') && streakCard()].filter(Boolean), colB = [on('todo') && todo].filter(Boolean), cards = [...colA, ...colB];
-  const left = SET.daily.limit - todayOut(), tileN = n => SET.hideAmt ? '••••' : n < 1000 ? String(n) : shortN(n);
-  const tiles = [
-    on('fokus') && ['fokus', 'Fokus', T.running ? fmtClock(T.left) : fmtDur(fm), T.running ? MODES[T.mode].label.toLowerCase() : todaySessions().length + ' sesi', false, T.running],
-    on('keuangan') && (SET.daily.on ? ['keuangan', 'Jatah', tileN(Math.abs(left)), left < 0 ? 'terlewati' : 'sisa hari ini', left < 0] : ['keuangan', 'Keluar', tileN(outToday), 'hari ini', false]),
-    on('todo') && ['todo', 'To-do', String(open.length + od.length), od.length ? od.length + ' lewat tenggat' : 'terbuka', od.length > 0]
-  ].filter(Boolean);
-  const tilesH = tiles.length ? `<div class="mtiles">${tiles.map(([v, l, n, sub, warn, clk]) => `<button class="mtile${warn ? ' warn' : ''}" type="button" data-go="${v}"><span class="l">${l}</span><b${clk ? ' data-clock' : ''}>${n}</b><small>${sub}</small></button>`).join('')}</div>` : '';
-  const start = isBlank() ? folder('Mulai dari sini', `<p class="f-cap">Belum ada data. Tiga langkah supaya halaman ini terisi:</p><ol class="start-steps">
-      <li><div><span class="t1">Ketik di Tulis cepat</span><span class="t2">makan 35rb, besok jam 9 rapat, catat ide #tag</span></div><button class="btn btn-quiet btn-sm" type="button" data-act="qcfocus">Coba</button></li>
-      ${on('jadwal') ? `<li><div><span class="t1">Atur rutinitas</span><span class="t2">${S.routines.length ? S.routines.length + ' rutinitas sudah ada' : 'Kebiasaan harian yang mau dijaga streak-nya'}</span></div><button class="btn btn-quiet btn-sm" type="button" data-act="rut">Atur</button></li>` : ''}
-      ${on('keuangan') ? `<li><div><span class="t1">Cek budget bulanan</span><span class="t2">${Object.keys(BUDGET).length} kategori · batas harian ${SET.daily.on ? rp(SET.daily.limit) : 'mati'}</span></div><button class="btn btn-quiet btn-sm" type="button" data-act="bud">Cek</button></li>` : ''}
-    </ol>`) : '';
-  return `<div class="vh"><div><h1>${greet}</h1><p class="lead">${lead}</p>${hid.length ? `<p class="hint" style="margin-top:var(--s-xs)">Disembunyikan: ${hid.join(', ')}. <button class="lnk small" data-act="settings">Atur tampilan</button></p>` : ''}</div></div>
-    ${tilesH}${start ? `<div style="margin-bottom:var(--s-lg)">${start}</div>` : ''}
-    ${on('todo') && od.length ? `<div class="today-od">${yellow}</div>` : ''}
-    ${cards.length ? (colA.length && colB.length ? `<div class="board today-b"><div class="col">${colA.join('')}</div><div class="col">${colB.join('')}</div></div>` : `<div class="col">${cards.join('')}</div>`) : ''}
-    ${!cards.length && !tiles.length ? '<div class="empty"><b>Semua bagian disembunyikan</b>Buka Atur tampilan untuk menampilkan lagi.<br><button class="btn btn-quiet btn-sm" data-act="settings" style="margin-top:var(--s-md)">Atur tampilan</button></div>' : ''}`;
+  const prog = items.length ? `<div class="prog-line"><div class="bar"><i style="width:${done.length / items.length * 100}%"></i></div><span>${done.length} dari ${items.length} selesai</span></div>` : '';
+  const sec = (title, cls, body) => `<section class="tsec ${cls}"><h3>${title}</h3><ul class="tlist">${body}</ul></section>`;
+  const parts = [];
+  if (late.length) parts.push(sec(`Terlambat <span class="n">${late.length}</span>`, 'late', late.map(taskTodo).join('')));
+  if (!showEv && !showTd) parts.push('<div class="empty"><b>Jadwal dan To-do disembunyikan</b>Tampilkan lagi lewat Pengaturan.</div>');
+  else if (open.length) parts.push(sec('Hari ini', '', open.map(row).join('')));
+  else if (items.length) parts.push(`<div class="tdone-all">${ico('check')}Semua beres untuk hari ini.</div>`);
+  else if (!late.length) parts.push(`<div class="empty"><b>Hari ini masih kosong</b>${showTd ? 'Tambah to-do lewat kolom di atas.' : ''}${isBlank() && showEv ? '<br><button class="btn btn-quiet btn-sm" type="button" data-act="rut" style="margin-top:var(--s-md)">Atur rutinitas harian</button>' : ''}</div>`);
+  const doneRows = [...done.map(row), ...doneOther.map(taskTodo)];
+  if (doneRows.length) parts.push(`<section class="tsec"><button class="tsec-t" type="button" data-act="tdone" aria-expanded="${TDONE}">Selesai <span class="n">${doneRows.length}</span>${ico('chev', 'ic-s')}</button>${TDONE ? `<ul class="tlist">${doneRows.join('')}</ul>` : ''}</section>`);
+  const foot = [showTd && '<button class="lnk small" type="button" data-go="todo">Semua to-do</button>', on('kalender') && '<button class="lnk small" type="button" data-go="kalender">Kalender</button>', showEv && '<button class="lnk small" type="button" data-act="rut">Rutinitas</button>'].filter(Boolean).join('');
+  return `<div class="focus-col"><div class="vh"><div><h1>${greet}</h1><p class="lead">${sub}</p>${hid.length ? `<p class="hint" style="margin-top:var(--s-xs)">Disembunyikan: ${hid.join(', ')}. <button class="lnk small" data-act="settings">Atur</button></p>` : ''}</div></div>
+    ${prog}${parts.join('')}${foot ? `<div class="tfoot">${foot}</div>` : ''}</div>`;
 }
 function evRow(e) {
   const now = new Date(), nowE = e.start <= now && e.end > now, past = e.end <= now, d = e.done === true, skip = e.done === false, due = past && e.done == null;
@@ -1595,35 +1621,37 @@ function padSave() {
     fr.readAsDataURL(file);
   });
 })();
+const tdMeta = t => t.done ? 'Selesai' + (t.doneAt ? ' ' + (isToday(t.doneAt) ? hm(t.doneAt) : when(t.doneAt).toLowerCase()) : '') : !t.due ? 'Tanpa tenggat' : t.allDay ? (isToday(t.due) ? 'Hari ini' : dayLabel(t.due)) : isToday(t.due) ? hm(t.due) : when(t.due);
+function taskTodo(t) {
+  const late = !t.done && t.due && t.due < new Date();
+  return `<li class="task${t.done ? ' done' : ''}${late ? ' late' : ''}"><button class="ck ${t.done ? 'on' : ''}" data-act="toggle" data-id="${t.id}" aria-label="${t.done ? 'Batal selesai' : 'Tandai selesai'}: ${esc(t.text)}">${ico('check')}</button><button class="tbtn" type="button" data-act="tdopen" data-id="${t.id}"><span class="tt">${esc(t.text)}</span><span class="tm2">${tdMeta(t)}${attCount(t)}</span></button>${late ? `<button class="tact" type="button" data-act="snooze" data-id="${t.id}">Besok</button>` : '<span></span>'}</li>`;
+}
+function taskEvent(e) {
+  const now = new Date(), nowE = e.start <= now && e.end > now, d = e.done === true, skip = e.done === false, due = e.end <= now && e.done == null, st = isRoutine(e) ? streakOf(e.title) : 0;
+  return `<li class="task${d || skip ? ' done' : ''}"><button class="ck ${d ? 'on' : due ? 'due' : ''}" data-act="evdone" data-id="${e.id}" aria-pressed="${d}" aria-label="${d ? 'Batal tandai selesai' : 'Tandai selesai'}: ${esc(e.title)}">${ico('check')}</button><div><span class="tt">${esc(e.title)}</span><span class="tm2">${hm(e.start)}–${hm(e.end)} · ${isRoutine(e) ? (st ? st + ' hari beruntun' : 'Rutinitas') : esc(e.cal)}${skip ? ' · dilewati' : ''}${due ? '<span class="sr"> · belum dicentang</span>' : ''}</span></div>${nowE && !d && !skip ? '<span class="pill now">Sekarang</span>' : '<span></span>'}</li>`;
+}
+let TDONE = false;
 function todoRow(t) {
   const late = !t.done && t.due && t.due < new Date(), soon = !t.done && t.due && (late || isToday(t.due));
   return `<li class="row ${t.done ? 'done' : ''}"><button class="ck ${t.done ? 'on' : ''}" data-act="toggle" data-id="${t.id}" aria-label="${t.done ? 'Batal selesai' : 'Tandai selesai'}: ${esc(t.text)}">${ico('check')}</button><button class="tbtn" type="button" data-act="tdopen" data-id="${t.id}"><span class="t1">${esc(t.text)}</span><span class="t2">${t.done ? 'Selesai' + (t.doneAt ? ' ' + when(t.doneAt).toLowerCase() : '') : t.due ? when(t.due) : 'Tanpa tenggat'}${srcS(t.src)}${attCount(t)}</span></button>${soon ? `<button class="pill plain" type="button" data-act="snooze" data-id="${t.id}">Besok</button>` : '<span></span>'}</li>`;
 }
 function vTodo() {
-  const now = new Date(), dd = t => dayDiff(t.due);
+  const dd = t => dayDiff(t.due);
   const open = S.todos.filter(t => !t.done);
-  const od = open.filter(t => t.due && t.due < now).sort((a, b) => a.due - b.due);
-  const rest = open.filter(t => !od.includes(t)).sort((a, b) => (a.due || 9e15) - (b.due || 9e15));
+  const late = open.filter(t => t.due && dd(t) < 0).sort((a, b) => a.due - b.due);
+  const rest = open.filter(t => !late.includes(t)).sort((a, b) => (a.due || 9e15) - (b.due || 9e15));
   const doneL = S.todos.filter(t => t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
-  const doneToday = doneL.filter(t => t.doneAt && isToday(t.doneAt)).length;
-  let G = [['Hari ini', rest.filter(t => t.due && dd(t) === 0)], ['Besok', rest.filter(t => t.due && dd(t) === 1)], ['Minggu ini', rest.filter(t => t.due && dd(t) >= 2 && dd(t) <= 7)], ['Nanti', rest.filter(t => t.due && dd(t) > 7)], ['Tanpa tenggat', rest.filter(t => !t.due)]];
-  if (TDF === 'hari') G = G.slice(0, 1); else if (TDF === 'minggu') G = G.slice(0, 3); else if (TDF === 'tanpa') G = G.slice(4); else if (TDF === 'selesai') G = [];
-  const showOd = ['semua', 'hari', 'minggu'].includes(TDF);
+  let G = [['Terlambat', late, 'late'], ['Hari ini', rest.filter(t => t.due && dd(t) === 0)], ['Besok', rest.filter(t => t.due && dd(t) === 1)], ['Minggu ini', rest.filter(t => t.due && dd(t) >= 2 && dd(t) <= 7)], ['Nanti', rest.filter(t => t.due && dd(t) > 7)], ['Tanpa tenggat', rest.filter(t => !t.due)]];
+  if (TDF === 'hari') G = G.slice(0, 2); else if (TDF === 'minggu') G = G.slice(0, 4); else if (TDF === 'tanpa') G = G.slice(5); else if (TDF === 'selesai') G = [];
   const F = [['semua', 'Semua'], ['hari', 'Hari ini'], ['minggu', 'Minggu ini'], ['tanpa', 'Tanpa tenggat'], ['selesai', 'Selesai']];
-  const chipsF = `<div class="chips scroll-sm" role="group" aria-label="Saring to-do">${F.map(([k, n]) => `<button class="chip" type="button" data-act="tdf" data-k="${k}" aria-pressed="${TDF === k}">${n}</button>`).join('')}</div>`;
-  const yellow = od.length ? `<section class="folder f-yellow"><div class="f-tab"><h2>Lewat tenggat<span class="cnt">${od.length}</span></h2></div><div class="f-body"><ul class="rows">${od.map(todoRow).join('')}</ul></div></section>`
-    : folder('Lewat tenggat', '<div class="empty"><b>Tidak ada yang lewat tenggat</b>Semua to-do masih aman.</div>', 'f-surface hide-sm');
-  const add = folder('Tambah to-do', `<form class="form" data-form="todo"><div class="field"><label class="lab" for="todo-in">To-do baru <small>waktu ikut terbaca</small></label><input class="inp" id="todo-in" placeholder="kirim laporan jumat 15:00" autocomplete="off"></div><div class="acts"><button class="btn btn-primary btn-sm">Tambah</button></div></form>
-    <div class="out" style="margin-top:var(--s-sm)"><div><span>Selesai hari ini</span><b>${doneToday}</b></div><div><span>Masih terbuka</span><b>${open.length}</b></div></div>`, 'f-surface hide-sm');
-  const groups = G.filter(([, l]) => l.length).map(([n, l]) => folder(`${n}<span class="cnt">${l.length}</span>`, `<ul class="rows">${l.map(todoRow).join('')}</ul>`));
-  const doneShown = TDF === 'selesai' || TDALL ? doneL : doneL.slice(0, 5);
-  const doneF = doneL.length && ['semua', 'selesai'].includes(TDF) ? folder(`Selesai<span class="cnt">${doneL.length}</span>`, `<ul class="rows">${doneShown.map(todoRow).join('')}</ul>${doneL.length > doneShown.length ? `<div class="more"><button class="lnk" type="button" data-act="tdall">Tampilkan semua (${doneL.length})</button></div>` : ''}`) : '';
-  const all = [...groups, doneF].filter(Boolean);
-  const none = !open.length && !doneL.length ? '<div class="empty"><b>Belum ada to-do</b>Tambah di atas, atau ketik di Tulis cepat: ingatkan bayar listrik besok.</div>'
-    : !all.length && !(showOd && od.length) ? `<div class="empty"><b>Kosong untuk saringan ini</b>Coba saringan lain.</div>` : '';
-  return `<div class="vh"><div><h1>To-do</h1><p class="lead">${open.length} terbuka · ${od.length} lewat tenggat · ${doneToday} selesai hari ini</p></div>${chipsF}</div>
-    <div class="deck">${showOd ? yellow : ''}${add}</div>
-    ${all.length ? `<div class="board"><div class="col">${all.filter((_, i) => i % 2 === 0).join('')}</div><div class="col">${all.filter((_, i) => i % 2 === 1).join('')}</div></div>` : ''}${none}`;
+  const seg = `<div class="seg seg-s seg-f scroll-sm" role="group" aria-label="Saring to-do">${F.map(([k, n]) => `<button type="button" data-act="tdf" data-k="${k}" aria-pressed="${TDF === k}">${n}</button>`).join('')}</div>`;
+  const secs = G.filter(([, l]) => l.length).map(([n, l, cls]) => `<section class="tsec ${cls || ''}"><h3>${n} <span class="n">${l.length}</span></h3><ul class="tlist">${l.map(taskTodo).join('')}</ul></section>`).join('');
+  let doneH = '';
+  if (TDF === 'selesai') doneH = doneL.length ? `<section class="tsec"><ul class="tlist">${doneL.slice(0, 50).map(taskTodo).join('')}</ul></section>` : '';
+  else if (TDF === 'semua' && doneL.length) doneH = `<section class="tsec"><button class="tsec-t" type="button" data-act="tdall" aria-expanded="${TDALL}">Selesai <span class="n">${doneL.length}</span>${ico('chev', 'ic-s')}</button>${TDALL ? `<ul class="tlist">${doneL.slice(0, 30).map(taskTodo).join('')}</ul>` : ''}</section>`;
+  const none = !open.length && !doneL.length ? '<div class="empty" style="margin-top:var(--s-lg)"><b>Belum ada to-do</b>Tambah lewat kolom di atas, misalnya: kirim laporan jumat 15:00.</div>'
+    : !secs && !doneH ? '<div class="empty" style="margin-top:var(--s-lg)"><b>Kosong untuk saringan ini</b>Coba saringan lain.</div>' : '';
+  return `<div class="focus-col"><div class="vh"><div><h1>To-do</h1><p class="lead">${open.length} terbuka${late.length ? ' · ' + late.length + ' terlambat' : ''}</p></div></div>${seg}${secs}${doneH}${none}</div>`;
 }
 function attachHTML(kind, it) {
   const ids = it.sk || [], list = ids.map(id => S.sketches.find(k => k.id === id)).filter(Boolean), others = S.sketches.filter(k => !ids.includes(k.id));
@@ -1785,6 +1813,7 @@ function render() {
   if (V === 'keuangan' && on('kalkulator') && CT !== 'biasa') calcTool();
   tick();
   renderMNav();
+  setQcPh();
   saveData();
 }
 function refresh() {
@@ -1792,7 +1821,7 @@ function refresh() {
   if (a && viewEl.contains(a) && a.matches('input, textarea') && a.value) return tick();
   render();
 }
-function go(v) { if (SHEET) closeSheet(); const toCalc = v === 'kalkulator' || v === 'hitung'; v = alias(v); if (toCalc) { V = v; KT = 'hitung'; setHash('keuangan'); render(); setPane('web'); const h = $('#hitung'); if (h) h.scrollIntoView({ block: 'start' }); return; } if (!VIEWS.includes(v) || (v !== 'hari-ini' && !on(v))) v = 'hari-ini'; V = v; if (location.hash !== '#' + v) setHash(v); render(); setPane('web'); window.scrollTo({ top: 0 }); }
+function go(v) { if (SHEET) closeSheet(); QCOFF = false; const toCalc = v === 'kalkulator' || v === 'hitung'; v = alias(v); if (toCalc) { V = v; KT = 'hitung'; setHash('keuangan'); render(); setPane('web'); const h = $('#hitung'); if (h) h.scrollIntoView({ block: 'start' }); return; } if (!VIEWS.includes(v) || (v !== 'hari-ini' && !on(v))) v = 'hari-ini'; V = v; if (location.hash !== '#' + v) setHash(v); render(); setPane('web'); window.scrollTo({ top: 0 }); }
 function setPane(p) {
   if (window.matchMedia('(max-width: 860px)').matches) { $('#stage').dataset.pane = p; document.querySelectorAll('[data-pane]').forEach(b => { if (b.tagName === 'BUTTON') b.setAttribute('aria-pressed', b.dataset.pane === p); }); }
 }
@@ -2120,7 +2149,7 @@ function closePanel() { PANEL = ''; $('#panel').classList.remove('open'); $('#pa
 document.addEventListener('click', e => {
   CALCF = !!e.target.closest('#hitung');
   const b = e.target.closest('[data-bot]'); if (b) return botAct(b.dataset.bot, +b.dataset.i);
-  const sg = e.target.closest('[data-sugg]'); if (sg) { if (sg.closest('#qc-sugg')) quick(sg.dataset.sugg, SHEET === 'qc' ? QCTX : null); else handle(sg.dataset.sugg); return; }
+  const sg = e.target.closest('[data-sugg]'); if (sg) { if (sg.closest('#qc-sugg')) quick(sg.dataset.sugg, qcCtx()); else handle(sg.dataset.sugg); return; }
   const pn = e.target.closest('button[data-pane]'); if (pn) { $('#stage').dataset.pane = pn.dataset.pane; document.querySelectorAll('button[data-pane]').forEach(x => x.setAttribute('aria-pressed', x === pn)); return; }
   const gl = e.target.closest('[data-go]'); if (gl) return go(gl.dataset.go);
   const nv = e.target.closest('.nav a, .mnav a, .more-it'); if (nv) { e.preventDefault(); return go(nv.dataset.v); }
@@ -2182,7 +2211,8 @@ document.addEventListener('click', e => {
   if (act === 'limsug') { SET.daily = { on: true, limit: limSuggest() }; applySet(); toast('Batas harian ' + rp(SET.daily.limit)); return; }
   if (act === 'toggle') { const t = S.todos.find(x => x.id === id); if (t) { t.done = !t.done; t.doneAt = t.done ? new Date() : null; if (PANEL === 'td') closePanel(); render(); if (t.done) toast('To-do selesai'); const b = document.querySelector(`#view [data-act="toggle"][data-id="${id}"]`); if (b) b.focus(); } return; }
   if (act === 'tdf') { TDF = a.dataset.k; TDALL = false; render(); const b = document.querySelector(`#view [data-act="tdf"][data-k="${TDF}"]`); if (b) b.focus(); return; }
-  if (act === 'tdall') { TDALL = true; render(); return; }
+  if (act === 'tdall') { TDALL = !TDALL; render(); return; }
+  if (act === 'tdone') { TDONE = !TDONE; render(); const b = $('#view [data-act="tdone"]'); if (b) b.focus(); return; }
   if (act === 'tdopen') { const t = S.todos.find(x => x.id === id); if (t) openPanel('To-do', todoHTML(t), 'td'); return; }
   if (act === 'tdq') { const i = $('#td-due'); i.value = a.textContent; i.dataset.q = a.dataset.q; return; }
   if (act === 'tddel') { const t = S.todos.find(x => x.id === id); S.todos = S.todos.filter(x => x.id !== id); closePanel(); render(); toast(`To-do dihapus${t ? ': ' + t.text : ''}`); return; }
@@ -2208,7 +2238,7 @@ document.addEventListener('click', e => {
   if (act === 'qcopen') return openSheet('qc');
   if (act === 'more') return SHEET === 'more' ? closeSheet() : openSheet('more');
   if (act === 'sheetx') return closeSheet();
-  if (act === 'qcmode') { QCTX = null; setQcPh(); $('#qc-in').focus(); return; }
+  if (act === 'qcmode') { if (SHEET === 'qc') QCTX = null; else QCOFF = true; setQcPh(); $('#qc-in').focus(); return; }
   if (act === 'kt') { KT = a.dataset.k; render(); const b = document.querySelector(`#view [data-act="kt"][data-k="${KT}"]`); if (b) b.focus(); return; }
   if (act === 'qcfocus' && isSm()) return openSheet('qc');
   if (act === 'qcfocus') { const i = $('#qc-in'); i.focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
@@ -2287,7 +2317,7 @@ document.addEventListener('submit', e => {
     }
     applySet(); toast(nn ? `Kategori ${nn} ditambahkan` : 'Budget disimpan ke Sheets'); return;
   }
-  if (f.id === 'qc') { const i = $('#qc-in'); const v = i.value; i.value = ''; quick(v, SHEET === 'qc' ? QCTX : null); return; }
+  if (f.id === 'qc') { const i = $('#qc-in'); const v = i.value; i.value = ''; quick(v, qcCtx()); return; }
   if (f.dataset.form === 'tg') {
     SET.tg.on = true; QCI = null; applySet();
     SEEDING = true; botSay('Halo! project001-Planner sudah tersambung. Kirim apa saja, misalnya <code>makan 35rb</code>, <code>besok jam 9 rapat</code>, atau <code>catat ide</code>. Ketik <code>/bantuan</code> untuk daftar lengkap.'); SEEDING = false;

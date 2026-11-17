@@ -1,7 +1,7 @@
 /* Service worker project001-Planner.
  * Halaman: ambil dari jaringan dulu (selalu versi terbaru saat online), jatuh ke cache saat offline.
  * Ikon dan manifest: dari cache dulu. Nama cache berganti tiap build yang isinya berubah. */
-const CACHE = 'p001-f48ee1eebb';
+const CACHE = 'p001-df75b78442';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png'];
 
 self.addEventListener('install', e => {
