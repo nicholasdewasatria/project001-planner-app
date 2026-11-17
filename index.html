@@ -31,7 +31,7 @@
   --c-fill: rgb(255 255 255 / 0.05); --c-fill-2: rgb(255 255 255 / 0.09); --c-outline: rgb(255 255 255 / 0.46);
   --c-hatch: rgb(255 255 255 / 0.12); --c-clear: rgb(0 0 0 / 0); --c-blue-wash: rgb(27 96 203 / 0.18); --c-yellow-wash: rgb(255 189 0 / 0.11);
   --c-solid: #141418; --c-edge: rgb(255 255 255 / 0.14); --c-scrim: rgb(2 2 2 / 0.6); --c-shadow: rgb(0 0 0 / 0.55);
-  --c-on-blue: #FFFFFF; --c-noir: #020202; --c-warn: #FFBD00; --c-nav: rgb(18 18 22 / 0.96);
+  --c-on-blue: #FFFFFF; --c-noir: #020202; --c-warn: #FFBD00; --c-green: #2FBF71; --c-nav: rgb(18 18 22 / 0.96);
   --hatch: repeating-linear-gradient(135deg, var(--c-hatch) 0 1px, var(--c-clear) 1px 7px);
   --mask-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 12h12.5M13 7l5 5-5 5'/%3E%3C/svg%3E");
   --mask-solid: linear-gradient(#000 0 0);
@@ -46,7 +46,7 @@
   :root:not([data-theme="dark"]) {
     color-scheme: light;
     --c-bg: #F2F2EF; --c-chat: #EAEAE6; --c-surface: #FFFFFF; --c-surface-2: #EEEEEA; --c-line: #DCDCD5;
-    --c-ink: #0B0B0D; --c-ink-2: #5A5A61; --c-blue-hi: #1B56B8; --c-warn: #8A5F00;
+    --c-ink: #0B0B0D; --c-ink-2: #5A5A61; --c-blue-hi: #1B56B8; --c-warn: #8A5F00; --c-green: #1A9E5C;
     --c-fill: rgb(0 0 0 / 0.04); --c-fill-2: rgb(0 0 0 / 0.07); --c-outline: rgb(0 0 0 / 0.40);
     --c-hatch: rgb(0 0 0 / 0.11); --c-blue-wash: rgb(27 96 203 / 0.13); --c-yellow-wash: rgb(255 189 0 / 0.2);
     --c-solid: #FFFFFF; --c-edge: rgb(0 0 0 / 0.10); --c-scrim: rgb(20 20 24 / 0.32); --c-shadow: rgb(20 20 30 / 0.16); --c-nav: rgb(255 255 255 / 0.96);
@@ -55,7 +55,7 @@
 :root[data-theme="light"] {
     color-scheme: light;
     --c-bg: #F2F2EF; --c-chat: #EAEAE6; --c-surface: #FFFFFF; --c-surface-2: #EEEEEA; --c-line: #DCDCD5;
-    --c-ink: #0B0B0D; --c-ink-2: #5A5A61; --c-blue-hi: #1B56B8; --c-warn: #8A5F00;
+    --c-ink: #0B0B0D; --c-ink-2: #5A5A61; --c-blue-hi: #1B56B8; --c-warn: #8A5F00; --c-green: #1A9E5C;
     --c-fill: rgb(0 0 0 / 0.04); --c-fill-2: rgb(0 0 0 / 0.07); --c-outline: rgb(0 0 0 / 0.40);
     --c-hatch: rgb(0 0 0 / 0.11); --c-blue-wash: rgb(27 96 203 / 0.13); --c-yellow-wash: rgb(255 189 0 / 0.2);
     --c-solid: #FFFFFF; --c-edge: rgb(0 0 0 / 0.10); --c-scrim: rgb(20 20 24 / 0.32); --c-shadow: rgb(20 20 30 / 0.16); --c-nav: rgb(255 255 255 / 0.96);
@@ -778,6 +778,16 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .vtip.show { opacity: 1; }
 .vtip b { display: block; font-size: var(--t-sm); font-weight: 600; }
 .vtip span { color: var(--c-ink-2); }
+/* ---------- v1.9: hijau = uang masuk / masih aman ---------- */
+.amt-in { color: var(--c-green); }
+.bar.safe i { background: var(--c-green); }
+/* panel detail jadwal/rutinitas */
+.evp-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-sm); align-items: center; padding: var(--s-md); border-radius: var(--r-inner); box-shadow: inset 0 0 0 1px var(--c-line); }
+.evp-hero .n { font-size: 2.25rem; font-weight: 500; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; text-align: right; }
+.evp-hero .n small { display: block; font-size: var(--t-2xs); letter-spacing: 0; font-weight: 400; color: var(--c-ink-2); margin-top: 4px; }
+.evp-hero .days7 { margin-top: var(--s-xs); flex-wrap: nowrap; gap: 4px; }
+.evp-hero .days7 span { width: 1.6rem; height: 1.6rem; font-size: 9px; }
+.evp-stat { font-size: var(--t-xs); color: var(--c-ink-2); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>
 
@@ -1564,7 +1574,7 @@ function vToday() {
 function evRow(e) {
   const now = new Date(), nowE = e.start <= now && e.end > now, past = e.end <= now, d = e.done === true, skip = e.done === false, due = past && e.done == null;
   const s = isRoutine(e) ? streakOf(e.title) : 0;
-  return `<li class="row erow${skip ? ' skip' : ''}"><button class="ck ${d ? 'on' : due ? 'due' : ''}" data-act="evdone" data-id="${e.id}" aria-pressed="${d}" aria-label="${d ? 'Batal tandai selesai' : 'Tandai selesai'}: ${esc(e.title)}">${ico('check')}</button><span class="tm">${hm(e.start)}<small>s.d. ${hm(e.end)}</small></span><div><span class="t1">${esc(e.title)}</span><span class="t2">${e.cal}${s ? ` · ${s} hari beruntun` : ''}${skip ? ' · dilewati' : ''}${due ? '<span class="sr"> · belum dicentang</span>' : ''}</span></div>${nowE && !d && !skip ? '<span class="pill now">Sekarang</span>' : '<span></span>'}</li>`;
+  return `<li class="row erow${skip ? ' skip' : ''}"><button class="ck ${d ? 'on' : due ? 'due' : ''}" data-act="evdone" data-id="${e.id}" aria-pressed="${d}" aria-label="${d ? 'Batal tandai selesai' : 'Tandai selesai'}: ${esc(e.title)}">${ico('check')}</button><span class="tm">${hm(e.start)}<small>s.d. ${hm(e.end)}</small></span><button class="tbtn" type="button" data-act="evopen" data-id="${e.id}"><span class="t1">${esc(e.title)}</span><span class="t2">${e.cal}${s ? ` · ${s} hari beruntun` : ''}${skip ? ' · dilewati' : ''}${due ? '<span class="sr"> · belum dicentang</span>' : ''}</span></button>${nowE && !d && !skip ? '<span class="pill now">Sekarang</span>' : '<span></span>'}</li>`;
 }
 function streakCard() {
   const head = '', more = '<div class="more"><button class="lnk" type="button" data-act="rut">Kelola rutinitas</button></div>';
@@ -1587,7 +1597,7 @@ function dailyBody(list) {
   const items = S.tx.filter(t => t.type === 'out' && inDaily(t.cat) && isToday(t.at)).sort((a, b) => b.at - a.at);
   return `<p class="f-cap">${left >= 0 ? 'Sisa yang boleh dipakai hari ini' : 'Batas harian terlewati'}</p>
     <span class="f-big" style="${big};${left < 0 ? 'color:var(--c-warn)' : ''}">${rp(Math.abs(left))}</span>
-    <div class="bar ${cls}" style="margin-top:var(--s-md)"><i style="width:${Math.min(100, r * 100)}%"></i></div>
+    <div class="bar ${cls || 'safe'}" style="margin-top:var(--s-md)"><i style="width:${Math.min(100, r * 100)}%"></i></div>
     <p class="f-cap" style="margin-top:var(--s-xs)">Terpakai ${rp(used)} dari ${rp(lim)}${r >= 0.85 && r <= 1 ? ' · <b style="color:var(--c-warn);font-weight:500">hampir habis</b>' : ''} · tagihan tidak dihitung</p>
     ${list ? `<ul class="rows" style="margin-top:var(--s-sm)">${items.map(t => `<li class="row"><span class="tm" style="min-width:3.5rem">${hm(t.at)}</span><div><span class="t1">${esc(t.note)}</span><span class="t2">${t.cat}</span></div><b class="num" style="font-weight:500;white-space:nowrap">${rp(t.amt)}</b></li>`).join('') || '<li><div class="empty"><b>Belum ada pengeluaran hari ini</b>Ketik di Tulis cepat: makan 35rb.</div></li>'}</ul>
     <form class="inl" data-form="limit" style="margin-top:var(--s-md)"><label class="sr" for="lim-in">Batas harian</label><input class="inp num" id="lim-in" value="${SET.hideAmt ? '' : Math.round(lim / 1000) + 'rb'}" placeholder="150rb" autocomplete="off"><button class="btn btn-quiet btn-sm">Ubah batas</button></form>
@@ -1596,7 +1606,7 @@ function dailyBody(list) {
 function budgetRow(k) {
   const s = spent(k), b = BUDGET[k], r = b > 0 ? s / b : 0;
   const cls = r > 1 ? 'over' : r >= 0.85 ? 'warn' : '';
-  return `<div class="brow"><span class="k">${k}</span><div class="bar ${cls}"><i style="width:${Math.min(100, r * 100)}%"></i></div><span class="v">${r >= 0.85 ? `<span class="w">${r > 1 ? 'Lewat' : 'Hampir habis'}</span> · ` : ''}<b>${rpS(s)}</b> / ${rpS(b)}</span></div>`;
+  return `<div class="brow"><span class="k">${k}</span><div class="bar ${cls || 'safe'}"><i style="width:${Math.min(100, r * 100)}%"></i></div><span class="v">${r >= 0.85 ? `<span class="w">${r > 1 ? 'Lewat' : 'Hampir habis'}</span> · ` : ''}<b>${rpS(s)}</b> / ${rpS(b)}</span></div>`;
 }
 function noteRow(n) {
   const fd = NF === 'semua' && n.fd && fdName(n.fd) ? `<span class="fdtag">${esc(fdName(n.fd))}</span> · ` : '';
@@ -1781,7 +1791,7 @@ function taskTodo(t) {
 }
 function taskEvent(e) {
   const now = new Date(), nowE = e.start <= now && e.end > now, d = e.done === true, skip = e.done === false, due = e.end <= now && e.done == null, st = isRoutine(e) ? streakOf(e.title) : 0;
-  return `<li class="task${d || skip ? ' done' : ''}"><button class="ck ${d ? 'on' : due ? 'due' : ''}" data-act="evdone" data-id="${e.id}" aria-pressed="${d}" aria-label="${d ? 'Batal tandai selesai' : 'Tandai selesai'}: ${esc(e.title)}">${ico('check')}</button><div><span class="tt">${esc(e.title)}</span><span class="tm2">${hm(e.start)}–${hm(e.end)} · ${isRoutine(e) ? (st ? st + ' hari beruntun' : 'Rutinitas') : esc(e.cal)}${skip ? ' · dilewati' : ''}${due ? '<span class="sr"> · belum dicentang</span>' : ''}</span></div>${nowE && !d && !skip ? '<span class="pill now">Sekarang</span>' : '<span></span>'}</li>`;
+  return `<li class="task${d || skip ? ' done' : ''}"><button class="ck ${d ? 'on' : due ? 'due' : ''}" data-act="evdone" data-id="${e.id}" aria-pressed="${d}" aria-label="${d ? 'Batal tandai selesai' : 'Tandai selesai'}: ${esc(e.title)}">${ico('check')}</button><button class="tbtn" type="button" data-act="evopen" data-id="${e.id}"><span class="tt">${esc(e.title)}</span><span class="tm2">${hm(e.start)}–${hm(e.end)} · ${isRoutine(e) ? (st ? st + ' hari beruntun' : 'Rutinitas') : esc(e.cal)}${skip ? ' · dilewati' : ''}${due ? '<span class="sr"> · belum dicentang</span>' : ''}</span></button>${nowE && !d && !skip ? '<span class="pill now">Sekarang</span>' : '<span></span>'}</li>`;
 }
 let TDONE = false;
 /* ---------- Statistik: grafik satu warna, tooltip per batang/sel, tampilan tabel ---------- */
@@ -1931,7 +1941,7 @@ function vMoney() {
   const bud = folder('Budget per kategori', `<div class="f-head"><span class="src">${ico('sheet')}Sheets › Budget</span><button class="lnk small" type="button" data-act="bud">Atur budget</button></div>${Object.keys(BUDGET).map(budgetRow).join('') || '<div class="empty"><b>Belum ada budget</b>Atur budget per kategori supaya sisa dan batas harian bisa dihitung.</div>'}`);
   const week = folder('Pengeluaran 7 hari', `<div class="week">${days.map(x => `<div class="d"><div class="col-b ${isToday(x.d) ? 'today' : ''}" style="height:${Math.max(2, x.v / mx * 100)}%">${x.v && !SET.hideAmt ? `<span>${x.v >= 1e6 ? (x.v / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + 'jt' : Math.round(x.v / 1e3) + 'rb'}</span>` : ''}</div><span class="lbl ${isToday(x.d) ? 'today' : ''}">${DAYS_T[x.d.getDay()].slice(0, 3)}</span></div>`).join('')}</div>`);
   const tx = folder('Transaksi', `<div class="f-head"><div class="chips">${['semua', 'keluar', 'masuk'].map(f => `<button class="chip" data-act="txf" data-f="${f}" aria-pressed="${TXF === f}">${cap(f)}</button>`).join('')}</div></div>
-    <ul class="rows">${list.map(t => `<li class="row"><span class="tm" style="min-width:4.5rem">${dayLabel(t.at).replace(/^(\w+), /, '')}<small>${hm(t.at)}</small></span><div><span class="t1">${esc(t.note)}</span><span class="t2">${t.cat}${srcL(t.src)}</span></div><b class="num" style="font-weight:500;white-space:nowrap">${t.type === 'in' ? '+' : '−'}${rp(t.amt)}</b></li>`).join('') || '<li><div class="empty"><b>Belum ada transaksi</b>Catat di samping atau lewat Tulis cepat: gaji 8jt, makan 35rb.</div></li>'}</ul>`, 'f-surface');
+    <ul class="rows">${list.map(t => `<li class="row"><span class="tm" style="min-width:4.5rem">${dayLabel(t.at).replace(/^(\w+), /, '')}<small>${hm(t.at)}</small></span><div><span class="t1">${esc(t.note)}</span><span class="t2">${t.cat}${srcL(t.src)}</span></div><b class="num${t.type === 'in' ? ' amt-in' : ''}" style="font-weight:500;white-space:nowrap">${t.type === 'in' ? '+' : '−'}${rp(t.amt)}</b></li>`).join('') || '<li><div class="empty"><b>Belum ada transaksi</b>Catat di samping atau lewat Tulis cepat: gaji 8jt, makan 35rb.</div></li>'}</ul>`, 'f-surface');
   return `<div class="vh"><div><h1>Keuangan</h1><p class="lead">${mName} ${now.getFullYear()}</p></div></div>
     ${ktab}<div class="kt" data-kt="${KT}">
     <div class="deck"><div data-ks="ringkas">${blue}</div><div data-ks="trans">${form}</div></div>
@@ -2327,6 +2337,22 @@ function fdHTML() {
   <section class="pn-sec"><h3>Folder baru</h3><form class="inl" data-form="fdnew"><label class="sr" for="fd-new">Nama folder baru</label><input class="inp" id="fd-new" placeholder="Misalnya: Resep, Klien, Bacaan" autocomplete="off"><button class="btn btn-primary btn-sm">Tambah</button></form></section>
   <p class="hint">Tulis cepat ke folder dari halaman mana pun dengan awalan nama folder, misalnya <code>kerja: cek backup server</code>. Khusus Inspirasi bisa juga <code>ide: …</code>. Menghapus folder tidak menghapus catatannya.</p>`;
 }
+function evHTML(e) {
+  const now = new Date(), r = isRoutine(e) ? S.routines.find(x => x.id === e.rid) || S.routines.find(x => x.name === e.title) : null;
+  const mins = Math.round((e.end - e.start) / 60000), nowE = e.start <= now && e.end > now;
+  const st = e.done === true ? 'Selesai' : e.done === false ? 'Dilewati' : nowE ? 'Sedang berlangsung' : e.end <= now ? 'Belum dicentang' : 'Belum mulai';
+  let hero = '';
+  if (r) {
+    const h = habitOf(r.name), sk = streakOf(r.name), D30 = lastDays(30); let sch = 0, ok = 0;
+    D30.slice(0, 29).forEach(d => { if (r.days.includes(d.getDay())) { sch++; if (h.days[dk(d)]) ok++; } });
+    const days = [...Array(7)].map((_, i) => { const d = at(i - 6, 0), okd = !!h.days[dk(d)], isT = i === 6, off = !r.days.includes(d.getDay()); return `<span class="${okd ? 'ok' : ''}${isT ? ' today' : ''}${off && !okd ? ' off' : ''}" title="${dayLabel(d)}">${DAYS_S[d.getDay()]}</span>`; }).join('');
+    hero = `<div class="evp-hero"><div><b style="font-weight:500">Streak</b><div class="evp-stat">Rekor ${h.best} hari · ${sch ? Math.round(ok / sch * 100) : 0}% tercapai 30 hari terakhir</div><div class="days7" aria-label="7 hari terakhir">${days}</div></div><span class="n">${sk}<small>hari beruntun</small></span></div>`;
+  }
+  return `${hero}
+    <dl class="kv"><dt>Waktu</dt><dd>${dayLabel(e.start)}, ${hm(e.start)}–${hm(e.end)} (${mins < 60 ? mins + ' menit' : String(+(mins / 60).toFixed(1)).replace('.', ',') + ' jam'})</dd>${r ? `<dt>Jadwal</dt><dd>${r.start}, ${daysLabel(r.days)}</dd>` : ''}<dt>Kalender</dt><dd>${esc(e.cal)}</dd><dt>Status</dt><dd>${st}</dd></dl>
+    <div class="acts"><button class="btn btn-primary btn-sm" type="button" data-act="evpdone" data-id="${e.id}">${e.done === true ? 'Batal selesai' : 'Tandai selesai'}</button>${e.done === true ? '' : `<button class="btn btn-quiet btn-sm" type="button" data-act="evpskip" data-id="${e.id}">${e.done === false ? 'Batal lewati' : 'Lewati hari ini'}</button>`}${r ? `<button class="btn btn-quiet btn-sm" type="button" data-act="evpedit" data-id="${e.id}">Ubah rutinitas</button>` : `<button class="btn btn-quiet btn-sm" type="button" data-act="evpdel" data-id="${e.id}">Hapus jadwal</button>`}</div>
+    ${r ? '<p class="hint">Hari yang tidak dijadwalkan dianggap libur dan tidak memutus streak.</p>' : '<p class="hint">Jadwal ini nanti tersinkron dengan Google Calendar.</p>'}`;
+}
 function openNote(id) {
   const n = S.notes.find(x => x.id === id); if (!n) return;
   $('#panel-b').innerHTML = `<form class="form" data-form="nedit" data-id="${n.id}">
@@ -2442,6 +2468,15 @@ document.addEventListener('click', e => {
   if (act === 'snooze') { const t = S.todos.find(x => x.id === id); if (t) { t.due = at(1, 9); render(); toast('Ditunda ke besok 09:00'); } return; }
   if (act === 'note') return openNote(id);
   if (act === 'vtab') { const card = a.closest('.folder'); const onT = !card.classList.contains('show-table'); card.classList.toggle('show-table', onT); a.setAttribute('aria-pressed', onT); a.textContent = onT ? 'Grafik' : 'Tabel'; return; }
+  if (act === 'evopen') { const e = S.events.find(x => x.id === id); if (e) openPanel(e.title, evHTML(e), 'ev'); return; }
+  if (act === 'evpdone' || act === 'evpskip') {
+    const e = S.events.find(x => x.id === id); if (!e) return;
+    const val = act === 'evpdone' ? (e.done === true ? null : true) : (e.done === false ? null : false);
+    const r = setEventDone(e, val); render(); $('#panel-b').innerHTML = evHTML(e);
+    toast(val === true ? streakMsg(e, r) : val === false ? e.title + ' dilewati hari ini' : 'Status dikembalikan'); return;
+  }
+  if (act === 'evpedit') { const e = S.events.find(x => x.id === id); const r = e && (S.routines.find(x => x.id === e.rid) || S.routines.find(x => x.name === e.title)); RED = r ? r.id : null; openPanel('Rutinitas', rutHTML(), 'rut'); const n = $('#rut-name'); if (n) n.focus(); return; }
+  if (act === 'evpdel') { const e = S.events.find(x => x.id === id); S.events = S.events.filter(x => x.id !== id); closePanel(); render(); toast('Jadwal dihapus' + (e ? ': ' + e.title : '')); return; }
   if (act === 'nf') { NF = a.dataset.k; render(); const b = document.querySelector(`#view [data-act="nf"][data-k="${NF}"]`); if (b) b.focus(); return; }
   if (act === 'fdpanel') return openPanel('Folder catatan', fdHTML(), 'fd');
   if (act === 'fddel') { if (a.dataset.armed !== '1') { a.dataset.armed = '1'; a.setAttribute('aria-label', 'Tekan lagi untuk hapus folder'); a.style.boxShadow = 'inset 0 0 0 1.5px var(--c-warn)'; toast('Tekan × sekali lagi untuk menghapus folder'); return; } const k = a.dataset.k, nm = fdName(k); S.noteFolders = S.noteFolders.filter(x => x.id !== k); S.notes.forEach(n => { if (n.fd === k) n.fd = null; }); if (NF === k) NF = 'semua'; $('#panel-b').innerHTML = fdHTML(); render(); toast(`Folder ${nm} dihapus. Catatannya pindah ke Tanpa folder`); return; }
