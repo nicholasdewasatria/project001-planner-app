@@ -691,6 +691,23 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .tfoot .lnk { color: var(--c-ink-2); text-decoration: none; font-size: var(--t-xs); }
 .tfoot .lnk:hover { color: var(--c-ink); text-decoration: underline; }
 .seg-f { margin-bottom: var(--s-xs); }
+/* ---------- v1.7: folder catatan ---------- */
+.nf { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 var(--s-sm); }
+.nf .chip { flex: none; }
+.nf .chip .n { margin-left: 6px; font-variant-numeric: tabular-nums; opacity: 0.7; }
+.nf .chip.add { box-shadow: inset 0 0 0 1px var(--c-line); color: var(--c-ink-2); }
+.note-list { list-style: none; margin: var(--s-xs) 0 0; padding: 0; }
+.note-list > li + li { border-top: 1px solid var(--c-line); }
+.note-list .row.btnrow { padding: var(--s-sm) 0; border-radius: 0; }
+.note-list .row.btnrow:hover { background: none; }
+.note-list .row.btnrow:hover .t1 { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--c-ink-2); }
+.fdtag { color: var(--c-blue-hi); }
+.note-edit { min-height: 9rem; resize: vertical; padding: var(--s-sm); line-height: 1.5; font-size: var(--t-md); }
+.fset { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--s-xs); align-items: center; padding: var(--s-xs) 0; }
+.fset + .fset { border-top: 1px solid var(--c-line); }
+.fset .iconbtn { width: 2.25rem; height: 2.25rem; }
+.qc-sh:has(#qc-mode:not(:empty)) > b { display: none; }
+.qc-sh #qc-mode { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>
 
@@ -876,7 +893,14 @@ const DOW3 = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 function daysLabel(ds) { const k = [...ds].sort().join(''); if (ds.length === 7) return 'setiap hari'; if (k === '12345') return 'Sen–Jum'; if (k === '123456') return 'Sen–Sab'; if (k === '06') return 'akhir pekan'; return [1, 2, 3, 4, 5, 6, 0].filter(d => ds.includes(d)).map(d => DOW3[d]).join(', '); }
 const hmAdd = (st, m) => { const [h, mi] = st.split(':').map(Number), t = h * 60 + mi + m; return pad(Math.floor(t / 60) % 24) + ':' + pad(t % 60); };
 const shortN = n => n >= 1e6 ? String(+(n / 1e6).toFixed(2)).replace('.', ',') + 'jt' : Math.round(n / 1e3) + 'rb';
-const emptyData = () => ({ notes: [], todos: [], events: [], tx: [], sessions: [], habits: {}, routines: [], sketches: [] });
+const defaultFolders = () => [{ id: 'ins', name: 'Inspirasi' }, { id: 'krj', name: 'Kerja' }, { id: 'pri', name: 'Pribadi' }];
+function withFolders(o) { /* data contoh: folder bawaan + catatan dibagi ke folder */
+  o.noteFolders = defaultFolders();
+  o.notes.forEach(n => { n.fd = n.tags.includes('ide') ? 'ins' : n.tags.some(t => ['kantor', 'pbx', 'fusionpbx', 'vpn', 'server', 'rocky', 'sinarjaya'].includes(t)) ? 'krj' : null; });
+  return o;
+}
+const fdName = id => ((S.noteFolders || []).find(x => x.id === id) || {}).name || '';
+const emptyData = () => ({ noteFolders: defaultFolders(), notes: [], todos: [], events: [], tx: [], sessions: [], habits: {}, routines: [], sketches: [] });
 /* contoh coretan: diagram jaringan sederhana (koordinat dasar lebar 800) */
 function sampleSketch(id) {
   const rect = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h], [x, y + 1]];
@@ -978,7 +1002,8 @@ function saveData(noCloud) {
   SDT = setTimeout(() => { try { localStorage.setItem(DKEY, JSON.stringify(dataBlob())); } catch (e) { toast('Penyimpanan HP penuh. Ekspor data, lalu hapus coretan berfoto yang lama'); } }, 300);
   if (!noCloud && typeof gQueue === 'function') gQueue();
 }
-let S = APP ? (loadData() || emptyData()) : seed();
+let S = APP ? (loadData() || emptyData()) : withFolders(seed());
+if (!S.noteFolders) S.noteFolders = defaultFolders();
 
 /* ---------- hitung ---------- */
 const isToday = d => dayDiff(d) === 0;
@@ -1109,9 +1134,9 @@ let typing = false;
 function reply(fn) { typing = true; renderChat(); setTimeout(() => { typing = false; fn(); }, 420); }
 
 const SUGG = [['makan 35rb nasi padang', 'keuangan'], ['/batas 150rb', 'keuangan'], ['/fokus konfigurasi PBX klien X', 'fokus'], ['catat port SIP klien X 5080 #pbx', 'catatan'], ['besok 9 pagi meeting klien X 1 jam', 'jadwal'], ['ingatkan follow up invoice', 'todo'], ['/streak', 'jadwal'], ['/mendatang', 'jadwal'], ['/cari vpn', 'catatan'], ['sisa budget makan?', 'keuangan'], ['=15jt/12', 'kalkulator'], ['/ringkasan'], ['/bantuan']];
-const QSUGG = [['beli es krim 10rb', 'keuangan'], ['reminder meeting besok jam 10', 'todo'], ['habit baru minum air jam 7 setiap hari', 'jadwal'], ['besok 9 pagi meeting klien X 1 jam', 'jadwal'], ['catat port SIP klien X 5080 #pbx', 'catatan'], ['/fokus konfigurasi PBX klien X', 'fokus'], ['/mendatang', 'jadwal'], ['/cari vpn', 'catatan'], ['=15jt/12', 'kalkulator'], ['/batas 150rb', 'keuangan']];
+const QSUGG = [['ide: app pengingat servis AC', 'catatan'], ['beli es krim 10rb', 'keuangan'], ['reminder meeting besok jam 10', 'todo'], ['habit baru minum air jam 7 setiap hari', 'jadwal'], ['besok 9 pagi meeting klien X 1 jam', 'jadwal'], ['catat port SIP klien X 5080 #pbx', 'catatan'], ['/fokus konfigurasi PBX klien X', 'fokus'], ['/mendatang', 'jadwal'], ['/cari vpn', 'catatan'], ['=15jt/12', 'kalkulator'], ['/batas 150rb', 'keuangan']];
 const chips = list => list.filter(([, k]) => !k || on(k)).map(([s]) => `<button type="button" data-sugg="${esc(s)}">${esc(s)}</button>`).join('');
-const QMODE = { todo: [['kirim laporan jumat 15:00'], ['reminder meeting besok jam 10'], ['beli es krim 10rb'], ['habit baru baca buku jam 21']], note: [['port SIP klien X 5080 #pbx'], ['ide konten tutorial sngrep #ide'], ['wifi tamu kantor: lantai 2 #kantor'], ['buku bagus: Atomic Habits #baca']] };
+const QMODE = { todo: [['kirim laporan jumat 15:00'], ['reminder meeting besok jam 10'], ['beli es krim 10rb'], ['habit baru baca buku jam 21']], note: [['ide: app pengingat servis AC'], ['port SIP klien X 5080 #pbx'], ['wifi tamu kantor: lantai 2 #kantor'], ['buku bagus: Atomic Habits #baca']] };
 const renderSugg = () => { $('#sugg').innerHTML = chips(SUGG); $('#qc-sugg').innerHTML = chips(qcCtx() ? QMODE[qcCtx().replace('-today', '')] : QSUGG); };
 const isSm = () => matchMedia('(max-width: 560px)').matches;
 let SHEET = '', QCTX = null; /* lembar bawah yang terbuka; mode Tulis cepat di HP (todo/note) */
@@ -1124,8 +1149,8 @@ function qcCtx() {
 }
 function setQcPh() {
   const i = $('#qc-in'); if (!i) return; renderSugg();
-  const c = qcCtx(), base = c && c.replace('-today', ''), label = base === 'todo' ? 'To-do' : 'Catatan';
-  i.placeholder = base ? (c === 'todo-today' ? 'Tambah to-do hari ini…' : QCPH[base]) : isSm() ? 'Tulis apa saja… makan 35rb' : 'Tulis cepat… makan 35rb, besok jam 9 rapat, catat ide';
+  const c = qcCtx(), base = c && c.replace('-today', ''), label = base === 'todo' ? 'To-do' : 'Catatan' + (NF !== 'semua' && fdName(NF) ? ' · ' + fdName(NF) : '');
+  i.placeholder = base ? (c === 'todo-today' ? 'Tambah to-do hari ini…' : base === 'note' && NF !== 'semua' && fdName(NF) ? 'Tulis di ' + fdName(NF) + '…' : QCPH[base]) : isSm() ? 'Tulis apa saja… makan 35rb' : 'Tulis cepat… makan 35rb, besok jam 9 rapat, catat ide';
   const pill = base ? `<button class="pill" type="button" data-act="qcmode" aria-label="Hapus mode ${label}, tulis bebas">${label} ${ico('x')}</button>` : '';
   const m = $('#qc-mode'); if (m) m.innerHTML = SHEET === 'qc' ? pill + (base === 'note' ? ` <button class="pill" type="button" data-act="padnew">${ico('sketch')}Coretan</button>` : '') : '';
   const d = $('#qc-chip'); if (d) d.innerHTML = SHEET === 'qc' ? '' : pill;
@@ -1170,6 +1195,8 @@ function handle(text, src = 'Telegram', force = null) {
   reply(() => {
     SRC = src;
     const cmd = /^[\/=]/.test(t);
+    const fp = !cmd && t.match(/^\s*([\p{L}\d][\p{L}\d ]{0,28}?)\s*:\s*(\S[\s\S]*)$/u);
+    if (fp) { const key = fp[1].trim().toLowerCase(), fdr = (S.noteFolders || []).find(x => x.name.toLowerCase() === key) || (['ide', 'inspirasi', 'idea'].includes(key) ? (S.noteFolders || []).find(x => x.id === 'ins' || x.name.toLowerCase() === 'inspirasi') : null); if (fdr) return addNote(fp[2], fdr.id); }
     const habit = !cmd && t.match(/^\s*(?:tolong\s+)?(?:(?:buat|bikin|tambah)\w*\s+)?(?:habit|kebiasaan|rutinitas)(?:\s+baru)?\b\s*:?\s*(.*)$/i);
     if (habit) return addHabit(habit[1]);
     const isRem = !cmd && /\b(reminder|pengingat|ingatkan|ingetin|remind)\b/i.test(t);
@@ -1177,7 +1204,7 @@ function handle(text, src = 'Telegram', force = null) {
     if (money && !money.bare && !isRem) return addTx(t, money);
     if (isRem) return addTodo(t, parseWhen(t), force === 'todo-today', true);
     if ((force === 'todo' || force === 'todo-today') && !cmd) return addTodo(t, parseWhen(t), force === 'todo-today');
-    if (force === 'note' && !cmd) return addNote(t.replace(/^catat:?\s*/i, ''));
+    if (force === 'note' && !cmd) return addNote(t.replace(/^catat:?\s*/i, ''), NF !== 'semua' ? NF : null);
     if (/^\/(start|bantuan|help)/.test(l)) return help();
     if (/^\/ringkasan/.test(l)) return summary();
     if (/^\/?batas\b/.test(l)) return limitReply(t);
@@ -1200,6 +1227,7 @@ function handle(text, src = 'Telegram', force = null) {
 function help() {
   botSay(`Kirim apa saja, saya pilah sendiri:<ul>
 <li>Catatan: tulis biasa, tambah <code>#tag</code></li>
+<li>Ide cepat: <code>ide: app pengingat servis AC</code> (masuk folder Inspirasi), atau <code>kerja: ...</code> untuk folder lain</li>
 <li>To-do: <code>kirim laporan jumat 15:00</code></li>
 <li>Pengingat: <code>reminder meeting besok jam 10</code></li>
 <li>Habit baru: <code>habit baru minum air jam 7 setiap hari</code></li>
@@ -1235,11 +1263,12 @@ function addHabit(raw) {
   botSay(`Habit baru: <b>${esc(name)}</b><br>${start}, ${daysLabel(days)}. Centang tiap hari supaya streak jalan.${hiddenNote('jadwal', 'Jadwal')}`, [[{ t: 'Kelola rutinitas', a: 'rut' }, { t: 'Batalkan', a: 'delhabit:' + r.id }]]);
   toast('Habit baru ditambahkan');
 }
-function addNote(text) {
-  const n = { id: nid(), text: text.replace(/\s+/g, ' ').trim(), tags: tagsOf(text), src: SRC, at: new Date() };
+function addNote(text, fd) {
+  const f0 = fd && (S.noteFolders || []).some(x => x.id === fd) ? fd : null;
+  const n = { id: nid(), text: text.replace(/\s+/g, ' ').trim(), tags: tagsOf(text), src: SRC, at: new Date(), fd: f0 };
   S.notes.unshift(n); refresh();
-  botSay(`Tersimpan di Catatan${n.tags.length ? ' dengan tag ' + n.tags.map(x => `<span class="hash">#${esc(x)}</span>`).join(' ') : ''}.${hiddenNote('catatan', 'Catatan')}`, [[{ t: 'Jadikan to-do', a: 'note2todo:' + n.id }, { t: 'Batalkan', a: 'delnote:' + n.id }]]);
-  toast('Catatan baru masuk ke tab Catatan');
+  botSay(`Tersimpan di ${f0 ? '<b>' + esc(fdName(f0)) + '</b>' : 'Catatan'}${n.tags.length ? ' dengan tag ' + n.tags.map(x => `<span class="hash">#${esc(x)}</span>`).join(' ') : ''}.${hiddenNote('catatan', 'Catatan')}`, [[{ t: 'Buka', a: 'opennote:' + n.id }, { t: 'Jadikan to-do', a: 'note2todo:' + n.id }, { t: 'Batalkan', a: 'delnote:' + n.id }]]);
+  toast(f0 ? 'Tersimpan di ' + fdName(f0) : 'Catatan tersimpan');
 }
 const CMD_HEAD = /^(tolong|buat(?:lah|kan)?|bikin(?:in|kan)?|tambah(?:kan)?|reminder|pengingat|ingatkan|ingetin|remind(?:\s+me)?|aku|saya|untuk|utk|buat|todo|to-do|tugas|baru)\s+/i;
 function cleanCmd(x) { let v = String(x).trim(), g = 0; while (CMD_HEAD.test(v + ' ') && g++ < 8) v = (v + ' ').replace(CMD_HEAD, '').trim(); return v; }
@@ -1330,6 +1359,7 @@ function botAct(a, i) {
   const id = +v;
   const say = (h, kb) => reply(() => botSay(h, kb));
   if (k === 'go') { go(v); renderChat(); return; }
+  if (k === 'opennote') { renderChat(); if (V !== 'catatan') go('catatan'); openNote(id); return; }
   if (k === 'rut') { renderChat(); RED = null; openPanel('Rutinitas', rutHTML(), 'rut'); return; }
   if (k === 'delhabit') { const r = S.routines.find(x => x.id === id); if (r) { S.routines = S.routines.filter(x => x !== r); syncRoutines(); refresh(); } return say('Habit dibatalkan.'); }
   if (k === 'search') { NQ = v; go('catatan'); renderChat(); return; }
@@ -1416,6 +1446,7 @@ const alias = v => (v === 'kalkulator' || v === 'hitung') ? 'keuangan' : v; /* H
 let TDF = 'semua', TDALL = false, CALCF = false, KT = 'ringkas';
 let CMO = 0, CSEL = dk(new Date());
 const CF = { jadwal: true, todo: true, catatan: true };
+let NF = 'semua';
 let V = 'hari-ini', NQ = '', NTAG = '', TXF = 'semua', CT = 'biasa', CEX = '', CRES = '0';
 const viewEl = $('#view');
 const folder = (title, body, cls = 'f-surface', extra = '') => `<section class="folder ${cls}"><div class="f-tab"><h2>${title}</h2></div><div class="f-body">${extra}${body}</div></section>`;
@@ -1487,7 +1518,8 @@ function budgetRow(k) {
   return `<div class="brow"><span class="k">${k}</span><div class="bar ${cls}"><i style="width:${Math.min(100, r * 100)}%"></i></div><span class="v">${r >= 0.85 ? `<span class="w">${r > 1 ? 'Lewat' : 'Hampir habis'}</span> · ` : ''}<b>${rpS(s)}</b> / ${rpS(b)}</span></div>`;
 }
 function noteRow(n) {
-  return `<li><button class="row btnrow" data-act="note" data-id="${n.id}"><div><span class="t1 clamp2">${esc(n.text)}</span><span class="t2">${n.tags.map(t => `<span class="hash">#${esc(t)}</span>`).join(' ')}${n.tags.length ? ' · ' : ''}${showSrc(n.src) ? n.src + " · " : ""}${when(n.at)}${attCount(n)}</span></div><svg class="ic ic-s muted"><use href="#i-arrow"/></svg></button></li>`;
+  const fd = NF === 'semua' && n.fd && fdName(n.fd) ? `<span class="fdtag">${esc(fdName(n.fd))}</span> · ` : '';
+  return `<li><button class="row btnrow" data-act="note" data-id="${n.id}"><div><span class="t1 clamp2">${esc(n.text)}</span><span class="t2">${fd}${n.tags.map(t => `<span class="hash">#${esc(t)}</span>`).join(' ')}${n.tags.length ? ' · ' : ''}${when(n.at)}${attCount(n)}</span></div><svg class="ic ic-s muted"><use href="#i-arrow"/></svg></button></li>`;
 }
 
 /* ---------- kalender ---------- */
@@ -1726,20 +1758,19 @@ function vSketches() {
 }
 function vNotes() {
   if (NT === 'coretan') return notesHead() + vSketches();
-  const tags = [...new Set(S.notes.flatMap(n => n.tags))];
-  return `${notesHead()}
-  <div class="board">
-    <div class="col">${folder('Tulis', `<form class="form" data-form="note"><div class="field"><label class="lab" for="note-in">Catatan baru <small>pakai #tag untuk mengelompokkan</small></label><textarea class="inp" id="note-in" placeholder="Misalnya: port SIP klien X 5080, password di brankas #pbx #klienx"></textarea></div><div class="acts"><button class="btn btn-primary">Simpan catatan</button></div></form>`, 'f-surface hide-sm')}
-    ${folder('Tag', `<div class="chips">${['', ...tags].map(t => `<button class="chip" data-act="tag" data-tag="${esc(t)}" aria-pressed="${NTAG === t}">${t ? '#' + esc(t) : 'Semua'}</button>`).join('')}</div>`)}</div>
-    <div class="col">${folder(`Semua catatan<span class="cnt" id="n-cnt">${S.notes.length}</span>`, `<div class="searchbox">${ico('search')}<label class="sr" for="nq">Cari catatan</label><input class="inp" id="nq" placeholder="Cari isi atau #tag…" value="${esc(NQ)}" autocomplete="off"></div><ul class="rows" id="n-list" style="margin-top:var(--s-xs)"></ul>`)}</div>
-  </div>`;
+  if (NF !== 'semua' && NF !== 'none' && !fdName(NF)) NF = 'semua';
+  const cnt = id => S.notes.filter(n => id === 'semua' ? true : id === 'none' ? !n.fd || !fdName(n.fd) : n.fd === id).length;
+  const fl = [['semua', 'Semua'], ...(S.noteFolders || []).map(x => [x.id, x.name]), ...(cnt('none') ? [['none', 'Tanpa folder']] : [])];
+  return `<div class="focus-col">${notesHead()}
+    <div class="nf" role="group" aria-label="Folder catatan">${fl.map(([id, n]) => `<button class="chip" type="button" data-act="nf" data-k="${id}" aria-pressed="${NF === id}">${esc(n)}<span class="n">${cnt(id)}</span></button>`).join('')}<button class="chip add" type="button" data-act="fdpanel">${ico('plus', 'ic-s')}Folder</button></div>
+    <div class="searchbox">${ico('search')}<label class="sr" for="nq">Cari catatan</label><input class="inp" id="nq" placeholder="Cari isi atau #tag…" value="${esc(NQ)}" autocomplete="off"></div>
+    <ul class="note-list" id="n-list"></ul></div>`;
 }
 function renderNoteList() {
   const el = $('#n-list'); if (!el) return;
   const q = NQ.toLowerCase().replace('#', '').trim();
-  const list = S.notes.filter(n => (!NTAG || n.tags.includes(NTAG)) && (!q || n.text.toLowerCase().includes(q) || n.tags.some(t => t.includes(q))));
-  el.innerHTML = list.map(noteRow).join('') || (S.notes.length ? `<li><div class="empty"><b>Tidak ada yang cocok</b>Coba kata lain atau pilih tag Semua.</div></li>` : `<li><div class="empty"><b>Belum ada catatan</b>Tulis di samping, atau ketik di Tulis cepat kapan saja.</div></li>`);
-  $('#n-cnt').textContent = list.length;
+  const list = S.notes.filter(n => (NF === 'semua' || (NF === 'none' ? !n.fd || !fdName(n.fd) : n.fd === NF)) && (!q || n.text.toLowerCase().includes(q) || n.tags.some(t => t.includes(q))));
+  el.innerHTML = list.map(noteRow).join('') || (q ? '<li><div class="empty"><b>Tidak ada yang cocok</b>Coba kata lain.</div></li>' : `<li><div class="empty"><b>${NF !== 'semua' && fdName(NF) ? 'Folder ' + esc(fdName(NF)) + ' masih kosong' : 'Belum ada catatan'}</b>Ketik di kolom atas. Dari halaman mana pun bisa juga: <code>ide: …</code></div></li>`);
 }
 
 function vFocus() {
@@ -2101,7 +2132,7 @@ async function gSetup() {
 const gFmt = d => d instanceof Date && !isNaN(d) ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}` : '';
 function gTables() {
   return {
-    Catatan: [['id', 'waktu', 'teks', 'tag', 'sumber', 'coretan'], ...S.notes.map(n => [n.id, gFmt(n.at), n.text, n.tags.join(' '), n.src, (n.sk || []).join(' ')])],
+    Catatan: [['id', 'waktu', 'folder', 'teks', 'tag', 'sumber', 'coretan'], ...S.notes.map(n => [n.id, gFmt(n.at), fdName(n.fd), n.text, n.tags.join(' '), n.src, (n.sk || []).join(' ')])],
     Todo: [['id', 'teks', 'tenggat', 'selesai', 'selesai_pada', 'sumber', 'coretan'], ...S.todos.map(t => [t.id, t.text, gFmt(t.due), t.done ? 'ya' : '', gFmt(t.doneAt), t.src, (t.sk || []).join(' ')])],
     Transaksi: [['id', 'waktu', 'jenis', 'kategori', 'jumlah', 'catatan', 'sumber'], ...S.tx.map(t => [t.id, gFmt(t.at), t.type === 'in' ? 'masuk' : 'keluar', t.cat, t.amt, t.note, t.src])],
     Budget: [['kategori', 'budget_bulanan', 'dihitung_batas_harian'], ...Object.keys(BUDGET).map(k => [k, BUDGET[k], inDaily(k) ? 'ya' : 'tidak'])],
@@ -2174,11 +2205,19 @@ function gHTML() {
       ${ids.folder ? `<a class="more-row" href="https://drive.google.com/drive/folders/${ids.folder}" target="_blank" rel="noopener">${ico('folder')}<span>Folder project001-Planner<small>data.json + Coretan</small></span>${ico('arrow')}</a>` : ''}
     </div><p class="hint">Data utama ada di data.json dan ikut ke semua perangkat yang masuk dengan akun ini. Spreadsheet diperbarui otomatis setiap sinkron. Mengedit langsung di Spreadsheet belum masuk kembali ke app.</p></section>`;
 }
+function fdHTML() {
+  return `<section class="pn-sec"><h3>Folder catatan</h3><div>${(S.noteFolders || []).map(x => `<form class="fset" data-form="fdren" data-id="${x.id}"><label class="sr" for="fd-${x.id}">Nama folder</label><input class="inp" id="fd-${x.id}" value="${esc(x.name)}" autocomplete="off"><button class="btn btn-quiet btn-sm">Simpan</button><button type="button" class="iconbtn" data-act="fddel" data-k="${x.id}" aria-label="Hapus folder ${esc(x.name)}">${ico('x')}</button></form>`).join('') || '<p class="hint">Belum ada folder.</p>'}</div></section>
+  <section class="pn-sec"><h3>Folder baru</h3><form class="inl" data-form="fdnew"><label class="sr" for="fd-new">Nama folder baru</label><input class="inp" id="fd-new" placeholder="Misalnya: Resep, Klien, Bacaan" autocomplete="off"><button class="btn btn-primary btn-sm">Tambah</button></form></section>
+  <p class="hint">Tulis cepat ke folder dari halaman mana pun dengan awalan nama folder, misalnya <code>kerja: cek backup server</code>. Khusus Inspirasi bisa juga <code>ide: …</code>. Menghapus folder tidak menghapus catatannya.</p>`;
+}
 function openNote(id) {
   const n = S.notes.find(x => x.id === id); if (!n) return;
-  $('#panel-b').innerHTML = `<p class="note-full">${esc(n.text)}</p>
-    <dl class="kv"><dt>Tag</dt><dd>${n.tags.map(t => `<span class="hash">#${esc(t)}</span>`).join(' ') || '–'}</dd><dt>Dari</dt><dd>${n.src}</dd><dt>Waktu</dt><dd>${when(n.at)}</dd><dt>Disimpan di</dt><dd>Google Sheets › Catatan</dd></dl>
-    <div class="acts"><button class="btn btn-primary btn-sm" data-act="n2t" data-id="${n.id}">Jadikan to-do</button><button class="btn btn-quiet btn-sm" data-act="ndel" data-id="${n.id}">Hapus</button></div>
+  $('#panel-b').innerHTML = `<form class="form" data-form="nedit" data-id="${n.id}">
+      <label class="sr" for="ne-text">Isi catatan</label><textarea class="inp note-edit" id="ne-text">${esc(n.text)}</textarea>
+      <div class="field"><label class="lab" for="ne-fd">Folder</label><select class="inp" id="ne-fd"><option value="">Tanpa folder</option>${(S.noteFolders || []).map(x => `<option value="${x.id}" ${n.fd === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
+      <div class="acts"><button class="btn btn-primary btn-sm">Simpan</button><button type="button" class="btn btn-quiet btn-sm" data-act="n2t" data-id="${n.id}">Jadikan to-do</button><button type="button" class="btn btn-quiet btn-sm" data-act="ndel" data-id="${n.id}">Hapus</button></div>
+    </form>
+    <p class="hint">${when(n.at)}${n.tags.length ? ' · ' + n.tags.map(t => '#' + esc(t)).join(' ') : ''} · pakai #tag di isi catatan</p>
     ${attachHTML('note', n)}`;
   PANEL = 'note'; $('#panel-t').textContent = 'Catatan';
   $('#panel').classList.add('open'); $('#panel').setAttribute('aria-hidden', 'false'); $('#scrim').classList.add('open');
@@ -2285,6 +2324,9 @@ document.addEventListener('click', e => {
   if (act === 'empty') { S = emptyData(); chat.length = 0; QCI = null; render(); toast('Data dikosongkan. Begini tampilan pengguna baru'); return; }
   if (act === 'snooze') { const t = S.todos.find(x => x.id === id); if (t) { t.due = at(1, 9); render(); toast('Ditunda ke besok 09:00'); } return; }
   if (act === 'note') return openNote(id);
+  if (act === 'nf') { NF = a.dataset.k; render(); const b = document.querySelector(`#view [data-act="nf"][data-k="${NF}"]`); if (b) b.focus(); return; }
+  if (act === 'fdpanel') return openPanel('Folder catatan', fdHTML(), 'fd');
+  if (act === 'fddel') { if (a.dataset.armed !== '1') { a.dataset.armed = '1'; a.setAttribute('aria-label', 'Tekan lagi untuk hapus folder'); a.style.boxShadow = 'inset 0 0 0 1.5px var(--c-warn)'; toast('Tekan × sekali lagi untuk menghapus folder'); return; } const k = a.dataset.k, nm = fdName(k); S.noteFolders = S.noteFolders.filter(x => x.id !== k); S.notes.forEach(n => { if (n.fd === k) n.fd = null; }); if (NF === k) NF = 'semua'; $('#panel-b').innerHTML = fdHTML(); render(); toast(`Folder ${nm} dihapus. Catatannya pindah ke Tanpa folder`); return; }
   if (act === 'n2t') { const n = S.notes.find(x => x.id === id); if (n) { S.notes = S.notes.filter(x => x !== n); S.todos.push({ id: nid(), text: n.text, due: null, done: false, src: 'Web' }); closePanel(); render(); toast('Dipindah ke To-do'); } return; }
   if (act === 'ndel') { S.notes = S.notes.filter(x => x.id !== id); closePanel(); render(); toast('Catatan dihapus'); return; }
   if (act === 'tag') { NTAG = a.dataset.tag; render(); return; }
@@ -2375,6 +2417,21 @@ document.addEventListener('submit', e => {
   }
   if (kind === 'limit') { const i = f.querySelector('input'), n = numOf(i.value); if (!(n > 0)) { i.focus(); toast('Isi batas harian, misalnya 150rb'); return; } SET.daily = { on: true, limit: n }; applySet(); toast('Batas harian ' + rp(n)); return; }
   if (kind === 'todo') { const i = $('#todo-in'), v = i.value.trim(); if (!v) return; const w = parseWhen(v); S.todos.push({ id: nid(), text: w ? w.title : cap(v), due: w ? w.date : null, done: false, src: 'Web' }); i.value = ''; render(); toast('To-do ditambahkan'); }
+  if (kind === 'nedit') {
+    const n = S.notes.find(x => x.id === +f.dataset.id); if (!n) return;
+    const v = $('#ne-text').value.trim(); if (!v) { $('#ne-text').focus(); toast('Isi catatan masih kosong'); return; }
+    n.text = v; n.tags = tagsOf(v); n.fd = $('#ne-fd').value || null; closePanel(); render(); toast(n.fd ? 'Disimpan di ' + fdName(n.fd) : 'Catatan disimpan'); return;
+  }
+  if (kind === 'fdnew') {
+    const i = $('#fd-new'), nm = cap(i.value.trim().replace(/\s+/g, ' ')); if (!nm) { i.focus(); return; }
+    if ((S.noteFolders || []).some(x => x.name.toLowerCase() === nm.toLowerCase())) { i.focus(); toast('Folder itu sudah ada'); return; }
+    const id = 'f' + nid(); S.noteFolders.push({ id, name: nm }); NF = id; $('#panel-b').innerHTML = fdHTML(); render(); toast('Folder ' + nm + ' dibuat. Tulis di sana lewat kolom atas'); return;
+  }
+  if (kind === 'fdren') {
+    const fo = S.noteFolders.find(x => x.id === f.dataset.id), i = f.querySelector('input'), nm = cap(i.value.trim().replace(/\s+/g, ' ')); if (!fo || !nm) return;
+    if (S.noteFolders.some(x => x !== fo && x.name.toLowerCase() === nm.toLowerCase())) { i.focus(); toast('Nama itu sudah dipakai'); return; }
+    fo.name = nm; $('#panel-b').innerHTML = fdHTML(); render(); toast('Folder diganti jadi ' + nm); return;
+  }
   if (kind === 'note') { const i = $('#note-in'), v = i.value.trim(); if (!v) return; S.notes.unshift({ id: nid(), text: v, tags: tagsOf(v), src: 'Web', at: new Date() }); i.value = ''; render(); toast('Catatan tersimpan'); }
   if (kind === 'tx') {
     const n = numOf($('#tx-amt').value), note = $('#tx-note').value.trim();
@@ -2403,7 +2460,7 @@ document.addEventListener('keydown', e => {
     if (k) { e.preventDefault(); key(k); }
   }
 });
-$('#reset').addEventListener('click', () => { S = seed(); syncRoutines(); chat.length = 0; QCI = null; setMode('fokus'); T.task = 'Update dokumentasi VM server dev'; seedChat(); render(); toast('Data contoh dikembalikan'); });
+$('#reset').addEventListener('click', () => { S = withFolders(seed()); syncRoutines(); chat.length = 0; QCI = null; setMode('fokus'); T.task = 'Update dokumentasi VM server dev'; seedChat(); render(); toast('Data contoh dikembalikan'); });
 
 /* ---------- percakapan awal ---------- */
 function seedChat() {
@@ -2450,6 +2507,15 @@ $('#d-file').addEventListener('change', e => {
   file.text().then(t => { S = applyBlob(JSON.parse(t, revive)); syncRoutines(); closePanel(); render(); toast('Data dipulihkan dari ' + file.name); })
     .catch(() => toast('File itu bukan cadangan project001-Planner'));
 });
+(() => {
+  const q = new URLSearchParams(location.search).get('tulis'); if (!q) return;
+  history.replaceState(null, '', location.pathname + location.hash);
+  if (q === 'ide') { NT = 'catatan'; const ins = (S.noteFolders || []).find(x => x.id === 'ins' || x.name.toLowerCase() === 'inspirasi'); NF = ins ? ins.id : 'semua'; go('catatan'); }
+  else if (q === 'todo') go('hari-ini');
+  else if (q === 'uang') { go('keuangan'); }
+  try { localStorage.setItem('p001-onb', localStorage.getItem('p001-onb') || '1'); } catch (e) { /* abaikan */ }
+  setTimeout(() => { if (isSm()) openSheet('qc'); else { QCOFF = q === 'uang'; setQcPh(); $('#qc-in').focus(); } }, 80);
+})();
 try { if (!localStorage.getItem('p001-onb')) openOnb(); } catch (e) { /* tanpa penyimpanan: lewati panduan */ }
 })();
 </script>
