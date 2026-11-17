@@ -859,6 +859,38 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .hm-empty { padding: 16px; text-align: center; color: var(--c-ink-2); font-size: var(--t-xs); }
 .tdv { margin-bottom: var(--s-md); }
 
+/* ---------- v2.2 Tulis cepat: pratinjau ---------- */
+.qp { margin-top: var(--s-sm); display: grid; }
+.qp-h { font-size: var(--t-xs); color: var(--c-ink-2); }
+.qp-t { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--s-xs); }
+.qp-t button { border: 0; padding: 6px 12px; border-radius: var(--r-pill); background: var(--c-inset); color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-line); font-size: var(--t-xs); font-weight: 500; }
+.qp-t button[aria-pressed="true"] { background: var(--c-blue); color: #F5F6F8; box-shadow: none; }
+.qp-r { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-sm); padding: 9px 0; border-bottom: 1px solid var(--c-line); font-size: var(--t-sm); }
+.qp-r span { color: var(--c-ink-2); flex: none; }
+.qp-r b { font-weight: 500; text-align: right; min-width: 0; overflow-wrap: anywhere; }
+.qp-r .qp-w { font-weight: 400; }
+.qp-save { margin-top: var(--s-sm); min-height: 2.75rem; border: 0; border-radius: 12px; background: var(--c-blue); color: #F5F6F8; font-weight: 600; font-size: var(--t-sm); }
+.qp-save:disabled { background: var(--c-inset); color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-line); cursor: default; }
+.qp .lnk { justify-self: start; margin-top: var(--s-xs); }
+/* ---------- v2.2 Catat uang ---------- */
+.usheet { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: min(100%, 26rem); z-index: 47; max-height: 92dvh; overflow-y: auto; padding: var(--s-xs) var(--s-md) max(var(--s-md), env(safe-area-inset-bottom, 0px)); background: var(--c-solid); border-radius: 24px 24px 0 0; box-shadow: inset 0 0 0 1px var(--c-line); }
+.usheet[hidden] { display: none; }
+.usheet .grab { display: block; }
+.u-seg { width: 100%; display: grid !important; grid-template-columns: 1fr 1fr; margin-top: var(--s-xs); }
+.u-amt { margin-top: var(--s-md); text-align: center; font-size: 2.5rem; font-weight: 500; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.u-hint { text-align: center; font-size: var(--t-xs); color: var(--c-ink-2); margin-top: 4px; }
+.u-hint b { font-weight: 600; }
+.u-cats { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: var(--s-md); }
+.u-cats button { border: 0; padding: 7px 13px; border-radius: var(--r-pill); background: var(--c-inset); color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-line); font-size: var(--t-xs); font-weight: 500; }
+.u-cats button[aria-pressed="true"] { background: var(--c-blue); color: #F5F6F8; box-shadow: none; }
+.u-note { width: 100%; margin-top: var(--s-sm); }
+.u-pad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 1.2fr; gap: 6px; margin-top: var(--s-sm); }
+.u-pad button { min-height: 3rem; border: 0; border-radius: 12px; background: var(--c-inset); color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-line); font-size: 1.25rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.u-pad .u-del { font-size: var(--t-xs); }
+.u-pad .u-ok { grid-row: span 3; background: var(--c-blue); color: #F5F6F8; box-shadow: none; font-size: var(--t-sm); font-weight: 600; }
+.u-pad .u-ok:disabled { background: var(--c-inset); color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-line); }
+.vh-act { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-sm); }
+
 /* ---------- v2.1 palet Nicholas: HANYA #2563EB #00E2BA #0F1115 #2A2E37 #F5F6F8 (tanpa transparansi) ---------- */
 :root { --c-bg: #0F1115; --c-chat: #0F1115; --c-surface: #0F1115; --c-surface-2: #0F1115; --c-solid: #0F1115; --c-line: #2A2E37; --c-edge: #2A2E37; --c-card-noir: #2563EB; --c-pill-on: #2563EB; --c-nav-on: #2563EB; --c-ink: #F5F6F8; --c-ink-2: #F5F6F8; --c-ink-3: #F5F6F8; --c-blue: #2563EB; --c-blue-hi: #2563EB; --c-green: #00E2BA; --c-hab: #00E2BA; --c-fok: #F5F6F8; --c-warn: #F5F6F8; --c-yellow: #00E2BA; --c-noir-edge: #2A2E37; --c-nav: #0F1115; --c-outline: #F5F6F8; --c-on-blue: #F5F6F8; --c-on-blue-2: #F5F6F8; --c-on-blue-line: #2A2E37; --c-fill: #2A2E37; --c-fill-2: #2A2E37; --c-hatch: #2A2E37; --c-blue-wash: #2A2E37; --c-yellow-wash: #2A2E37; --c-shadow: #0F1115; --c-scrim: #0F1115; --c-noir: #0F1115; --c-on-yellow: #0F1115; --c-on-yellow-2: #0F1115; --c-on-yellow-line: #0F1115; --c-on-yellow-fill: #2A2E37; --c-clear: transparent; --c-inset: #2A2E37; --c-inset-edge: #2A2E37; }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --c-bg: #F5F6F8; --c-chat: #F5F6F8; --c-surface: #F5F6F8; --c-surface-2: #F5F6F8; --c-solid: #F5F6F8; --c-line: #2A2E37; --c-edge: #2A2E37; --c-card-noir: #2563EB; --c-pill-on: #0F1115; --c-nav-on: #0F1115; --c-ink: #0F1115; --c-ink-2: #0F1115; --c-ink-3: #0F1115; --c-blue: #2563EB; --c-blue-hi: #2563EB; --c-green: #0F1115; --c-hab: #00E2BA; --c-fok: #0F1115; --c-warn: #0F1115; --c-yellow: #00E2BA; --c-noir-edge: #2A2E37; --c-nav: #F5F6F8; --c-outline: #0F1115; --c-on-blue: #F5F6F8; --c-on-blue-2: #F5F6F8; --c-on-blue-line: #F5F6F8; --c-fill: #F5F6F8; --c-fill-2: #F5F6F8; --c-hatch: #2A2E37; --c-blue-wash: #F5F6F8; --c-yellow-wash: #F5F6F8; --c-shadow: #2A2E37; --c-scrim: #0F1115; --c-noir: #0F1115; --c-on-yellow: #0F1115; --c-on-yellow-2: #0F1115; --c-on-yellow-line: #0F1115; --c-on-yellow-fill: #F5F6F8; --c-clear: transparent; --c-inset: #F5F6F8; --c-inset-edge: #2A2E37; } }
@@ -963,6 +995,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
         <div class="grab" aria-hidden="true"></div>
         <div class="qc-sh"><b>Tulis cepat</b><span id="qc-mode"></span><button class="iconbtn" type="button" data-act="sheetx" aria-label="Tutup Tulis cepat"><svg class="ic"><use href="#i-x"/></svg></button></div>
         <form class="qc" id="qc"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg><span id="qc-chip"></span><label for="qc-in" class="sr">Tulis cepat</label><input class="inp" id="qc-in" autocomplete="off" placeholder="Tulis cepat… makan 35rb, besok jam 9 rapat, catat ide"><button class="send" type="submit" aria-label="Simpan"><svg class="ic"><use href="#i-send"/></svg></button></form>
+        <div id="qc-prev" aria-live="polite" hidden></div>
         <div class="qc-sugg" id="qc-sugg" aria-label="Contoh"></div>
         <div id="qc-out" aria-live="polite" hidden></div>
       </div>
@@ -986,6 +1019,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 <div class="scrim" id="scrim"></div>
 <div class="scrim" id="sscrim"></div>
 <div class="sheet" id="more" role="dialog" aria-modal="true" aria-label="Menu lainnya" hidden></div>
+<div class="usheet" id="uang" role="dialog" aria-modal="true" aria-label="Catat uang" hidden></div>
 <aside class="panel" id="panel" aria-labelledby="panel-t" aria-hidden="true">
   <div class="pn-h"><h2 id="panel-t">Catatan</h2><button class="iconbtn" type="button" data-act="close" aria-label="Tutup"><svg class="ic"><use href="#i-x"/></svg></button></div>
   <div class="pn-b" id="panel-b"></div>
@@ -1323,7 +1357,7 @@ let QCOFF = false; /* laptop: mode konteks dimatikan sampai pindah halaman */
 function qcCtx() {
   if (SHEET === 'qc') return QCTX;
   if (isSm() || QCOFF) return null;
-  return V === 'hari-ini' && on('todo') ? 'todo-today' : V === 'todo' && on('todo') ? 'todo' : V === 'catatan' && on('catatan') && NT === 'catatan' ? 'note' : null;
+  return V === 'todo' && on('todo') ? 'todo' : V === 'catatan' && on('catatan') && NT === 'catatan' ? 'note' : null;
 }
 function setQcPh() {
   const i = $('#qc-in'); if (!i) return; renderSugg();
@@ -1336,13 +1370,15 @@ function setQcPh() {
 function openSheet(k) {
   if (PANEL) closePanel();
   SHEET = k; document.documentElement.dataset.sheet = k; $('#sscrim').classList.add('open');
-  if (k === 'qc') { QCTX = V === 'hari-ini' && on('todo') ? 'todo-today' : V === 'todo' && on('todo') ? 'todo' : V === 'catatan' && on('catatan') ? 'note' : null; QCI = null; renderQC(); setQcPh(); setTimeout(() => $('#qc-in').focus(), 60); }
+  if (k === 'qc') { QCTX = V === 'todo' && on('todo') ? 'todo' : V === 'catatan' && on('catatan') ? 'note' : null; QCI = null; renderQC(); setQcPh(); setTimeout(() => $('#qc-in').focus(), 60); }
   if (k === 'more') { renderMore(); $('#more').hidden = false; const b = $('#more .iconbtn'); if (b) b.focus(); }
+  if (k === 'uang') { renderUang(); $('#uang').hidden = false; const b = $('#uang .u-pad button'); if (b) b.focus(); }
+  if (k === 'qc') qcPrev();
   renderMNav();
 }
 function closeSheet() {
   const was = SHEET; if (!was) return;
-  SHEET = ''; QCTX = null; delete document.documentElement.dataset.sheet; $('#sscrim').classList.remove('open'); $('#more').hidden = true; setQcPh(); renderMNav();
+  SHEET = ''; QCTX = null; QTYPE = null; delete document.documentElement.dataset.sheet; $('#sscrim').classList.remove('open'); $('#more').hidden = true; $('#uang').hidden = true; setQcPh(); renderMNav();
   const b = document.querySelector(was === 'qc' ? '#mnav .fab' : '#mnav [data-act="more"]'); if (b && isSm()) b.focus();
 }
 const MV = { 'hari-ini': ['Home', 'sun'], todo: ['To-do', 'check'], keuangan: ['Uang', 'wallet'], kalender: ['Kalender', 'month'], catatan: ['Catatan', 'note'], fokus: ['Fokus', 'timer'], statistik: ['Statistik', 'chart'] };
@@ -1366,6 +1402,91 @@ function renderMore() {
 }
 function quick(text, force) { const t = text.trim(); if (!t) return; QCI = chat.length; handle(t, 'Web', force); if (chat[QCI]) chat[QCI].web = true; renderChat(); }
 
+
+/* ---------- v2.2 Tulis cepat: pratinjau sebelum simpan (aturan sama dengan handle) ---------- */
+let QTYPE = null;
+const QT = [['todo', 'To-do'], ['event', 'Jadwal'], ['tx', 'Uang'], ['note', 'Catatan'], ['habit', 'Habit']];
+const REM_RE = /\b(reminder|pengingat|ingatkan|ingetin|remind)\b/i;
+function qcGuess(text, force) {
+  const t = String(text || '').trim(); if (!t) return null;
+  const l = t.toLowerCase();
+  if (/^[\/=]/.test(t)) return { k: 'cmd' };
+  const fp = t.match(/^\s*([\p{L}\d][\p{L}\d ]{0,28}?)\s*:\s*(\S[\s\S]*)$/u);
+  if (fp) { const key = fp[1].trim().toLowerCase(), fdr = (S.noteFolders || []).find(x => x.name.toLowerCase() === key) || (['ide', 'inspirasi', 'idea'].includes(key) ? (S.noteFolders || []).find(x => x.id === 'ins' || x.name.toLowerCase() === 'inspirasi') : null); if (fdr) return { k: 'note', text: fp[2], fd: fdr.id }; }
+  const habit = t.match(/^\s*(?:tolong\s+)?(?:(?:buat|bikin|tambah)\w*\s+)?(?:habit|kebiasaan|rutinitas)(?:\s+baru)?\b\s*:?\s*(.*)$/i);
+  if (habit) return { k: 'habit', raw: habit[1] };
+  const isRem = REM_RE.test(t), money = !/^catat\b/i.test(t) && parseAmt(t);
+  if (money && !money.bare && !isRem) return { k: 'tx', amt: money };
+  if (isRem) return { k: 'todo', w: parseWhen(t), rem: true, today: force === 'todo-today' };
+  if (force === 'todo' || force === 'todo-today') return { k: 'todo', w: parseWhen(t), today: force === 'todo-today' };
+  if (force === 'note') return { k: 'note', text: t.replace(/^catat:?\s*/i, ''), fd: NF !== 'semua' ? NF : null };
+  if (/^catat\b/.test(l)) return { k: 'note', text: t.replace(/^catat:?\s*/i, '') };
+  const w = parseWhen(t); let amt = parseAmt(t);
+  if (amt && amt.bare && catOf(t).cat === 'Lainnya') amt = null;
+  if (amt && !(w && w.hasTime)) return { k: 'tx', amt };
+  if (w && w.hasTime && !/^(ingatkan|ingetin|follow)/.test(l)) return { k: 'event', w };
+  if (/^(ingatkan|ingetin|todo|to-do|tugas)\b|follow up|jangan lupa/.test(l) || w) return { k: 'todo', w };
+  return { k: 'note', text: t.replace(/^catat:?\s*/i, '') };
+}
+function qcPrev() {
+  const el = $('#qc-prev'), inp = $('#qc-in'), sg = $('#qc-sugg'); if (!el || !inp) return;
+  const v = inp.value, g = qcGuess(v, qcCtx());
+  if (!g) { el.hidden = true; el.innerHTML = ''; if (sg) sg.hidden = false; return; }
+  if (sg) sg.hidden = true; el.hidden = false;
+  if (g.k === 'cmd') { el.innerHTML = '<div class="qp"><p class="qp-h">Perintah. Tekan Enter untuk menjalankan.</p></div>'; return; }
+  const k = QTYPE || g.k, t = v.trim(), row = (a, b) => `<div class="qp-r"><span>${a}</span><b>${b}</b></div>`;
+  let rows = '', ok = true, extra = '';
+  if (k === 'todo') { const w = g.w !== undefined ? g.w : parseWhen(t), title = cap(cleanCmd(w ? w.title : t) || t), due = w ? w.date : g.today ? at(0, 23, 59) : null;
+    rows = row('Judul', esc(title)) + row('Kapan', due ? (w && w.hasTime ? when(due) : dayLabel(due)) : 'Tanpa tenggat') + (g.rem || REM_RE.test(t) ? row('Pengingat', 'Ya') : ''); }
+  if (k === 'event') { const w = g.w || parseWhen(t);
+    if (!w) { rows = row('Waktu', '<span class="qp-w">Belum ada. Tambahkan, mis. besok jam 10</span>'); ok = false; }
+    else rows = row('Judul', esc(w.title)) + row('Waktu', `${dayLabel(w.date)}, ${hm(w.date)}–${hm(new Date(w.date.getTime() + w.dur * 60000))}`) + row('Masuk ke', 'Google Calendar'); }
+  if (k === 'tx') { const a = g.amt || parseAmt(t);
+    if (!a) { rows = row('Jumlah', '<span class="qp-w">Belum ada. Tambahkan, mis. 25rb</span>'); ok = false; extra = '<button class="lnk small" type="button" data-act="uopen">Pakai papan angka</button>'; }
+    else { const c = catOf(t), note = cap(t.replace(a.m, ' ').replace(/\s+/g, ' ').trim() || c.cat);
+      rows = row('Catatan', esc(note)) + row('Jumlah', rp(a.n)) + row(c.type === 'in' ? 'Jenis' : 'Kategori', c.type === 'in' ? 'Pemasukan' : c.cat) + (c.type === 'out' && on('keuangan') && SET.daily.on && inDaily(c.cat) ? row('Jatah setelah ini', rp(SET.daily.limit - todayOut() - a.n)) : ''); } }
+  if (k === 'note') { const tx = g.k === 'note' ? g.text : t, fd = g.k === 'note' ? g.fd : null; rows = row('Isi', esc(tx.length > 70 ? tx.slice(0, 70) + '…' : tx)) + row('Folder', fd ? esc(fdName(fd)) : 'Catatan'); }
+  if (k === 'habit') { const raw = g.k === 'habit' ? g.raw : t, hw = parseWhen(' ' + raw + ' '); rows = row('Habit', esc(cap(cleanCmd(String(hw ? hw.title : raw).replace(/\b(setiap|tiap)\s+hari\b|\b(senin|selasa|rabu|kamis|jumat|sabtu|minggu)\b|\bhari kerja\b|\bakhir pekan\b|[,&-]+/ig, ' ').replace(/\s+/g, ' ').trim())) || 'Habit baru')) + row('Jam', hw && hw.hasTime ? hm(hw.date) : '06:00') + row('Hari', /senin\s*-\s*jumat|hari kerja/i.test(raw) ? 'Senin–Jumat' : /akhir pekan|weekend/i.test(raw) ? 'Akhir pekan' : 'Setiap hari'); }
+  const lab = QT.find(x => x[0] === k)[1];
+  el.innerHTML = `<div class="qp"><div class="qp-t" role="group" aria-label="Jenis">${QT.map(([kk, n]) => `<button type="button" data-act="qtype" data-k="${kk}" aria-pressed="${kk === k}">${n}</button>`).join('')}</div>${rows}${extra}<button class="qp-save" type="submit" form="qc" ${ok ? '' : 'disabled'}>Simpan ${lab.toLowerCase()}</button></div>`;
+}
+function qcSave(text, ty) {
+  const t = String(text || '').trim(); if (!t) return;
+  const g = qcGuess(t, qcCtx()) || {};
+  QCI = chat.length; meSay(t); if (chat[QCI]) chat[QCI].web = true;
+  reply(() => {
+    SRC = 'Web';
+    if (ty === 'todo') return addTodo(t, parseWhen(t), qcCtx() === 'todo-today', REM_RE.test(t));
+    if (ty === 'event') { const w = parseWhen(t); return w ? addEvent(w) : addTodo(t, null); }
+    if (ty === 'tx') { const a = parseAmt(t); return a ? addTx(t, a) : addNote(t); }
+    if (ty === 'note') return addNote(g.k === 'note' ? g.text : t, g.k === 'note' ? g.fd : null);
+    if (ty === 'habit') return addHabit(g.k === 'habit' ? g.raw : t);
+  });
+}
+/* ---------- v2.2 Catat uang: papan angka ---------- */
+const UM = { amt: '', type: 'out', cat: 'Makan', note: '' };
+const uCats = () => UM.type === 'out' ? [...Object.keys(BUDGET), 'Lainnya'] : ['Pemasukan'];
+function renderUang() {
+  const el = $('#uang'); if (!el) return;
+  const n = Number(UM.amt || 0), out = UM.type === 'out', cats = uCats();
+  if (!cats.includes(UM.cat)) UM.cat = cats[0];
+  const daily = out && on('keuangan') && SET.daily.on && inDaily(UM.cat), left = SET.daily.limit - todayOut() - n;
+  const hint = !out ? 'Masuk ke saldo bulan ini' : daily ? `Jatah hari ini setelah ini: <b>${SET.hideAmt ? MASK : rp(left)}</b>` : `${esc(UM.cat)} tidak dihitung di jatah harian`;
+  const keys = ['1', '2', '3', 'del', '4', '5', '6', 'ok', '7', '8', '9', '000', '0'];
+  el.innerHTML = `<div class="grab" aria-hidden="true"></div><div class="sh-h"><b>Catat uang</b><button class="iconbtn" type="button" data-act="sheetx" aria-label="Tutup">${ico('x')}</button></div>
+    <div class="seg seg-s u-seg" role="group" aria-label="Jenis transaksi">${[['out', 'Keluar'], ['in', 'Masuk']].map(([k, l]) => `<button type="button" data-act="utype" data-k="${k}" aria-pressed="${UM.type === k}">${l}</button>`).join('')}</div>
+    <div class="u-amt" aria-live="polite">${rp(n)}</div><p class="u-hint">${hint}</p>
+    <div class="u-cats" role="group" aria-label="Kategori">${cats.map(c => `<button type="button" data-act="ucat" data-k="${esc(c)}" aria-pressed="${UM.cat === c}">${esc(c)}</button>`).join('')}</div>
+    <label class="sr" for="u-note">Catatan</label><input class="inp u-note" id="u-note" autocomplete="off" placeholder="Catatan (opsional), mis. kopi susu" value="${esc(UM.note)}">
+    <div class="u-pad">${keys.map(k => k === 'del' ? '<button type="button" class="u-del" data-act="ukey" data-k="del" aria-label="Hapus angka">Hapus</button>' : k === 'ok' ? `<button type="button" class="u-ok" data-act="usave" ${n > 0 ? '' : 'disabled'}>Simpan</button>` : `<button type="button" data-act="ukey" data-k="${k}">${k}</button>`).join('')}</div>`;
+}
+function uSave() {
+  const n = Number(UM.amt || 0); if (!(n > 0)) return;
+  const out = UM.type === 'out', cat = out ? UM.cat : 'Pemasukan';
+  const tx = { id: nid(), at: new Date(), type: out ? 'out' : 'in', cat, amt: n, note: cap(UM.note.trim() || cat), src: 'Web' };
+  S.tx.push(tx); UM.amt = ''; UM.note = ''; closeSheet(); refresh();
+  toast(`Tercatat ${rp(n)} · ${out ? cat : 'masuk'}`);
+}
 function handle(text, src = 'Telegram', force = null) {
   const t = text.trim(); if (!t) return;
   meSay(t);
@@ -2085,7 +2206,7 @@ function vMoney() {
   const week = folder('Pengeluaran 7 hari', `<div class="week">${days.map(x => `<div class="d"><div class="col-b ${isToday(x.d) ? 'today' : ''}" style="height:${Math.max(2, x.v / mx * 100)}%">${x.v && !SET.hideAmt ? `<span>${x.v >= 1e6 ? (x.v / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + 'jt' : Math.round(x.v / 1e3) + 'rb'}</span>` : ''}</div><span class="lbl ${isToday(x.d) ? 'today' : ''}">${DAYS_T[x.d.getDay()].slice(0, 3)}</span></div>`).join('')}</div>`);
   const tx = folder('Transaksi', `<div class="f-head"><div class="chips">${['semua', 'keluar', 'masuk'].map(f => `<button class="chip" data-act="txf" data-f="${f}" aria-pressed="${TXF === f}">${cap(f)}</button>`).join('')}</div></div>
     <ul class="rows">${list.map(t => `<li class="row"><span class="tm" style="min-width:4.5rem">${dayLabel(t.at).replace(/^(\w+), /, '')}<small>${hm(t.at)}</small></span><div><span class="t1">${esc(t.note)}</span><span class="t2">${t.cat}${srcL(t.src)}</span></div><b class="num${t.type === 'in' ? ' amt-in' : ''}" style="font-weight:500;white-space:nowrap">${t.type === 'in' ? '+' : '−'}${rp(t.amt)}</b></li>`).join('') || '<li><div class="empty"><b>Belum ada transaksi</b>Catat di samping atau lewat Tulis cepat: gaji 8jt, makan 35rb.</div></li>'}</ul>`, 'f-surface');
-  return `<div class="vh"><div><h1>Keuangan</h1><p class="lead">${mName} ${now.getFullYear()}</p></div></div>
+  return `<div class="vh vh-act"><div><h1>Keuangan</h1><p class="lead">${mName} ${now.getFullYear()}</p></div><button class="btn btn-primary btn-sm" type="button" data-act="uopen">${ico('plus')}Catat</button></div>
     ${ktab}<div class="kt" data-kt="${KT}">
     <div class="deck"><div data-ks="ringkas">${blue}</div><div data-ks="trans">${form}</div></div>
     <div class="board"><div class="col"><div data-ks="ringkas">${folder(SET.daily.on ? 'Batas harian' : 'Hari ini', dailyBody(true))}</div><div data-ks="ringkas">${bud}</div><div data-ks="trans">${week}</div></div><div class="col"><div data-ks="trans">${tx}</div></div></div>
@@ -2514,7 +2635,7 @@ function closePanel() { PANEL = ''; $('#panel').classList.remove('open'); $('#pa
 document.addEventListener('click', e => {
   CALCF = !!e.target.closest('#hitung');
   const b = e.target.closest('[data-bot]'); if (b) return botAct(b.dataset.bot, +b.dataset.i);
-  const sg = e.target.closest('[data-sugg]'); if (sg) { if (sg.closest('#qc-sugg')) quick(sg.dataset.sugg, qcCtx()); else handle(sg.dataset.sugg); return; }
+  const sg = e.target.closest('[data-sugg]'); if (sg) { if (sg.closest('#qc-sugg')) { const qi = $('#qc-in'); qi.value = sg.dataset.sugg; QTYPE = null; qcPrev(); qi.focus(); } else handle(sg.dataset.sugg); return; }
   const pn = e.target.closest('button[data-pane]'); if (pn) { $('#stage').dataset.pane = pn.dataset.pane; document.querySelectorAll('button[data-pane]').forEach(x => x.setAttribute('aria-pressed', x === pn)); return; }
   const gl = e.target.closest('[data-go]'); if (gl) return go(gl.dataset.go);
   const nv = e.target.closest('.nav a, .mnav a, .more-it'); if (nv) { e.preventDefault(); return go(nv.dataset.v); }
@@ -2525,6 +2646,12 @@ document.addEventListener('click', e => {
   const id = +a.dataset.id, act = a.dataset.act;
   if (act === 'close') return closePanel();
   if (act === 'hf') { HF = a.dataset.k; return render(); }
+  if (act === 'qtype') { const g = qcGuess($('#qc-in').value, qcCtx()); QTYPE = g && g.k === a.dataset.k ? null : a.dataset.k; qcPrev(); return; }
+  if (act === 'uopen') { const qi = $('#qc-in'), pa = qi && parseAmt(qi.value); if (pa) UM.amt = String(pa.n); return openSheet('uang'); }
+  if (act === 'utype') { UM.type = a.dataset.k; return renderUang(); }
+  if (act === 'ucat') { UM.cat = a.dataset.k; return renderUang(); }
+  if (act === 'ukey') { const k = a.dataset.k; UM.amt = k === 'del' ? UM.amt.slice(0, -1) : (UM.amt + k).replace(/^0+/, '').slice(0, 12); renderUang(); const nb = document.querySelector(`#uang [data-act="ukey"][data-k="${k}"]`); if (nb) nb.focus(); return; }
+  if (act === 'usave') return uSave();
   if (act === 'tdv') { TDV = a.dataset.k; return render(); }
   if (act === 'hmgo') return go(a.dataset.v);
   if (act === 'hmday') { CSEL = a.dataset.k; const kd = keyDate(CSEL), n0 = new Date(); CMO = (kd.getFullYear() - n0.getFullYear()) * 12 + kd.getMonth() - n0.getMonth(); return go(on('kalender') ? 'kalender' : 'todo'); }
@@ -2700,7 +2827,7 @@ document.addEventListener('submit', e => {
     }
     applySet(); toast(nn ? `Kategori ${nn} ditambahkan` : 'Budget disimpan ke Sheets'); return;
   }
-  if (f.id === 'qc') { const i = $('#qc-in'); const v = i.value; i.value = ''; quick(v, qcCtx()); return; }
+  if (f.id === 'qc') { const i = $('#qc-in'); const v = i.value; i.value = ''; const ty = QTYPE; QTYPE = null; if (ty) qcSave(v, ty); else quick(v, qcCtx()); qcPrev(); return; }
   if (f.dataset.form === 'tg') {
     SET.tg.on = true; QCI = null; applySet();
     SEEDING = true; botSay('Halo! project001-Planner sudah tersambung. Kirim apa saja, misalnya <code>makan 35rb</code>, <code>besok jam 9 rapat</code>, atau <code>catat ide</code>. Ketik <code>/bantuan</code> untuk daftar lengkap.'); SEEDING = false;
@@ -2746,6 +2873,8 @@ document.addEventListener('input', e => {
   if (e.target.id === 'nq') { NQ = e.target.value; renderNoteList(); }
   if (e.target.closest('[data-form="tool"]')) calcTool();
   if (e.target.id === 'task-in') T.task = e.target.value;
+  if (e.target.id === 'qc-in') { QTYPE = null; qcPrev(); }
+  if (e.target.id === 'u-note') UM.note = e.target.value;
 });
 document.addEventListener('keydown', e => {
   if (!$('#pad').hidden) {
