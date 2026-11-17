@@ -641,6 +641,25 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .mtile small { font-size: var(--t-2xs); color: var(--c-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mtile.warn { box-shadow: inset 0 0 0 1px var(--c-warn); }
 .mtile.warn small { color: var(--c-warn); }
+/* ---------- v1.4: lebih tenang ---------- */
+.brand .by, .links, .tgchip { display: none !important; }
+.src { display: none; }
+.qc-sugg { display: none; }
+.qc-wrap:focus-within .qc-sugg { display: flex; }
+.mtiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-sm); margin-bottom: var(--s-lg); }
+.mtile { padding: var(--s-md); }
+.mtile b { font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem); }
+.today-od { margin-bottom: var(--s-lg); }
+@media (max-width: 1100px) { .today-b { display: flex; flex-direction: column; gap: var(--s-lg); } .today-b > .col { display: contents; } .today-b .o-1 { order: 1; } .today-b .o-2 { order: 2; } .today-b .o-3 { order: 3; } }
+.ck.due { box-shadow: inset 0 0 0 1.5px var(--c-warn); }
+.erow.skip .t1 { text-decoration: line-through; color: var(--c-ink-2); }
+.strk-c { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--s-sm); align-items: center; padding: var(--s-sm) 0; }
+.strk-c + .strk-c { border-top: 1px solid var(--f-line); }
+.strk-c .days7 { margin-top: 0; flex-wrap: nowrap; gap: 3px; }
+.strk-c .days7 span { width: 1.25rem; height: 1.25rem; border-radius: 5px; font-size: 9px; }
+.strk-c .n { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; min-width: 3.25rem; }
+.strk-c .n small { font-size: var(--t-2xs); font-weight: 400; letter-spacing: 0; color: var(--c-ink-2); margin-left: 3px; }
+@media (max-width: 560px) { .mtiles { gap: var(--s-xs); margin-bottom: var(--s-md); } .mtile { padding: var(--s-sm); } .strk-c .days7 span { width: 1rem; height: 1rem; font-size: 0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>
 
@@ -1337,18 +1356,16 @@ function vToday() {
     <ul class="rows">${od.map(t => `<li class="row"><button class="ck" data-act="toggle" data-id="${t.id}" aria-label="Tandai selesai">${ico('check')}</button><div><span class="t1">${esc(t.text)}</span><span class="t2">${when(t.due)}${srcL(t.src)}</span></div><button class="pill plain" data-act="snooze" data-id="${t.id}">Besok</button></li>`).join('')}</ul>
   </div></section>` : folder('Lewat tenggat', '<div class="empty"><b>Tidak ada yang lewat tenggat</b>Semua to-do masih aman.</div>', 'f-surface hide-sm');
   const doneN = evs.filter(e => e.done === true).length;
-  const jadwal = folder('Jadwal', `${evs.length ? `<div class="jprog"><span><b>${doneN} dari ${evs.length}</b> selesai</span><div class="bar"><i style="width:${doneN / evs.length * 100}%"></i></div></div>` : ''}<ul class="rows">${evs.map(evRow).join('') || '<li><div class="empty"><b>Tidak ada jadwal</b>Ketik di Tulis cepat: besok 9 pagi meeting 1 jam.</div></li>'}</ul>`, 'f-surface', `<div class="f-head"><span class="src">${ico('today')}Dari Google Calendar · kerja, rutinitas, Life OS</span>${on('kalender') ? '<button class="lnk small" data-go="kalender">Buka kalender</button>' : ''}</div>`);
-  const todo = folder(`To-do<span class="cnt">${open.length}</span>`, `<form class="inl hide-sm" data-form="todo"><label class="sr" for="todo-in">To-do baru</label><input class="inp" id="todo-in" placeholder="Tambah to-do…" autocomplete="off"><button class="iconbtn" aria-label="Tambah">${ico('plus')}</button></form>
-    <ul class="rows lim-sm" style="margin-top:var(--s-xs)">${open.map(t => `<li class="row"><button class="ck" data-act="toggle" data-id="${t.id}" aria-label="Tandai selesai">${ico('check')}</button><div><span class="t1">${esc(t.text)}</span><span class="t2">${t.due ? when(t.due) : 'Tanpa tenggat'}${srcS(t.src)}</span></div><span></span></li>`).join('')}
+  const jadwal = folder('Jadwal', `${evs.length ? `<div class="jprog"><span><b>${doneN} dari ${evs.length}</b> selesai</span><div class="bar"><i style="width:${doneN / evs.length * 100}%"></i></div></div>` : ''}<ul class="rows">${evs.map(evRow).join('') || '<li><div class="empty"><b>Tidak ada jadwal</b>Ketik di Tulis cepat: besok 9 pagi meeting 1 jam.</div></li>'}</ul>${on('kalender') ? '<div class="more"><button class="lnk" data-go="kalender">Buka kalender</button></div>' : ''}`, 'f-surface o-1');
+  const todo = folder(`To-do<span class="cnt">${open.length}</span>`, `<ul class="rows lim-sm">${open.map(t => `<li class="row"><button class="ck" data-act="toggle" data-id="${t.id}" aria-label="Tandai selesai">${ico('check')}</button><div><span class="t1">${esc(t.text)}</span><span class="t2">${t.due ? when(t.due) : 'Tanpa tenggat'}${srcS(t.src)}</span></div><span></span></li>`).join('')}
     ${doneT.filter(t => !t.doneAt || isToday(t.doneAt)).map(t => `<li class="row done"><button class="ck on" data-act="toggle" data-id="${t.id}" aria-label="Batal selesai">${ico('check')}</button><div><span class="t1">${esc(t.text)}</span><span class="t2">Selesai</span></div><span></span></li>`).join('')}</ul>
     ${!open.length && !doneT.length ? '<div class="empty" style="margin-top:var(--s-xs)"><b>Belum ada to-do</b>Tambah di atas, atau ketik di Tulis cepat: ingatkan bayar listrik besok.</div>' : ''}
-    <div class="more"><button class="lnk" data-go="todo">Semua to-do</button></div>`);
+    <div class="more"><button class="lnk" data-go="todo">Semua to-do</button></div>`, 'f-surface o-2');
   const keu = folder(SET.daily.on ? 'Jatah hari ini' : 'Uang hari ini', dailyBody(false) + `<div class="more"><button class="lnk" data-go="keuangan">Buka Keuangan</button></div>`, 'f-surface hide-sm');
   const notes = folder('Catatan terbaru', `<ul class="rows">${S.notes.slice(0, 3).map(n => noteRow(n)).join('') || '<li><div class="empty"><b>Belum ada catatan</b>Ketik apa saja di Tulis cepat, tambahkan #tag.</div></li>'}</ul><div class="more"><button class="lnk" data-go="catatan">Semua catatan</button></div>`);
-  const lead = [`${DAYS_T[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}<span class="hide-sm">`, on('jadwal') && `${evs.length} jadwal`, on('todo') && `${open.length + od.length} to-do`, on('todo') && od.length && `${od.length} lewat tenggat`].filter(Boolean).join(' · ') + '</span>';
+  const lead = `${DAYS_T[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]}`;
   const hid = MODS.filter(m => !on(m[0])).map(m => m[1]);
-  const deck = [on('fokus') && blue, on('todo') && yellow].filter(Boolean);
-  const cards = [on('jadwal') && jadwal, on('todo') && todo, on('jadwal') && streakCard(), on('keuangan') && keu, on('catatan') && notes].filter(Boolean);
+  const colA = [on('jadwal') && jadwal, on('jadwal') && streakCard()].filter(Boolean), colB = [on('todo') && todo].filter(Boolean), cards = [...colA, ...colB];
   const left = SET.daily.limit - todayOut(), tileN = n => SET.hideAmt ? '••••' : n < 1000 ? String(n) : shortN(n);
   const tiles = [
     on('fokus') && ['fokus', 'Fokus', T.running ? fmtClock(T.left) : fmtDur(fm), T.running ? MODES[T.mode].label.toLowerCase() : todaySessions().length + ' sesi', false, T.running],
@@ -1363,25 +1380,24 @@ function vToday() {
     </ol>`) : '';
   return `<div class="vh"><div><h1>${greet}</h1><p class="lead">${lead}</p>${hid.length ? `<p class="hint" style="margin-top:var(--s-xs)">Disembunyikan: ${hid.join(', ')}. <button class="lnk small" data-act="settings">Atur tampilan</button></p>` : ''}</div></div>
     ${tilesH}${start ? `<div style="margin-bottom:var(--s-lg)">${start}</div>` : ''}
-    ${deck.length ? `<div class="deck">${deck.join('')}</div>` : ''}
-    ${cards.length ? `<div class="board"><div class="col">${cards.filter((_, i) => i % 2 === 0).join('')}</div><div class="col">${cards.filter((_, i) => i % 2 === 1).join('')}</div></div>` : ''}
-    ${!deck.length && !cards.length ? '<div class="empty"><b>Semua bagian disembunyikan</b>Buka Atur tampilan untuk menampilkan lagi.<br><button class="btn btn-quiet btn-sm" data-act="settings" style="margin-top:var(--s-md)">Atur tampilan</button></div>' : ''}`;
+    ${on('todo') && od.length ? `<div class="today-od">${yellow}</div>` : ''}
+    ${cards.length ? (colA.length && colB.length ? `<div class="board today-b"><div class="col">${colA.join('')}</div><div class="col">${colB.join('')}</div></div>` : `<div class="col">${cards.join('')}</div>`) : ''}
+    ${!cards.length && !tiles.length ? '<div class="empty"><b>Semua bagian disembunyikan</b>Buka Atur tampilan untuk menampilkan lagi.<br><button class="btn btn-quiet btn-sm" data-act="settings" style="margin-top:var(--s-md)">Atur tampilan</button></div>' : ''}`;
 }
 function evRow(e) {
-  const now = new Date(), nowE = e.start <= now && e.end > now, past = e.end <= now, d = e.done === true;
-  const st = d ? `<span class="pill plain ok">${ico('check')}Selesai</span>` : e.done === false ? '<span class="pill plain">Dilewati</span>' : nowE ? '<span class="pill now">Sekarang</span>' : past ? `<span class="pill late">${ico('clock')}Belum dicentang</span>` : '';
+  const now = new Date(), nowE = e.start <= now && e.end > now, past = e.end <= now, d = e.done === true, skip = e.done === false, due = past && e.done == null;
   const s = isRoutine(e) ? streakOf(e.title) : 0;
-  return `<li class="row erow"><button class="ck ${d ? 'on' : ''}" data-act="evdone" data-id="${e.id}" aria-pressed="${d}" aria-label="${d ? 'Batal tandai selesai' : 'Tandai selesai'}: ${esc(e.title)}">${ico('check')}</button><span class="tm">${hm(e.start)}<small>s.d. ${hm(e.end)}</small></span><div><span class="t1">${esc(e.title)}</span><span class="t2">${e.cal}${s ? ` · streak ${s} hari` : ''}</span></div>${st}</li>`;
+  return `<li class="row erow${skip ? ' skip' : ''}"><button class="ck ${d ? 'on' : due ? 'due' : ''}" data-act="evdone" data-id="${e.id}" aria-pressed="${d}" aria-label="${d ? 'Batal tandai selesai' : 'Tandai selesai'}: ${esc(e.title)}">${ico('check')}</button><span class="tm">${hm(e.start)}<small>s.d. ${hm(e.end)}</small></span><div><span class="t1">${esc(e.title)}</span><span class="t2">${e.cal}${s ? ` · ${s} hari beruntun` : ''}${skip ? ' · dilewati' : ''}${due ? '<span class="sr"> · belum dicentang</span>' : ''}</span></div>${nowE && !d && !skip ? '<span class="pill now">Sekarang</span>' : '<span></span>'}</li>`;
 }
 function streakCard() {
-  const head = `<div class="f-head"><span class="src">${ico('month')}Google Calendar › Rutinitas</span><button class="lnk small" type="button" data-act="rut">Kelola</button></div>`;
-  if (!S.routines.length) return folder('Streak rutinitas', head + `<div class="empty"><b>Belum ada rutinitas</b>Tambahkan kebiasaan yang mau dijaga, misalnya olahraga pagi.<br><button class="btn btn-quiet btn-sm" type="button" data-act="rut" style="margin-top:var(--s-md)">Tambah rutinitas</button></div>`);
+  const head = '', more = '<div class="more"><button class="lnk" type="button" data-act="rut">Kelola rutinitas</button></div>';
+  if (!S.routines.length) return folder('Streak', head + `<div class="empty"><b>Belum ada rutinitas</b>Tambahkan kebiasaan yang mau dijaga.<br><button class="btn btn-quiet btn-sm" type="button" data-act="rut" style="margin-top:var(--s-md)">Tambah rutinitas</button></div>`, 'f-surface o-3');
   const rows = S.routines.map(r => {
-    const n = r.name, s = streakOf(n), h = habitOf(n), td = !!h.days[dk(day0())], sch = r.days.includes(new Date().getDay());
-    const days = [...Array(7)].map((_, i) => { const d = at(i - 6, 0), ok = !!h.days[dk(d)], isT = i === 6, off = !r.days.includes(d.getDay()); return `<span class="${ok ? 'ok' : ''}${isT ? ' today' : ''}${off && !ok ? ' off' : ''}" title="${dayLabel(d)}: ${ok ? 'selesai' : off ? 'libur' : isT ? 'belum' : 'tidak'}">${DAYS_S[d.getDay()]}</span>`; }).join('');
-    return `<li class="strk"><div><span class="t1">${esc(n)}</span><span class="t2">${td ? 'Hari ini sudah' : !sch ? 'Hari ini libur' : s ? 'Belum hari ini, jangan sampai putus' : 'Mulai lagi hari ini'} · ${r.start}, ${daysLabel(r.days)} · rekor ${h.best} hari</span><div class="days7" aria-label="7 hari terakhir">${days}</div></div><span class="n">${s}<small>hari</small></span></li>`;
+    const n = r.name, st = streakOf(n), h = habitOf(n);
+    const days = [...Array(7)].map((_, i) => { const d = at(i - 6, 0), ok = !!h.days[dk(d)], isT = i === 6, off = !r.days.includes(d.getDay()); return `<span class="${ok ? 'ok' : ''}${isT ? ' today' : ''}${off && !ok ? ' off' : ''}" title="${dayLabel(d)}: ${ok ? 'selesai' : off ? 'libur' : isT ? 'belum' : 'tidak'}">${DAYS_S[d.getDay()].slice(0, 1)}</span>`; }).join('');
+    return `<li class="strk-c"><div><span class="t1">${esc(n)}</span><span class="t2">rekor ${h.best} hari</span></div><div class="days7" aria-label="7 hari terakhir">${days}</div><span class="n">${st}<small>hari</small></span></li>`;
   }).join('');
-  return folder('Streak rutinitas', head + `<ul class="rows">${rows}</ul><p class="hint" style="margin-top:var(--s-xs)">Dihitung dari jadwal Rutinitas yang dicentang. Hari libur (kotak putus-putus) tidak memutus streak.</p>`);
+  return folder('Streak', `<ul class="rows">${rows}</ul>` + more, 'f-surface o-3');
 }
 function dailyBody(list) {
   const big = 'font-size:clamp(2rem,1.6rem + 1.4vw,2.75rem);margin-top:var(--s-xs)';
@@ -1464,8 +1480,8 @@ function vCal() {
     ${on('todo') ? `<div class="dgroup"><h4>To-do bertenggat</h4><ul class="rows">${it.td.map(t => `<li class="row ${t.done ? 'done' : ''}"><button class="ck ${t.done ? 'on' : ''}" data-act="toggle" data-id="${t.id}" aria-label="${t.done ? 'Batal selesai' : 'Tandai selesai'}">${ico('check')}</button><div><span class="t1">${esc(t.text)}</span><span class="t2">${hm(t.due)}${srcS(t.src)}</span></div>${!t.done && t.due < now ? `<span class="pill late">${ico('clock')}Lewat</span>` : '<span></span>'}</li>`).join('') || `<li class="row" style="grid-template-columns:1fr"><span class="t2">Tidak ada to-do bertenggat.</span></li>`}</ul></div>` : ''}
     ${on('catatan') ? `<div class="dgroup"><h4>Catatan dibuat hari itu</h4><ul class="rows">${it.nt.map(noteRow).join('') || `<li class="row" style="grid-template-columns:1fr"><span class="t2">Tidak ada catatan.</span></li>`}</ul></div>` : ''}`);
   const ug = upcomingGroups(14);
-  const up = folder('Mendatang', ug.length ? ug.map(g => `<div class="dgroup"><h4>${dayLabel(keyDate(g.k)) === 'Hari ini' || dayLabel(keyDate(g.k)) === 'Besok' ? dayLabel(keyDate(g.k)) + ' · ' : ''}${dayFull(keyDate(g.k))}</h4><ul class="rows">${g.items.map(x => x.row).join('')}</ul></div>`).join('') + '<p class="hint" style="margin-top:var(--s-sm)">14 hari ke depan. Rutinitas harian tidak ditampilkan di sini.</p>' : '<div class="empty"><b>Tidak ada yang akan datang</b>Ketik di Tulis cepat: besok 9 pagi meeting.</div>');
-  return `<div class="vh"><div><h1>Kalender</h1><p class="lead">Jadwal, to-do, dan catatan per tanggal. Nanti tersambung dua arah dengan Google Calendar.</p></div></div>
+  const up = folder('Mendatang', ug.length ? ug.map(g => `<div class="dgroup"><h4>${dayLabel(keyDate(g.k)) === 'Hari ini' || dayLabel(keyDate(g.k)) === 'Besok' ? dayLabel(keyDate(g.k)) + ' · ' : ''}${dayFull(keyDate(g.k))}</h4><ul class="rows">${g.items.map(x => x.row).join('')}</ul></div>`).join('') : '<div class="empty"><b>Tidak ada yang akan datang</b>Ketik di Tulis cepat: besok 9 pagi meeting.</div>');
+  return `<div class="vh"><div><h1>Kalender</h1></div></div>
     <div class="cal-wrap"><div class="col">${cal}${up}</div><div class="col">${detail}</div></div>`;
 }
 
@@ -1598,7 +1614,6 @@ function vTodo() {
   const yellow = od.length ? `<section class="folder f-yellow"><div class="f-tab"><h2>Lewat tenggat<span class="cnt">${od.length}</span></h2></div><div class="f-body"><ul class="rows">${od.map(todoRow).join('')}</ul></div></section>`
     : folder('Lewat tenggat', '<div class="empty"><b>Tidak ada yang lewat tenggat</b>Semua to-do masih aman.</div>', 'f-surface hide-sm');
   const add = folder('Tambah to-do', `<form class="form" data-form="todo"><div class="field"><label class="lab" for="todo-in">To-do baru <small>waktu ikut terbaca</small></label><input class="inp" id="todo-in" placeholder="kirim laporan jumat 15:00" autocomplete="off"></div><div class="acts"><button class="btn btn-primary btn-sm">Tambah</button></div></form>
-    <p class="hint" style="margin-top:var(--s-sm)">Contoh waktu: besok, lusa, nama hari, jam 9 pagi, 15:00. To-do bertenggat diingatkan lewat notifikasi Google Calendar${tgOn() ? ' dan Telegram' : ''}.</p>
     <div class="out" style="margin-top:var(--s-sm)"><div><span>Selesai hari ini</span><b>${doneToday}</b></div><div><span>Masih terbuka</span><b>${open.length}</b></div></div>`, 'f-surface hide-sm');
   const groups = G.filter(([, l]) => l.length).map(([n, l]) => folder(`${n}<span class="cnt">${l.length}</span>`, `<ul class="rows">${l.map(todoRow).join('')}</ul>`));
   const doneShown = TDF === 'selesai' || TDALL ? doneL : doneL.slice(0, 5);
@@ -1633,14 +1648,13 @@ function todoHTML(t) {
 let NT = 'catatan'; /* tab Catatan | Coretan */
 function notesHead() {
   const seg = `<div class="seg" role="group" aria-label="Jenis catatan"><button type="button" data-act="nt" data-k="catatan" aria-pressed="${NT === 'catatan'}">Catatan</button><button type="button" data-act="nt" data-k="coretan" aria-pressed="${NT === 'coretan'}">Coretan</button></div>`;
-  return `<div class="vh"><div><h1>Catatan</h1><p class="lead">${NT === 'coretan' ? 'Papan coret-coret. Gambarnya tersimpan di Google Drive.' : 'Dari Telegram dan web. Tersimpan di Google Sheets › Catatan.'}</p></div>${seg}</div>`;
+  return `<div class="vh"><div><h1>Catatan</h1></div>${seg}</div>`;
 }
 function vSketches() {
   const list = S.sketches.slice().sort((a, b) => b.at - a.at);
   const cards = list.map(k => `<button class="sk" type="button" data-act="padopen" data-id="${k.id}"><img src="${k.png || (k.png = padPng(k))}" alt="Coretan: ${esc(k.title)}"><span class="t1">${esc(k.title)}</span><span class="t2">${when(k.at)}${k.tags.length ? ' · ' + k.tags.map(t => '#' + esc(t)).join(' ') : ''}${k.bg ? ' · foto' : ''}${(() => { const u = [...S.notes, ...S.todos].filter(x => x.sk && x.sk.includes(k.id)).length; return u ? ` · terlampir di ${u}` : ''; })()}</span></button>`).join('');
   return folder(`Coretan<span class="cnt">${list.length}</span>`, `<div class="f-head"><span class="src">${ico('folder')}Drive › project001-Planner/Coretan</span><div class="acts"><button class="btn btn-quiet btn-sm" type="button" data-act="padphotonew">${ico('camera', 'ic-s')}Dari foto</button><button class="btn btn-primary btn-sm" type="button" data-act="padnew">Coretan baru</button></div></div>
-    ${list.length ? `<div class="sk-grid">${cards}</div>` : '<div class="empty"><b>Belum ada coretan</b>Buat diagram, sketsa, atau corat-coret ide. Gambarnya disimpan sebagai PNG di Drive.</div>'}
-    <p class="hint" style="margin-top:var(--s-md)">Tiap coretan disimpan dua file di Drive: PNG untuk dilihat, dan data goresan (JSON) supaya bisa dibuka dan diedit lagi. Daftarnya tercatat di Sheets › Coretan. Coretan bisa dilampirkan ke catatan atau to-do dari panel detailnya.</p>`);
+    ${list.length ? `<div class="sk-grid">${cards}</div>` : '<div class="empty"><b>Belum ada coretan</b>Buat diagram, sketsa, atau corat-coret ide. Gambarnya disimpan sebagai PNG di Drive.</div>'}`);
 }
 function vNotes() {
   if (NT === 'coretan') return notesHead() + vSketches();
@@ -1671,7 +1685,6 @@ function vFocus() {
     <div class="focus-meta"><span data-end>${T.running ? 'Selesai sekitar ' + hm(endAt()) : T.left < T.total ? 'Dijeda' : 'Siap'}</span><span>Sesi ke-${ss.length + 1} hari ini<span class="cyc" aria-label="${n} dari 4 sesi menuju istirahat panjang">${[0, 1, 2, 3].map(i => `<span class="${i < n ? 'on' : ''}"></span>`).join('')}</span></span></div>
     <div class="field" style="margin-top:var(--s-lg)"><label class="lab" for="task-in">Sedang mengerjakan</label><input class="inp task-inp" id="task-in" value="${esc(T.task)}" placeholder="Misalnya: tiket inventory kantor"></div>
     <div class="acts" style="margin-top:var(--s-md)">${T.running ? `<button class="btn btn-primary" data-act="pause">Jeda</button>` : `<button class="btn btn-primary" data-act="start">${T.left < T.total ? 'Lanjutkan' : 'Mulai'}</button>`}<button class="btn btn-quiet" data-act="reset">Ulang</button></div>
-    <p class="f-cap" style="margin-top:var(--s-md)">${tgOn() ? 'Saat selesai, bot Telegram mengabari dan menawarkan istirahat. Timer di sini tepat detik; pesan Telegram bisa telat sekitar 1 menit.' : 'Saat selesai, ada bunyi dan tawaran istirahat di bagian atas halaman. Kabar lewat Telegram menyusul di Part 2.'}</p>
   </div></section>`;
   const log = folder(`Sesi hari ini<span class="cnt">${ss.length}</span>`, ss.length ? `<ul class="rows">${ss.slice().reverse().map(s => `<li class="row"><span class="tm">${hm(new Date(s.end - s.min * 60000))}<small>s.d. ${hm(s.end)}</small></span><div><span class="t1">${esc(s.task)}</span><span class="t2">${s.min} menit</span></div><span class="pill plain">${ico('check')}Tercatat</span></li>`).join('')}</ul>` : '<div class="empty"><b>Belum ada sesi</b>Mulai satu sesi 25 menit.</div>');
   const per = folder('Waktu per tugas', `<p class="f-cap">Total ${fmtDur(focusMin())}. Bahan daily report.</p><div style="margin-top:var(--s-xs)">${Object.entries(by).map(([k, v]) => `<div class="brow" style="grid-template-columns:minmax(0,1fr) minmax(0,8rem) auto"><span class="k" title="${esc(k)}">${esc(k)}</span><div class="bar"><i style="width:${v / max * 100}%"></i></div><span class="v"><b>${fmtDur(v)}</b></span></div>`).join('') || '<div class="empty"><b>Belum ada sesi hari ini</b>Waktu per tugas muncul setelah sesi pertama selesai.</div>'}</div><div class="acts" style="margin-top:var(--s-md)"><button class="btn btn-quiet btn-sm" data-act="sendreport">${tgOn() ? ico('tg', 'ic-s') + 'Kirim rangkuman ke Telegram' : ico('note', 'ic-s') + 'Buat daily report'}</button></div>`);
@@ -1703,7 +1716,7 @@ function vMoney() {
   const week = folder('Pengeluaran 7 hari', `<div class="week">${days.map(x => `<div class="d"><div class="col-b ${isToday(x.d) ? 'today' : ''}" style="height:${Math.max(2, x.v / mx * 100)}%">${x.v && !SET.hideAmt ? `<span>${x.v >= 1e6 ? (x.v / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + 'jt' : Math.round(x.v / 1e3) + 'rb'}</span>` : ''}</div><span class="lbl ${isToday(x.d) ? 'today' : ''}">${DAYS_T[x.d.getDay()].slice(0, 3)}</span></div>`).join('')}</div>`);
   const tx = folder('Transaksi', `<div class="f-head"><div class="chips">${['semua', 'keluar', 'masuk'].map(f => `<button class="chip" data-act="txf" data-f="${f}" aria-pressed="${TXF === f}">${cap(f)}</button>`).join('')}</div></div>
     <ul class="rows">${list.map(t => `<li class="row"><span class="tm" style="min-width:4.5rem">${dayLabel(t.at).replace(/^(\w+), /, '')}<small>${hm(t.at)}</small></span><div><span class="t1">${esc(t.note)}</span><span class="t2">${t.cat}${srcL(t.src)}</span></div><b class="num" style="font-weight:500;white-space:nowrap">${t.type === 'in' ? '+' : '−'}${rp(t.amt)}</b></li>`).join('') || '<li><div class="empty"><b>Belum ada transaksi</b>Catat di samping atau lewat Tulis cepat: gaji 8jt, makan 35rb.</div></li>'}</ul>`, 'f-surface');
-  return `<div class="vh"><div><h1>Keuangan</h1><p class="lead">${mName} ${now.getFullYear()} · data di Google Sheets, bisa diedit langsung di sana.</p></div></div>
+  return `<div class="vh"><div><h1>Keuangan</h1><p class="lead">${mName} ${now.getFullYear()}</p></div></div>
     ${ktab}<div class="kt" data-kt="${KT}">
     <div class="deck"><div data-ks="ringkas">${blue}</div><div data-ks="trans">${form}</div></div>
     <div class="board"><div class="col"><div data-ks="ringkas">${folder(SET.daily.on ? 'Batas harian' : 'Hari ini', dailyBody(true))}</div><div data-ks="ringkas">${bud}</div><div data-ks="trans">${week}</div></div><div class="col"><div data-ks="trans">${tx}</div></div></div>
