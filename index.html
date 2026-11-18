@@ -1210,7 +1210,7 @@ select.inp { appearance: none; -webkit-appearance: none; padding-right: 2rem; ba
 .vh h1 { font-weight: 700; letter-spacing: -0.03em; }
 /* warna latar halaman mengikuti bagiannya */
 html[data-view] body { background-repeat: no-repeat; background-image: linear-gradient(180deg, var(--vg, transparent) 0, transparent 380px); }
-html[data-view="todo"] { --vg: #2563EB55; } html[data-view="habit"] { --vg: #12B88650; } html[data-view="fokus"] { --vg: #7C5CFF55; } html[data-view="keuangan"] { --vg: #F59F0045; }
+html[data-view="todo"] { --vg: #2563EB55; } html[data-view="habit"] { --vg: #1ED76050; } html[data-view="fokus"] { --vg: #7C5CFF55; } html[data-view="keuangan"] { --vg: #F59F0045; }
 html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg: #E5487D48; } html[data-view="statistik"] { --vg: #2E9BD650; } html[data-view="cari"] { --vg: #6C7A8955; }
 @media (prefers-color-scheme: light) { html:not([data-theme="dark"])[data-view] body { background-image: linear-gradient(180deg, var(--vg, transparent) 0, transparent 300px); } }
 .top { background: transparent !important; }
@@ -1262,7 +1262,7 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 .tile-b small { font-size: var(--t-2xs); color: var(--c-dim); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .tile-a { position: absolute; right: 8px; bottom: 8px; width: 44px; height: 44px; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--p-0); color: var(--p-4); box-shadow: 0 6px 16px -6px #000000; cursor: pointer; font-size: var(--t-xs); }
 .tile-a .ic { width: 20px; height: 20px; }
-.tile-a.on { background: #12B886; color: var(--p-0); }
+.tile-a.on { background: #1ED760; color: var(--p-0); }
 .tile-a.play { background: var(--p-acc); color: var(--p-on-acc); }
 .tile-a.play .ic { fill: currentColor; width: 18px; height: 18px; margin-left: 2px; }
 .tile-a:focus-visible { outline: 2px solid var(--p-4); outline-offset: 2px; }
@@ -1435,7 +1435,7 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 .hbd-i small { font-size: var(--t-2xs); color: var(--c-dim); }
 .hbd-i em { font-style: normal; font-size: var(--t-2xs); font-weight: 600; margin-top: 4px; color: var(--c-ink); font-variant-numeric: tabular-nums; }
 /* D. rekap Wrapped (layar penuh gaya story) */
-.wr { --wb: #0B3D35; --wf: #FFFFFF; --wd: #CFEFE8; --wa: #1ED760; position: fixed; inset: 0; z-index: 60; background: var(--wb); color: var(--wf); display: grid; justify-items: center; }
+.wr { --wb: #0E3B20; --wf: #FFFFFF; --wd: #CFF2DA; --wa: #1ED760; position: fixed; inset: 0; z-index: 60; background: var(--wb); color: var(--wf); display: grid; justify-items: center; }
 .wr[hidden] { display: none; }
 .wr[data-s="top"] { --wb: #2E2563; --wd: #C9CCF5; }
 .wr[data-s="streak"] { --wb: #F59F00; --wf: #121212; --wd: #121212; --wa: #121212; }
@@ -3446,7 +3446,7 @@ const TPL = () => [
 const tplOf = k => TPL().find(t => t.k === k);
 function tplPickHTML() {
   return `<p class="lead">${L('Pilih yang paling mirip dengan keseharianmu. Isinya bisa diubah di langkah berikutnya.', 'Pick the one closest to your days. You can change everything in the next steps.')}</p>
-  <div class="tp-grid">${TPL().map(t => `<button type="button" class="tp-card" data-act="tplpick" data-k="${t.k}" aria-pressed="${OB.tpl === t.k}">${art(t.ic, ({ kantor: '#2563EB', kuliah: '#7C5CFF', freelance: '#F2762E', keluarga: '#2FA85A', sehat: '#E5484D', hemat: '#12B886', kosong: '#6C7A89' })[t.k])}<b>${esc(t.n)}</b><small>${esc(t.d)}</small>${t.k !== 'kosong' ? `<span class="tp-meta">${t.hab.length} habit · ${t.bud.length} ${L('kategori', 'categories')} · ${t.td.length} to-do</span>` : ''}</button>`).join('')}</div>`;
+  <div class="tp-grid">${TPL().map(t => `<button type="button" class="tp-card" data-act="tplpick" data-k="${t.k}" aria-pressed="${OB.tpl === t.k}">${art(t.ic, ({ kantor: '#2563EB', kuliah: '#7C5CFF', freelance: '#F2762E', keluarga: '#2FA85A', sehat: '#E5484D', hemat: '#1ED760', kosong: '#6C7A89' })[t.k])}<b>${esc(t.n)}</b><small>${esc(t.d)}</small>${t.k !== 'kosong' ? `<span class="tp-meta">${t.hab.length} habit · ${t.bud.length} ${L('kategori', 'categories')} · ${t.td.length} to-do</span>` : ''}</button>`).join('')}</div>`;
 }
 function tplBudget(inc) {
   const T0 = OB.T; T0.bud.forEach(([c, p]) => { BUDGET[c] = Math.max(50000, Math.round(inc * p / 50000) * 50000); });
@@ -3501,7 +3501,7 @@ function tplTodoSave() {
 }
 
 /* ---------- v2.8 thumbnail kartu: warna + ikon dipilih dari isi teks ---------- */
-const ARTK = { todo: ['check', '#2563EB'], habit: ['habit', '#12B886'], fokus: ['timer', '#7C5CFF'], keuangan: ['wallet', '#F59F00'], uang: ['wallet', '#F59F00'], catatan: ['note', '#F2762E'], note: ['note', '#F2762E'], kalender: ['month', '#E5487D'], event: ['month', '#E5487D'], statistik: ['chart', '#2E9BD6'], 'hari-ini': ['sun', '#2563EB'], plan: ['star', '#2563EB'] };
+const ARTK = { todo: ['check', '#2563EB'], habit: ['habit', '#1ED760'], fokus: ['timer', '#7C5CFF'], keuangan: ['wallet', '#F59F00'], uang: ['wallet', '#F59F00'], catatan: ['note', '#F2762E'], note: ['note', '#F2762E'], kalender: ['month', '#E5487D'], event: ['month', '#E5487D'], statistik: ['chart', '#2E9BD6'], 'hari-ini': ['sun', '#2563EB'], plan: ['star', '#2563EB'] };
 const ARTW = [
   [/^\s*(ide|idea)\b|inspirasi|inspiration|wishlist/i, ['bulb', '#F59F00']],
   [/follow up|penawaran|quote|proposal/i, ['brief', '#6C7A89']],
@@ -3512,7 +3512,7 @@ const ARTW = [
   [/\bbaca|\bread|buku|book/i, ['book', '#B07A4B']],
   [/belajar|study|kuliah|class|tugas|assignment|proxmox|school|presentasi|presentation/i, ['cap', '#7C5CFF']],
   [/tagihan|\bbill|bayar|\bpay\b|listrik|electric|invoice|pdam|cicilan|installment/i, ['receipt', '#F59F00']],
-  [/gaji|salary|pemasukan|income|bonus|hemat|tabung|saving|catat pengeluaran|spending|bekal|lunch from home/i, ['coin', '#12B886']],
+  [/gaji|salary|pemasukan|income|bonus|hemat|tabung|saving|catat pengeluaran|spending|bekal|lunch from home/i, ['coin', '#1ED760']],
   [/makan|food|lunch|dinner|sarapan|breakfast|kopi|coffee|latte|masak|cook|resep|recipe|soto|nasi|roti|traktir|treat|meal/i, ['food', '#F2762E']],
   [/transport|grab|gojek|bensin|fuel|parkir|parking|taxi|ojek|servis motor/i, ['car', '#2E9BD6']],
   [/belanja|shopping|groceries|\bbeli\b|\bbuy\b|sayur|vegetable/i, ['cart', '#E5487D']],
@@ -3527,7 +3527,7 @@ const ARTW = [
   [/hadiah|gift/i, ['gift', '#E5487D']],
   [/meeting|rapat|stand-up|klien|client|vendor|kerja|\bwork\b|kantor|office|follow up|kunjungan|visit|review|training|portofolio|portfolio/i, ['brief', '#6C7A89']]
 ];
-const artInk = c => { const n = parseInt(c.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; return (0.299 * r + 0.587 * g + 0.114 * b) > 165 ? '#0F1115' : '#F5F6F8'; };
+const artInk = c => { const n = parseInt(c.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; return (0.299 * r + 0.587 * g + 0.114 * b) > 165 || (g > 180 && r < 100) ? '#0F1115' : '#F5F6F8'; };
 const art = (icon, color, cls = '') => `<span class="art ${cls}" style="--a:${color};--ai:${artInk(color)}" aria-hidden="true">${ico(icon)}</span>`;
 function artPick(text, kind) { const t = String(text || ''); for (const [re, v] of ARTW) if (re.test(t)) return v; return ARTK[kind] || ARTK.todo; }
 const artFor = (text, kind, cls = '') => { const [i, c] = artPick(text, kind); return art(i, c, cls); };
@@ -3864,11 +3864,11 @@ function vHabit3() {
   const now = new Date(), tod = habToday(now), off = S.routines.filter(r => !r.days.includes(now.getDay()));
   const done = tod.filter(r => habCnt(r) >= habTarget(r)).length;
   const head = `<div class="vh vh-act"><div><h1>Habit</h1><p class="lead">${tod.length ? L(`${done} dari ${tod.length} selesai hari ini`, `${done} of ${tod.length} done today`) : S.routines.length ? L('Tidak ada habit terjadwal hari ini', 'No habits scheduled today') : L('Kebiasaan harian dan streak', 'Daily habits and streaks')}</p></div><button class="btn btn-primary btn-sm" type="button" data-act="habadd">${ico('plus')}Habit</button></div>`;
-  if (!S.routines.length) return `<div class="focus-col">${head}<div class="hm-card hh-empty">${art('habit', '#12B886', 'art-lg')}<b>${L('Belum ada habit', 'No habits yet')}</b><p>${L('Tambah kebiasaan yang mau dijaga, misalnya olahraga pagi atau minum air 8 gelas. Progres harian, peta setahun, lencana, dan rekap mingguan muncul di sini.', 'Add a habit you want to keep, like a morning workout or 8 glasses of water. Daily progress, a year map, badges and weekly recaps show up here.')}</p><button class="btn btn-primary" type="button" data-act="habadd">${ico('plus')}${L('Tambah habit pertama', 'Add your first habit')}</button></div></div>`;
+  if (!S.routines.length) return `<div class="focus-col">${head}<div class="hm-card hh-empty">${art('habit', '#1ED760', 'art-lg')}<b>${L('Belum ada habit', 'No habits yet')}</b><p>${L('Tambah kebiasaan yang mau dijaga, misalnya olahraga pagi atau minum air 8 gelas. Progres harian, peta setahun, lencana, dan rekap mingguan muncul di sini.', 'Add a habit you want to keep, like a morning workout or 8 glasses of water. Daily progress, a year map, badges and weekly recaps show up here.')}</p><button class="btn btn-primary" type="button" data-act="habadd">${ico('plus')}${L('Tambah habit pertama', 'Add your first habit')}</button></div></div>`;
   const sel = S.routines.find(r => r.id === HSEL) || S.routines[0];
   const hero = `<section class="hh" aria-label="${L('Progres habit', 'Habit progress')}"><div class="hh-r">${ringSvg(120, 52, 10, tod.length ? done / tod.length : 0, '')}<span><b>${done}/${tod.length}</b><small>${L('hari ini', 'today')}</small></span></div>
     <div class="hh-kv"><span><b>${ico('habit')}${L(`${allStreak()} hari`, `${allStreak()} days`)}</b><small>${L('streak semua selesai', 'all-done streak')}</small></span><span><b>${rate30()}%</b><small>${L('selesai, 30 hari terakhir', 'done, last 30 days')}</small></span></div></section>`;
-  const wr = ['w', 'm'].map(k => { const d = wrapData(k); return d.has ? `<button type="button" class="hw-t" data-act="wrapopen" data-k="${k}">${art(k === 'w' ? 'month' : 'star', k === 'w' ? '#12B886' : '#2E9BD6', 'art-sm')}<span><b>${k === 'w' ? L('Minggu lalu', 'Last week') : MONTHS[d.s.getMonth()]}</b><small>${k === 'w' ? d.label : d.s.getFullYear()} · ${d.pct}%</small></span>${ico('chev')}</button>` : ''; }).join('');
+  const wr = ['w', 'm'].map(k => { const d = wrapData(k); return d.has ? `<button type="button" class="hw-t" data-act="wrapopen" data-k="${k}">${art(k === 'w' ? 'month' : 'star', k === 'w' ? '#1ED760' : '#2E9BD6', 'art-sm')}<span><b>${k === 'w' ? L('Minggu lalu', 'Last week') : MONTHS[d.s.getMonth()]}</b><small>${k === 'w' ? d.label : d.s.getFullYear()} · ${d.pct}%</small></span>${ico('chev')}</button>` : ''; }).join('');
   return `<div class="focus-col">${head}${hero}
     ${wr ? `<div class="hab-sec">${L('Rekap', 'Recap')}<span>${L('gaya story, bisa dibagikan', 'story style, shareable')}</span></div><div class="hw">${wr}</div>` : ''}
     <div class="hab-sec">${L('Minggu ini', 'This week')}<span>${L('penuh = semua selesai', 'full = all done')}</span></div>${habWeek()}
@@ -3914,7 +3914,7 @@ function wrapCard() {
   if (!on('habit')) return '';
   const k = ['m', 'w'].find(x => !wSeen()[wrapRange(x).id] && wrapData(x).has); if (!k) return '';
   const d = wrapData(k), t = k === 'w' ? L('Rekap minggu lalu siap', 'Last week’s recap is ready') : L(`Rekap ${MONTHS[d.s.getMonth()]} siap`, `Your ${MONTHS[d.s.getMonth()]} recap is ready`);
-  return `<div class="hm-card wr-card"><button type="button" class="wr-cb" data-act="wrapopen" data-k="${k}">${art('star', '#12B886', 'art-lg')}<span><b>${t}</b><small>${d.label} · ${L(`${d.pct}% selesai`, `${d.pct}% done`)}</small></span></button><button type="button" class="wr-cx" data-act="wrapseen" data-k="${k}" aria-label="${L('Tutup kartu rekap', 'Dismiss recap card')}">${ico('x')}</button></div>`;
+  return `<div class="hm-card wr-card"><button type="button" class="wr-cb" data-act="wrapopen" data-k="${k}">${art('star', '#1ED760', 'art-lg')}<span><b>${t}</b><small>${d.label} · ${L(`${d.pct}% selesai`, `${d.pct}% done`)}</small></span></button><button type="button" class="wr-cx" data-act="wrapseen" data-k="${k}" aria-label="${L('Tutup kartu rekap', 'Dismiss recap card')}">${ico('x')}</button></div>`;
 }
 const wrQty = p => habTarget(p.r) > 1 && p.qty ? ` · ${fmtQ(p.qty)}${p.r.unit ? ' ' + esc(p.r.unit) : ''}` : '';
 function wrSlide(s, d) {
@@ -4035,7 +4035,7 @@ ARTW.unshift(
   [/jurnal|journal/i, ['pen', '#F2762E']],
   [/bahasa asing|language practice/i, ['cap', '#2E9BD6']],
   [/rencanakan hari|plan your day/i, ['star', '#2563EB']],
-  [/jajan|snacking/i, ['coin', '#12B886']],
+  [/jajan|snacking/i, ['coin', '#1ED760']],
   [/rapikan|tidy/i, ['home', '#2FA85A']]
 );
 let HPC = 'semua', HPQ = '', HPT = null, HPFROM = '', HPKEEP = false;
@@ -4086,7 +4086,7 @@ function hpForm(t) {
     const d = $('#rut-dur'); if (![...d.options].some(o => +o.value === t.dur)) { const o = document.createElement('option'); o.value = t.dur; o.textContent = t.dur + L(' menit', ' min'); d.prepend(o); } d.value = String(t.dur);
     $('#rut-tg').value = t.tg; $('#rut-unit').value = t.u;
     document.querySelectorAll('#panel [data-act="rutday"]').forEach(b => b.setAttribute('aria-pressed', t.days.includes(+b.dataset.d)));
-    const f = n.closest('form'); f.insertAdjacentHTML('afterbegin', `<p class="hint hp-note">${art('habit', '#12B886', 'art-sm')}<span>${L(`Dari template <b>${esc(t.n)}</b>. Ubah bila perlu, lalu ketuk Tambah.`, `From the <b>${esc(t.n)}</b> template. Adjust if needed, then tap Add.`)}</span></p>`);
+    const f = n.closest('form'); f.insertAdjacentHTML('afterbegin', `<p class="hint hp-note">${art('habit', '#1ED760', 'art-sm')}<span>${L(`Dari template <b>${esc(t.n)}</b>. Ubah bila perlu, lalu ketuk Tambah.`, `From the <b>${esc(t.n)}</b> template. Adjust if needed, then tap Add.`)}</span></p>`);
   }
   n.focus(); if (t) n.select();
 }
