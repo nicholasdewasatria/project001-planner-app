@@ -1489,6 +1489,36 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
   @keyframes wr-in { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
 }
 @media (max-width: 380px) { .hh { grid-template-columns: 104px minmax(0, 1fr); gap: var(--s-md); } .hh-r, .hh-r > svg { width: 104px; height: 104px; } .wr-hero { font-size: 4.5rem; } }
+/* v3.4 pop up pilihan template habit */
+.hpick { padding-top: 0; }
+.hp-top { position: sticky; top: 0; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-xs); padding: var(--s-xs) 0 var(--s-sm); background: var(--c-solid); }
+.pn-b > .hp-top { top: calc(-1 * var(--s-lg)); margin-top: calc(-1 * var(--s-lg)); padding-top: var(--s-lg); }
+.pn-b > .hp-list { margin-top: calc(var(--s-xs) - var(--s-lg)); }
+.hp-top .sh-h { margin-bottom: 0; }
+.hp-q { border-radius: var(--r-pill); }
+.hp-chips { margin-top: 0; }
+.hp-chips button { min-height: 44px; }
+.hp-chips button:focus-visible { outline: 2px solid var(--c-blue-hi); outline-offset: -2px; }
+.hp-list, .hp-g { display: grid; gap: 8px; }
+.hp-list { padding-bottom: var(--s-sm); }
+.hp-g h3 { margin: var(--s-xs) 0 0; font-size: var(--t-xs); font-weight: 600; color: var(--c-dim); }
+.hp-c { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 60px; padding: 10px 12px; border-radius: 10px; background: var(--c-card); color: var(--c-ink); }
+.hp-c:hover:not(:disabled) { background: var(--c-card-hi); }
+.hp-c:focus-visible { outline: 2px solid var(--c-blue-hi); outline-offset: 2px; }
+.hp-x { min-width: 0; }
+.hp-x b, .hp-x small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hp-x b { font-size: var(--t-sm); font-weight: 600; }
+.hp-x small { margin-top: 2px; font-size: var(--t-2xs); color: var(--c-dim); }
+.hp-add { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--c-card-hi); color: var(--c-ink); }
+.hp-add .ic { width: 18px; height: 18px; }
+.hp-c:disabled { cursor: default; }
+.hp-c:disabled .art { opacity: 0.55; }
+.hp-c:disabled b { color: var(--c-dim); }
+.hp-has { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--r-pill); box-shadow: inset 0 0 0 1px var(--c-line); font-size: var(--t-2xs); font-weight: 600; color: var(--c-dim); white-space: nowrap; }
+.hp-has .ic { width: 14px; height: 14px; }
+.hp-none { padding: var(--s-sm) 0; font-size: var(--t-xs); color: var(--c-dim); }
+.hp-note { display: flex; align-items: center; gap: 8px; }
+.hp-open { justify-self: start; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1628,6 +1658,7 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 <div class="scrim" id="sscrim"></div>
 <div class="sheet" id="more" role="dialog" aria-modal="true" aria-label="Menu lainnya" hidden></div>
 <div class="usheet" id="uang" role="dialog" aria-modal="true" aria-label="Catat uang" hidden></div>
+<div class="sheet hpick" id="hpick" role="dialog" aria-modal="true" aria-labelledby="hp-t" hidden></div>
 <aside class="panel" id="panel" aria-labelledby="panel-t" aria-hidden="true">
   <div class="pn-h"><h2 id="panel-t">Catatan</h2><button class="iconbtn" type="button" data-act="close" aria-label="Tutup"><svg class="ic"><use href="#i-x"/></svg></button></div>
   <div class="pn-b" id="panel-b"></div>
@@ -2024,7 +2055,8 @@ function openSheet(k) {
 }
 function closeSheet() {
   const was = SHEET; if (!was) return;
-  SHEET = ''; QCTX = null; QTYPE = null; delete document.documentElement.dataset.sheet; $('#sscrim').classList.remove('open'); $('#more').hidden = true; $('#uang').hidden = true; setQcPh(); renderMNav();
+  SHEET = ''; QCTX = null; QTYPE = null; delete document.documentElement.dataset.sheet; $('#sscrim').classList.remove('open'); $('#more').hidden = true; $('#uang').hidden = true; $('#hpick').hidden = true; setQcPh(); renderMNav();
+  if (was === 'hpick') { if (!HPKEEP) hpBack(); return; }
   const b = document.querySelector(was === 'qc' ? '#mnav .fab' : '#mnav [data-act="more"]'); if (b && isSm()) b.focus();
 }
 const MV = { cari: [L('Cari', 'Search'), 'search'], 'hari-ini': ['Home', 'home'], todo: ['To-do', 'check'], keuangan: ['Uang', 'wallet'], kalender: ['Kalender', 'month'], catatan: ['Catatan', 'note'], habit: ['Habit', 'habit'], fokus: ['Fokus', 'timer'], statistik: ['Statistik', 'chart'] };
@@ -3916,6 +3948,117 @@ function habAct(act, a, id) {
   return false;
 }
 
+/* ---------- v3.4 pop up pilihan template habit ---------- */
+/* Satu sumber: htpl() juga mengisi RSUG (saran di panduan awal). Nilai yang sama dengan TPL() v2.7 dibuat persis sama. */
+/* [kategori, nama ID, nama EN, jam, menit, hari, target, satuan ID, satuan EN, saran awal] */
+function htpl() {
+  const S6 = [1, 2, 3, 4, 5, 6];
+  return [
+    ['kes', 'Minum air', 'Drink water', '08:00', 15, EVERY, 8, 'gelas', 'glasses'],
+    ['kes', 'Olahraga pagi', 'Morning workout', '05:30', 45, S6, 1, '', '', 1],
+    ['kes', 'Jalan 8rb langkah', 'Walk 8k steps', '17:00', 60, EVERY, 8000, 'langkah', 'steps'],
+    ['kes', 'Tidur sebelum 23:00', 'Sleep before 11pm', '22:30', 30, EVERY, 1, '', '', 1],
+    ['kes', 'Minum vitamin', 'Take vitamins', '07:00', 10, EVERY],
+    ['kes', 'Jalan sore', 'Evening walk', '17:00', 30, EVERY, 1, '', '', 1],
+    ['bel', 'Baca 10 halaman', 'Read 10 pages', '21:00', 20, EVERY, 10, 'halaman', 'pages', 1],
+    ['bel', 'Belajar 30 menit', 'Study 30 min', '20:00', 30, EVERY, 1, '', '', 1],
+    ['bel', 'Bahasa asing 15 menit', 'Language practice 15 min', '19:00', 15, EVERY],
+    ['pro', 'Rencanakan hari', 'Plan your day', '07:30', 10, WKDAY],
+    ['pro', 'Cek email pagi', 'Check email in the morning', '08:30', 15, WKDAY],
+    ['pro', 'Fokus 2 sesi', '2 focus sessions', '09:00', 60, WKDAY, 2, 'sesi', 'sessions'],
+    ['pik', 'Meditasi 10 menit', 'Meditate 10 minutes', '06:30', 10, EVERY],
+    ['pik', 'Tulis jurnal', 'Write a journal', '21:30', 15, EVERY],
+    ['pik', 'Tanpa HP sebelum tidur', 'No phone before bed', '22:00', 30, EVERY],
+    ['uang', 'Catat pengeluaran hari ini', 'Log today’s spending', '21:00', 10, EVERY],
+    ['uang', 'Tanpa jajan', 'No snacking out', '15:00', 15, EVERY],
+    ['uang', 'Sisihkan tabungan', 'Set aside savings', '20:00', 10, [1]],
+    ['uang', 'Bawa bekal', 'Bring lunch from home', '07:00', 15, WKDAY],
+    ['rum', 'Rapikan kamar', 'Tidy your room', '07:00', 15, EVERY],
+    ['rum', 'Siram tanaman', 'Water the plants', '06:30', 10, EVERY],
+    ['rum', 'Masak di rumah', 'Cook at home', '18:00', 60, EVERY]
+  ].map(([c, id, en, s, dur, days, tg = 1, uid = '', uen = '', sug = 0], i) => ({ i, c, id, en, n: L(id, en), s, dur, days, tg, u: L(uid, uen), sug }));
+}
+const HCAT = () => [['semua', L('Semua', 'All')], ['kes', L('Kesehatan', 'Health')], ['bel', L('Belajar', 'Learning')], ['pro', L('Produktivitas', 'Productivity')], ['pik', L('Pikiran', 'Mind')], ['uang', L('Uang', 'Money')], ['rum', L('Rumah', 'Home')]];
+/* ikon yang cocok untuk template baru (diperiksa sebelum aturan lama) */
+ARTW.unshift(
+  [/vitamin/i, ['heart', '#E5484D']],
+  [/tanaman|\bplants?\b/i, ['drop', '#2FA85A']],
+  [/tanpa hp|no phone/i, ['moon', '#5B5BD6']],
+  [/meditasi|meditat/i, ['sun', '#9B5DE5']],
+  [/jurnal|journal/i, ['pen', '#F2762E']],
+  [/bahasa asing|language practice/i, ['cap', '#2E9BD6']],
+  [/rencanakan hari|plan your day/i, ['star', '#2563EB']],
+  [/jajan|snacking/i, ['coin', '#12B886']],
+  [/rapikan|tidy/i, ['home', '#2FA85A']]
+);
+let HPC = 'semua', HPQ = '', HPT = null, HPFROM = '', HPKEEP = false;
+const hpHas = t => S.routines.some(r => { const n = r.name.trim().toLowerCase(); return n === t.id.toLowerCase() || n === t.en.toLowerCase(); });
+const hpMeta = t => `${t.s} · ${daysLabel(t.days)} · ${t.tg > 1 ? fmtQ(t.tg) + (t.u ? ' ' + t.u : '') : t.dur + L(' menit', ' min')}`;
+function hpCard(t) {
+  const has = hpHas(t);
+  return `<button type="button" class="hp-c" data-act="hppick" data-k="${t.i}"${has ? ' disabled aria-disabled="true"' : ''}>${artFor(t.n, 'habit')}<span class="hp-x"><b>${esc(t.n)}</b><small>${esc(hpMeta(t))}</small></span>${has ? `<span class="hp-has">${ico('check')}${L('Sudah ada', 'Added')}</span>` : `<span class="hp-add" aria-hidden="true">${ico('plus')}</span>`}</button>`;
+}
+function hpList() {
+  const q = HPQ.trim().toLowerCase(), all = htpl().filter(t => (HPC === 'semua' || t.c === HPC) && (!q || (t.id + ' ' + t.en).toLowerCase().includes(q)));
+  const own = `<button type="button" class="hp-c hp-own" data-act="hpown">${art('pen', '#6C7A89')}<span class="hp-x"><b>${L('Buat sendiri', 'Create your own')}</b><small>${L('Isi nama, jam, dan hari sendiri', 'Set the name, time and days yourself')}</small></span><span class="hp-add" aria-hidden="true">${ico('chev')}</span></button>`;
+  if (!all.length) return own + `<p class="hp-none">${L('Tidak ada template yang cocok. Pakai Buat sendiri.', 'No matching template. Use Create your own.')}</p>`;
+  return own + HCAT().slice(1).map(([k, n]) => { const g = all.filter(t => t.c === k); return g.length ? `<section class="hp-g" aria-label="${esc(n)}">${HPC === 'semua' ? `<h3>${esc(n)}</h3>` : ''}${g.map(hpCard).join('')}</section>` : ''; }).join('');
+}
+function hpHTML(sheet) {
+  return `<div class="hp-top">${sheet ? `<div class="grab" aria-hidden="true"></div><div class="sh-h"><b id="hp-t">${L('Pilih habit', 'Pick a habit')}</b><button class="iconbtn" type="button" data-act="hpx" aria-label="${L('Tutup', 'Close')}">${ico('x')}</button></div>` : ''}
+    <label class="sr" for="hp-q">${L('Cari template habit', 'Search habit templates')}</label><input class="inp hp-q" id="hp-q" type="search" value="${esc(HPQ)}" placeholder="${L('Cari, misalnya air atau baca', 'Search, like water or read')}" autocomplete="off">
+    <div class="hm-chips hp-chips" role="group" aria-label="${L('Kategori', 'Category')}">${HCAT().map(([k, n]) => `<button type="button" data-act="hpcat" data-k="${k}" aria-pressed="${HPC === k}">${esc(n)}</button>`).join('')}</div></div>
+    <div class="hp-list" id="hp-list">${hpList()}</div>`;
+}
+function hpBox() { return SHEET === 'hpick' ? $('#hpick') : PANEL === 'hpick' ? $('#panel-b') : null; }
+function hpRe(sel) { const b = hpBox(); if (!b) return; const l = b.querySelector('#hp-list'); if (l) l.innerHTML = hpList(); b.querySelectorAll('[data-act="hpcat"]').forEach(x => x.setAttribute('aria-pressed', x.dataset.k === HPC)); if (sel) { const f = b.querySelector(sel); if (f) f.focus(); } }
+function hpOpen(a) {
+  HPFROM = PANEL === 'rut' ? 'rut' : '';
+  if (PANEL) closePanel();
+  HPC = 'semua'; HPQ = '';
+  HPT = { el: a, sel: a && a.dataset.act ? (a.closest('#panel') ? '#panel ' : '#view ') + `[data-act="${a.dataset.act}"]` : null };
+  if (isSm()) {
+    openSheet('hpick'); const el = $('#hpick'); el.innerHTML = hpHTML(true); el.hidden = false; el.scrollTop = 0;
+    const x = el.querySelector('[data-act="hpx"]'); if (x) x.focus();
+  } else openPanel(L('Pilih habit', 'Pick a habit'), hpHTML(false), 'hpick');
+}
+/* tutup tanpa memilih: fokus kembali ke pemicu (atau ke panel Kelola bila dibuka dari sana) */
+function hpBack() {
+  const t = HPT, from = HPFROM; HPT = null; HPFROM = '';
+  if (from === 'rut') { RED = null; openPanel('Rutinitas', rutHTML(), 'rut'); const b = $('#panel [data-act="hpick"]'); if (b) b.focus(); return; }
+  if (!t) return;
+  const el = t.el && t.el.isConnected ? t.el : t.sel ? document.querySelector(t.sel) : null; if (el) el.focus();
+}
+function hpForm(t) {
+  HPT = null; HPFROM = '';
+  if (SHEET === 'hpick') { HPKEEP = true; closeSheet(); HPKEEP = false; }
+  RED = null; openPanel('Rutinitas', rutHTML(), 'rut');
+  const n = $('#rut-name'); if (!n) return;
+  if (t) {
+    n.value = t.n; $('#rut-start').value = t.s;
+    const d = $('#rut-dur'); if (![...d.options].some(o => +o.value === t.dur)) { const o = document.createElement('option'); o.value = t.dur; o.textContent = t.dur + L(' menit', ' min'); d.prepend(o); } d.value = String(t.dur);
+    $('#rut-tg').value = t.tg; $('#rut-unit').value = t.u;
+    document.querySelectorAll('#panel [data-act="rutday"]').forEach(b => b.setAttribute('aria-pressed', t.days.includes(+b.dataset.d)));
+    const f = n.closest('form'); f.insertAdjacentHTML('afterbegin', `<p class="hint hp-note">${art('habit', '#12B886', 'art-sm')}<span>${L(`Dari template <b>${esc(t.n)}</b>. Ubah bila perlu, lalu ketuk Tambah.`, `From the <b>${esc(t.n)}</b> template. Adjust if needed, then tap Add.`)}</span></p>`);
+  }
+  n.focus(); if (t) n.select();
+}
+function hpAct(act, a) {
+  if (act === 'habadd' || act === 'hpick') { hpOpen(a); return true; }
+  if (act === 'hpx') { closeSheet(); return true; }
+  if (act === 'hpcat') { HPC = a.dataset.k; hpRe(`[data-act="hpcat"][data-k="${HPC}"]`); return true; }
+  if (act === 'hpown') { hpForm(null); return true; }
+  if (act === 'hppick') { const t = htpl()[+a.dataset.k]; if (!t) return true; if (hpHas(t)) { toast(L(`${t.n} sudah ada di habit kamu`, `${t.n} is already in your habits`)); return true; } hpForm(t); return true; }
+  return false;
+}
+document.addEventListener('input', e => { if (e.target.id === 'hp-q') { HPQ = e.target.value; hpRe(); } });
+
+/* peta setahun: sembunyikan label bulan yang terpotong di tepi area geser */
+function hyFit(sc) { const r = sc.getBoundingClientRect(), rg = document.createRange(); sc.querySelectorAll('.hy-m span').forEach(s => { rg.selectNodeContents(s); const b = rg.getBoundingClientRect(); s.style.visibility = b.left >= r.left - 1 && b.right <= r.right + 1 ? '' : 'hidden'; }); }
+function hyFitAll() { document.querySelectorAll('#view .hy-sc').forEach(hyFit); }
+document.addEventListener('scroll', e => { const t = e.target; if (t && t.classList && t.classList.contains('hy-sc')) hyFit(t); }, true);
+window.addEventListener('resize', () => requestAnimationFrame(hyFitAll));
+
 /* ---------- render + navigasi ---------- */
 function render() {
   if (V !== 'hari-ini' && !on(V)) { V = 'hari-ini'; setHash('hari-ini'); }
@@ -3928,6 +4071,7 @@ function render() {
   renderMNav();
   renderMini();
   setQcPh();
+  if (V === 'habit') requestAnimationFrame(hyFitAll);
   saveData();
 }
 function refresh() {
@@ -3968,7 +4112,7 @@ function tgHTML() {
   return `<button class="lnk small" type="button" data-act="settings" style="justify-self:start">‹ Pengaturan</button>` + st + notif + ex;
 }
 let RED = null; /* id rutinitas yang sedang diubah */
-const RSUG = [['Olahraga pagi', '05:30', 45], ['Belajar 30 menit', '20:00', 30], ['Baca buku 20 menit', '21:00', 20], ['Jalan kaki sore', '17:00', 45], ['Tidur sebelum 23:00', '22:30', 30]];
+const RSUG = htpl().filter(t => t.sug).map(t => [t.n, t.s, t.dur]);
 const backSet = `<button class="lnk small" type="button" data-act="settings" style="justify-self:start">‹ Pengaturan</button>`;
 function rutHTML() {
   const r = RED ? S.routines.find(x => x.id === RED) : null, days = r ? r.days : [0, 1, 2, 3, 4, 5, 6];
@@ -3978,7 +4122,7 @@ function rutHTML() {
   return backSet + `<section class="pn-sec"><h3>Rutinitas kamu</h3>${list}</section>
   <section class="pn-sec"><h3>${r ? 'Ubah: ' + esc(r.name) : 'Tambah rutinitas'}</h3><form class="form" data-form="rut">
     <div class="field"><label class="lab" for="rut-name">Nama</label><input class="inp" id="rut-name" value="${r ? esc(r.name) : ''}" placeholder="Olahraga pagi" autocomplete="off"></div>
-    ${!r && sugg.length ? `<div class="chips">${sugg.map(([n]) => `<button type="button" class="chip" data-act="rutsug" data-n="${esc(n)}">${esc(n)}</button>`).join('')}</div>` : ''}
+    ${!r ? `<button type="button" class="btn btn-quiet btn-sm hp-open" data-act="hpick">${ico('apps')}${L('Pilih dari template', 'Pick from templates')}</button>` : ''}
     <div class="grid2f"><div class="field"><label class="lab" for="rut-start">Mulai</label><input class="inp num" id="rut-start" inputmode="numeric" placeholder="06:00" autocomplete="off" value="${r ? r.start : '06:00'}"></div>
     <div class="field"><label class="lab" for="rut-dur">Lama</label><select class="inp" id="rut-dur">${[15, 20, 30, 45, 60, 90].map(m => `<option value="${m}" ${(r ? r.dur : 30) === m ? 'selected' : ''}>${m < 60 ? m + ' menit' : String(m / 60).replace('.', ',') + ' jam'}</option>`).join('')}</select></div></div>
     <div class="grid2f"><div class="field"><label class="lab" for="rut-tg">Target per hari <small>1 = cukup dicentang</small></label><input class="inp num" id="rut-tg" inputmode="numeric" value="${r ? habTarget(r) : 1}" autocomplete="off"></div>
@@ -4311,7 +4455,7 @@ function openNote(id) {
   $('#panel').classList.add('open'); $('#panel').setAttribute('aria-hidden', 'false'); $('#scrim').classList.add('open');
   $('#panel .iconbtn').focus();
 }
-function closePanel() { PANEL = ''; $('#panel').classList.remove('open'); $('#panel').setAttribute('aria-hidden', 'true'); $('#scrim').classList.remove('open'); }
+function closePanel() { if (PANEL === 'hpick') setTimeout(hpBack, 0); PANEL = ''; $('#panel').classList.remove('open'); $('#panel').setAttribute('aria-hidden', 'true'); $('#scrim').classList.remove('open'); }
 
 document.addEventListener('click', e => {
   CALCF = !!e.target.closest('#hitung');
@@ -4325,6 +4469,7 @@ document.addEventListener('click', e => {
   const k = e.target.closest('[data-key]'); if (k) return key(k.dataset.key);
   const a = e.target.closest('[data-act]'); if (!a) return;
   const id = +a.dataset.id, act = a.dataset.act;
+  if (hpAct(act, a)) return;
   if (act === 'close') return closePanel();
   if (act === 'hf') { HF = a.dataset.k; return render(); }
   if (act === 'qtype') { const g = qcGuess($('#qc-in').value, qcCtx()); QTYPE = g && g.k === a.dataset.k ? null : a.dataset.k; qcPrev(); return; }
