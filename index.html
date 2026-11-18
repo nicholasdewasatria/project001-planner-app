@@ -5,8 +5,8 @@
 <title>project001-Planner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Planner harian: jadwal, to-do, catatan, coretan, fokus, dan keuangan.">
-<meta name="theme-color" content="#0F1115" data-def="#0F1115" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#F5F6F8" data-def="#F5F6F8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121212" data-def="#121212" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF" data-def="#FFFFFF" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -1544,10 +1544,13 @@ const MODS = [
   ['statistik', 'Statistik', 'chart', 'Grafik to-do, fokus, habit, dan pengeluaran']
 ];
 const SET_DEF = () => ({ show: Object.fromEntries(MODS.map(m => [m[0], true])), hideAmt: false, daily: { on: true, limit: 150000 }, tg: { on: false, notif: {} }, theme: 'auto' });
-let PALK = (() => { try { const v = localStorage.getItem('p001-pal'); return ['netral', 'hijau'].includes(v) ? v : 'planner'; } catch (e) { return 'planner'; } })();
-const applyPal = () => { if (PALK === 'planner') delete document.documentElement.dataset.pal; else document.documentElement.dataset.pal = PALK; };
+let PALK = (() => { try { const v = localStorage.getItem('p001-pal'); return ['planner', 'netral', 'hijau'].includes(v) ? v : 'netral'; } catch (e) { return 'netral'; } })();
+const applyPal = () => {
+  if (PALK === 'planner') delete document.documentElement.dataset.pal; else document.documentElement.dataset.pal = PALK;
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => { const lt = /light/.test(m.media); m.dataset.def = PALK === 'planner' ? (lt ? '#F5F6F8' : '#0F1115') : (lt ? '#FFFFFF' : '#121212'); if (!document.documentElement.dataset.theme) m.content = m.dataset.def; });
+};
 applyPal();
-const PALS = () => [['planner', 'Planner', ['#2563EB', '#00E2BA']], ['netral', L('Netral', 'Neutral'), ['#121212', '#2563EB']], ['hijau', L('Hijau', 'Green'), ['#121212', '#1ED760']]];
+const PALS = () => [['netral', L('Netral', 'Neutral'), ['#121212', '#2563EB']], ['planner', 'Planner', ['#2563EB', '#00E2BA']], ['hijau', L('Hijau', 'Green'), ['#121212', '#1ED760']]];
 const palSeg = cls => `<div class="seg pal-seg ${cls}" role="group" aria-label="${L('Palet warna', 'Color palette')}">${PALS().map(([k, n, c]) => `<button type="button" data-act="pal" data-k="${k}" aria-pressed="${PALK === k}"><span class="pal-dot" aria-hidden="true">${c.map(x => `<i style="background:${x}"></i>`).join('')}</span><span data-raw>${n}</span></button>`).join('')}</div>`;
 let SET = (() => { const d = SET_DEF(); try { const v = JSON.parse(localStorage.getItem('p001-set') || 'null'); if (v) return { show: { ...d.show, ...(v.show || {}) }, hideAmt: !!v.hideAmt, daily: { ...d.daily, ...(v.daily || {}) }, tg: { on: !!(v.tg && v.tg.on), notif: { ...((v.tg && v.tg.notif) || {}) } }, theme: ['dark', 'light'].includes(v.theme) ? v.theme : 'auto' }; } catch (e) { /* tanpa penyimpanan */ } return d; })();
 const tgOn = () => SET.tg.on;
@@ -3537,7 +3540,7 @@ const okPill = APP ? '<span class="pill">Nanti</span>' : `<span class="pill">${'
 const THEMES = [['auto', 'Otomatis'], ['dark', 'Gelap'], ['light', 'Terang']];
 const themeSeg = cls => `<div class="seg ${cls}" role="group" aria-label="Tema">${THEMES.map(([k, n]) => `<button type="button" data-act="theme" data-k="${k}" aria-pressed="${SET.theme === k}">${n}</button>`).join('')}</div>`;
 function settingsHTML() {
-  return `<section class="pn-sec"><h3>${L('Bahasa', 'Language')}</h3>${langSeg('')}<p class="hint">${L('Halaman dimuat ulang setelah ganti bahasa.', 'The page reloads after you switch.')}</p></section><section class="pn-sec"><h3>Tema</h3>${themeSeg('')}<p class="hint">Otomatis mengikuti mode gelap atau terang di HP dan laptop.</p></section><section class="pn-sec"><h3>${L('Palet warna', 'Color palette')}</h3>${palSeg('')}<p class="hint">${L('Planner: biru dan teal bawaan. Netral: hitam dan abu netral, aksen biru. Hijau: hitam netral dengan aksen hijau.', 'Planner: the default blue and teal. Neutral: neutral black and grey with blue accents. Green: neutral black with green accents.')}</p></section>
+  return `<section class="pn-sec"><h3>${L('Bahasa', 'Language')}</h3>${langSeg('')}<p class="hint">${L('Halaman dimuat ulang setelah ganti bahasa.', 'The page reloads after you switch.')}</p></section><section class="pn-sec"><h3>Tema</h3>${themeSeg('')}<p class="hint">Otomatis mengikuti mode gelap atau terang di HP dan laptop.</p></section><section class="pn-sec"><h3>${L('Palet warna', 'Color palette')}</h3>${palSeg('')}<p class="hint">${L('Netral (bawaan): hitam dan abu netral, aksen biru. Planner: hitam kebiruan dengan biru dan teal. Hijau: hitam netral dengan aksen hijau.', 'Neutral (default): neutral black and grey with blue accents. Planner: blue-black with blue and teal. Green: neutral black with green accents.')}</p></section>
   <section class="pn-sec"><h3>Integrasi</h3><div>
     ${APP ? `<div class="set">${ico('cloud')}<div><b>Akun Google</b><small>${G.email ? esc(G.email) + ' · ' + esc(gStText()) : 'Belum masuk. Data hanya di HP ini'}</small></div><button class="btn btn-quiet btn-sm" type="button" data-act="gpanel">${G.email ? 'Atur' : 'Masuk'}</button></div>`
       : `<div class="set">${ico('sheet')}<div><b>Google Sheets</b><small>Catatan, to-do, keuangan, rutinitas</small></div>${okPill.replace('CHECK', ico('check'))}</div>`}
