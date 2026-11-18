@@ -1345,6 +1345,150 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 /* ---------- v3.2 pengingat Calendar ---------- */
 .rem-seg { display: flex; margin: -2px 0 var(--s-sm); }
 .rem-seg button { flex: 1 1 0; min-width: 0; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
+
+/* ---------- v3.3 Habit: bulatan Beranda, halaman progres, rekap Wrapped ---------- */
+:root { --hx-track: color-mix(in srgb, var(--c-ink) 16%, transparent); }
+.hx-tr { fill: none; stroke: var(--hx-track); }
+.hx-pr { fill: none; stroke: var(--p-acc2); stroke-linecap: round; }
+/* A. bulatan habit */
+.hb { margin-top: var(--s-md); }
+.hb .shelf-h { flex-wrap: wrap; row-gap: 2px; }
+.hb-st { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-2xs); color: var(--c-dim); }
+.hb-st .ic { width: 16px; height: 16px; color: var(--c-hab); flex: none; }
+.hb-st b { color: var(--c-ink); font-weight: 700; }
+.hb-row { display: flex; gap: 12px; margin: var(--s-xs) calc(-1 * var(--s-2xs)) 0; padding: 4px var(--s-2xs) 6px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+.hb-row::-webkit-scrollbar { display: none; }
+.hb-b { all: unset; box-sizing: border-box; flex: none; width: 72px; min-height: 44px; display: grid; justify-items: center; align-content: start; gap: 2px; cursor: pointer; scroll-snap-align: start; border-radius: 12px; }
+.hb-b:focus-visible { outline: 2px solid var(--c-blue-hi); outline-offset: 2px; }
+.hb-ring { position: relative; width: 60px; height: 60px; display: grid; place-items: center; margin-bottom: 4px; }
+.hb-ring > svg { position: absolute; inset: 0; width: 60px; height: 60px; }
+.hb-ring .art { width: 46px; height: 46px; }
+.hb-ok { position: absolute; right: 0; bottom: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--p-acc2); color: var(--p-0); display: none; place-items: center; box-shadow: 0 0 0 2.5px var(--c-bg); z-index: 2; }
+.hb-ok .ic { width: 12px; height: 12px; stroke-width: 3.2; }
+.hb-b.on .hb-ok { display: grid; }
+.hb-n, .hb-q { max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.6875rem; line-height: 1.25; color: var(--c-ink); text-align: center; }
+.hb-n { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.hb-q { color: var(--c-dim); font-variant-numeric: tabular-nums; }
+.hb-plus { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--hx-track); color: var(--c-dim); }
+.hb-plus .ic { width: 20px; height: 20px; }
+.hb-add .hb-n { color: var(--c-dim); }
+.hb-off { margin: var(--s-2xs) 0 0; font-size: var(--t-2xs); color: var(--c-dim); }
+/* kartu rekap di Beranda */
+.wr-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px; padding: 8px 4px 8px 8px !important; margin-top: var(--s-md); border-radius: 10px; }
+.wr-cb { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: center; min-width: 0; min-height: 44px; border-radius: 8px; }
+.wr-cb b { display: block; font-size: var(--t-sm); font-weight: 700; }
+.wr-cb small { display: block; font-size: var(--t-2xs); color: var(--c-dim); margin-top: 2px; }
+.wr-cx { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--c-dim); display: grid; place-items: center; cursor: pointer; }
+.wr-cx .ic { width: 18px; height: 18px; }
+.wr-cb:focus-visible, .wr-cx:focus-visible, .hw-t:focus-visible { outline: 2px solid var(--c-blue-hi); outline-offset: 2px; }
+/* C. halaman Habit */
+.hh { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: var(--s-lg); align-items: center; margin-top: var(--s-md); }
+.hh-r { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
+.hh-r > svg { position: absolute; inset: 0; width: 120px; height: 120px; }
+.hh-r > span { display: grid; justify-items: center; line-height: 1.1; }
+.hh-r b { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.hh-r small { font-size: var(--t-2xs); color: var(--c-dim); }
+.hh-kv { display: grid; gap: var(--s-sm); }
+.hh-kv span { display: grid; gap: 1px; }
+.hh-kv b { display: inline-flex; align-items: center; gap: 6px; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
+.hh-kv b .ic { width: 18px; height: 18px; color: var(--c-hab); }
+.hh-kv small { font-size: var(--t-2xs); color: var(--c-dim); }
+.hh-empty { display: grid; justify-items: start; gap: var(--s-xs); padding: var(--s-lg) !important; margin-top: var(--s-md); border-radius: 12px; }
+.hh-empty b { font-size: var(--t-md); }
+.hh-empty p { margin: 0; color: var(--c-dim); font-size: var(--t-sm); }
+.hh-empty .btn { margin-top: var(--s-xs); }
+.hw { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: var(--s-xs); }
+.hw-t { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 30px minmax(0, 1fr) 16px; gap: 10px; align-items: center; min-height: 52px; padding: 8px 10px; border-radius: 10px; background: var(--c-card); }
+.hw-t b { display: block; font-size: var(--t-xs); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hw-t small { display: block; font-size: var(--t-2xs); color: var(--c-dim); }
+.hw-t > .ic { width: 16px; height: 16px; color: var(--c-dim); }
+.hd7 { display: flex; gap: 4px; margin-top: 5px; }
+.hd7 i { width: 9px; height: 9px; border-radius: 2px; background: var(--hx-track); }
+.hd7 i.ok { background: var(--p-acc2); }
+.hd7 i.off { background: transparent; box-shadow: inset 0 0 0 1px var(--hx-track); }
+.hd7 i.td { box-shadow: inset 0 0 0 1.5px var(--c-dim); background: transparent; }
+.hy-ch { margin-top: var(--s-xs); }
+.hy { display: grid; grid-template-columns: 22px minmax(0, max-content); gap: 4px; margin-top: var(--s-sm); }
+.hy-d { display: grid; grid-template-rows: 14px repeat(7, 10px); row-gap: 2px; font-size: 0.5625rem; line-height: 10px; color: var(--c-dim); }
+.hy-sc { overflow-x: auto; direction: rtl; scrollbar-width: thin; padding-bottom: 4px; }
+.hy-in { direction: ltr; width: max-content; }
+.hy-m, .hy-g { display: grid; grid-template-columns: repeat(53, 10px); column-gap: 2px; }
+.hy-m { height: 14px; font-size: 0.5625rem; line-height: 12px; color: var(--c-dim); }
+.hy-m span { white-space: nowrap; }
+.hy-g { grid-template-rows: repeat(7, 10px); row-gap: 2px; grid-auto-flow: column; }
+.hy-g i, .hy-lg i { width: 10px; height: 10px; border-radius: 2px; background: var(--hx-track); }
+.hy-g i.off { background: transparent; box-shadow: inset 0 0 0 1px var(--hx-track); }
+.hy-g i.l1, .hy-lg i.l1 { background: color-mix(in srgb, var(--p-acc2) 35%, var(--c-bg)); }
+.hy-g i.l2, .hy-lg i.l2 { background: color-mix(in srgb, var(--p-acc2) 65%, var(--c-bg)); }
+.hy-g i.l3, .hy-lg i.l3 { background: var(--p-acc2); }
+.hy-g i.td { box-shadow: 0 0 0 1.5px var(--c-ink); }
+.hy-g i.fu { visibility: hidden; }
+.hy-f { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px var(--s-sm); margin-top: var(--s-xs); font-size: var(--t-2xs); color: var(--c-dim); }
+.hy-lg { display: inline-flex; align-items: center; gap: 3px; }
+.hy-lg i:first-child { margin-left: 3px; } .hy-lg i:last-child { margin-right: 3px; }
+.hbd { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: var(--s-xs); }
+.hbd-i { display: grid; justify-items: center; gap: 2px; padding: 12px 6px 10px; border-radius: 10px; background: var(--c-card); text-align: center; }
+.hbd-c { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--hx-track); color: var(--c-dim); margin-bottom: 4px; }
+.hbd-c .ic { width: 20px; height: 20px; }
+.hbd-i.on .hbd-c { background: var(--p-acc2); color: var(--p-0); }
+.hbd-i b { font-size: 1.375rem; font-weight: 800; line-height: 1; }
+.hbd-i small { font-size: var(--t-2xs); color: var(--c-dim); }
+.hbd-i em { font-style: normal; font-size: var(--t-2xs); font-weight: 600; margin-top: 4px; color: var(--c-ink); font-variant-numeric: tabular-nums; }
+/* D. rekap Wrapped (layar penuh gaya story) */
+.wr { --wb: #0B3D35; --wf: #FFFFFF; --wd: #CFEFE8; --wa: #00E2BA; position: fixed; inset: 0; z-index: 60; background: var(--wb); color: var(--wf); display: grid; justify-items: center; }
+.wr[hidden] { display: none; }
+.wr[data-s="top"] { --wb: #2E2563; --wd: #C9CCF5; }
+.wr[data-s="streak"] { --wb: #F59F00; --wf: #121212; --wd: #121212; --wa: #121212; }
+.wr[data-s="hour"] { --wb: #2563EB; --wd: #FFFFFF; --wa: #FFFFFF; }
+.wr-in { width: min(100%, 30rem); height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 14px; padding: max(14px, env(safe-area-inset-top, 0px)) 18px max(16px, env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
+.wr-prog { display: flex; gap: 4px; }
+.wr-prog i { flex: 1; height: 3px; border-radius: 2px; background: color-mix(in srgb, var(--wf) 30%, transparent); }
+.wr-prog i.on { background: var(--wf); }
+.wr-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.wr-eb { font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--wd); }
+.wr-x, .wr-ar { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--wf); display: grid; place-items: center; cursor: pointer; flex: none; }
+.wr-x .ic, .wr-ar .ic { width: 22px; height: 22px; stroke-width: 2.2; }
+.wr-ar { background: color-mix(in srgb, var(--wf) 14%, transparent); }
+.wr-ar:disabled { visibility: hidden; }
+.wr-l .ic { transform: rotate(180deg); }
+.wr-body { display: flex; flex-direction: column; justify-content: center; gap: 14px; min-height: 0; overflow-y: auto; cursor: pointer; user-select: none; }
+.wr-k { margin: 0; font-size: 1.375rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
+.wr-h { margin: 0; font-size: 2rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+.wr-hero { font-size: 5.5rem; font-weight: 800; line-height: 0.95; letter-spacing: -0.04em; color: var(--wa); font-variant-numeric: tabular-nums; }
+.wr-hero span { font-size: 1.5rem; letter-spacing: 0; color: var(--wf); font-weight: 700; }
+.wr-p { margin: 0; font-size: var(--t-md); line-height: 1.4; color: var(--wd); }
+.wr-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.wr-chips span { padding: 8px 14px; border-radius: var(--r-pill); background: rgb(0 0 0 / 0.25); font-size: var(--t-xs); }
+.wr-lst { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.wr-lst li { display: grid; grid-template-columns: 18px 40px minmax(0, 1fr); gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: rgb(0 0 0 / 0.25); }
+.wr-num { font-weight: 800; font-size: var(--t-md); }
+.wr-t b, .wr-one b { display: block; font-size: var(--t-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wr-t small, .wr-one small { display: block; font-size: var(--t-2xs); color: var(--wd); }
+.wr-ic .ic { width: 56px; height: 56px; stroke-width: 1.6; }
+.wr-one { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px; border-radius: 12px; background: rgb(0 0 0 / 0.12); }
+.wr-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.wr-bars li { display: grid; grid-template-columns: 88px minmax(0, 1fr) 28px; gap: 10px; align-items: center; font-size: var(--t-sm); }
+.wr-bars li > i { height: 12px; border-radius: 6px; background: rgb(0 0 0 / 0.25); overflow: hidden; }
+.wr-bars li > i > i { display: block; height: 100%; border-radius: 6px; background: var(--wf); }
+.wr-bars b { text-align: right; font-variant-numeric: tabular-nums; }
+.wr-sum { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.wr-sum li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 10px 14px; border-radius: 10px; background: rgb(0 0 0 / 0.25); min-width: 0; }
+.wr-sum b { font-size: 1.5rem; font-weight: 800; color: var(--wa); max-width: 100%; overflow-wrap: anywhere; }
+.wr-sum span { font-size: var(--t-sm); color: var(--wd); }
+.wr-big, .wr-sh { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: var(--r-pill); background: var(--wf); color: var(--wb); font: inherit; font-weight: 700; cursor: pointer; }
+.wr-big { align-self: center; min-height: 48px; padding: 0 24px; font-size: var(--t-sm); margin-top: 6px; }
+.wr-sh { min-height: 44px; padding: 0 18px; font-size: var(--t-xs); }
+.wr-big .ic, .wr-sh .ic { width: 18px; height: 18px; }
+.wr-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.wr-n { font-size: var(--t-2xs); color: var(--wd); font-variant-numeric: tabular-nums; }
+.wr-x:focus-visible, .wr-ar:focus-visible, .wr-big:focus-visible, .wr-sh:focus-visible { outline: 2px solid var(--wf); outline-offset: 2px; }
+.wr-open .toast { z-index: 70; }
+.toast .t-undo { color: var(--c-blue-hi); }
+@media (prefers-reduced-motion: no-preference) {
+  .wr-anim { animation: wr-in 0.22s ease-out; }
+  @keyframes wr-in { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+}
+@media (max-width: 380px) { .hh { grid-template-columns: 104px minmax(0, 1fr); gap: var(--s-md); } .hh-r, .hh-r > svg { width: 104px; height: 104px; } .wr-hero { font-size: 4.5rem; } }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1357,6 +1501,8 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4M5 12.5v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
@@ -1579,7 +1725,7 @@ function withFolders(o) { /* data contoh: folder bawaan + catatan dibagi ke fold
   return o;
 }
 const fdName = id => ((S.noteFolders || []).find(x => x.id === id) || {}).name || '';
-const emptyData = () => ({ noteFolders: defaultFolders(), notes: [], todos: [], events: [], tx: [], sessions: [], habits: {}, routines: [], sketches: [], plans: {}, closed: {} });
+const emptyData = () => ({ noteFolders: defaultFolders(), notes: [], todos: [], events: [], tx: [], sessions: [], habits: {}, routines: [], sketches: [], plans: {}, closed: {}, wrapSeen: {} });
 /* contoh coretan: diagram jaringan sederhana (koordinat dasar lebar 800) */
 function sampleSketch(id) {
   const rect = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h], [x, y + 1]];
@@ -1703,11 +1849,12 @@ function withHistory(o) { /* data contoh: to-do selesai + sesi fokus di hari-har
     }
     o.routines.forEach(r => { const h = o.habits[r.name]; if (h && r.days.includes(dow) && rnd() < (dow === 1 ? 0.4 : 0.72)) h.days[dk(day)] = true; });
   }
+  habHist(o);
   return o;
 }
 let S = APP ? (loadData() || emptyData()) : withHistory(withFolders(seed()));
 if (!S.noteFolders) S.noteFolders = defaultFolders();
-if (!S.plans) S.plans = {}; if (!S.closed) S.closed = {};
+if (!S.plans) S.plans = {}; if (!S.closed) S.closed = {}; if (!S.wrapSeen) S.wrapSeen = {};
 
 /* ---------- hitung ---------- */
 const isToday = d => dayDiff(d) === 0;
@@ -1881,7 +2028,7 @@ function closeSheet() {
   const b = document.querySelector(was === 'qc' ? '#mnav .fab' : '#mnav [data-act="more"]'); if (b && isSm()) b.focus();
 }
 const MV = { cari: [L('Cari', 'Search'), 'search'], 'hari-ini': ['Home', 'home'], todo: ['To-do', 'check'], keuangan: ['Uang', 'wallet'], kalender: ['Kalender', 'month'], catatan: ['Catatan', 'note'], habit: ['Habit', 'habit'], fokus: ['Fokus', 'timer'], statistik: ['Statistik', 'chart'] };
-function mnavSplit() { const p = ['hari-ini', 'todo', 'keuangan', 'kalender', 'catatan', 'habit', 'fokus', 'statistik', 'cari'].filter(v => v === 'hari-ini' || on(v)); return { main: p.slice(0, 3), rest: p.slice(3) }; }
+function mnavSplit() { const p = (on('habit') ? ['hari-ini', 'todo', 'habit', 'keuangan', 'kalender', 'catatan', 'fokus', 'statistik', 'cari'] : ['hari-ini', 'todo', 'keuangan', 'kalender', 'catatan', 'habit', 'fokus', 'statistik', 'cari']).filter(v => v === 'hari-ini' || on(v)); return { main: p.slice(0, 3), rest: p.slice(3) }; }
 function renderMNav() {
   const el = $('#mnav'); if (!el) return;
   const { main, rest } = mnavSplit();
@@ -2732,12 +2879,12 @@ const habCnt = (r, k = dk(new Date())) => { const h = habitOf(r.name); return h.
 const fmtQ = n => n >= 1000 ? L(String(+(n / 1000).toFixed(1)).replace('.', ',') + 'rb', +(n / 1000).toFixed(1) + 'k') : String(n);
 function habSnap(r) {
   const h = habitOf(r.name), e = S.events.find(x => x.rid === r.id && isToday(x.start));
-  const s = { days: { ...h.days }, cnt: { ...(h.cnt || {}) }, best: h.best, ed: e ? e.done : undefined };
-  return () => { h.days = s.days; h.cnt = s.cnt; h.best = s.best; if (e) e.done = s.ed; refresh(); };
+  const s = { days: { ...h.days }, cnt: { ...(h.cnt || {}) }, at: { ...(h.at || {}) }, best: h.best, ed: e ? e.done : undefined };
+  return () => { h.days = s.days; h.cnt = s.cnt; h.at = s.at; h.best = s.best; if (e) e.done = s.ed; refresh(); };
 }
 function habMark(r, val) {
   const h = habitOf(r.name), k = dk(new Date());
-  if (val) h.days[k] = true; else { delete h.days[k]; if (h.cnt) delete h.cnt[k]; }
+  if (val) { h.days[k] = true; (h.at = h.at || {})[k] = new Date().getHours(); } else { delete h.days[k]; if (h.cnt) delete h.cnt[k]; if (h.at) delete h.at[k]; }
   const e = S.events.find(x => x.rid === r.id && isToday(x.start)); if (e) e.done = val ? true : null;
   const s = streakOf(r.name); if (s > h.best) h.best = s; return s;
 }
@@ -2759,34 +2906,6 @@ function habDay(d) {
 function miniRing(p) {
   const r = 17, L = 2 * Math.PI * r, q = Math.max(0, Math.min(1, p || 0));
   return `<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="${r}" style="fill:none;stroke:var(--c-line);stroke-width:2.5"/>${q > 0 ? `<circle cx="20" cy="20" r="${r}" style="fill:none;stroke:var(--p-acc2);stroke-width:2.5;stroke-linecap:round" stroke-dasharray="${(L * q).toFixed(1)} ${L.toFixed(1)}" transform="rotate(-90 20 20)"/>` : ''}</svg>`;
-}
-function vHabit() {
-  const now = new Date(), d0 = day0(), mon = new Date(d0); mon.setDate(d0.getDate() - ((d0.getDay() + 6) % 7));
-  const tod = S.routines.filter(r => r.days.includes(now.getDay())), off = S.routines.filter(r => !r.days.includes(now.getDay()));
-  const done = tod.filter(r => habCnt(r) >= habTarget(r)).length;
-  const head = `<div class="vh vh-act"><div><h1>Habit</h1><p class="lead">${tod.length ? `${done} dari ${tod.length} selesai hari ini` : 'Tidak ada habit terjadwal hari ini'}</p></div><button class="btn btn-primary btn-sm" type="button" data-act="habadd">${ico('plus')}Habit</button></div>`;
-  if (!S.routines.length) return `<div class="focus-col">${head}<div class="hm-card hm-empty"><b>Belum ada habit</b><br>Tambah kebiasaan yang mau dijaga, misalnya olahraga pagi atau minum air 8 gelas.</div></div>`;
-  const wk = [...Array(7)].map((_, i) => {
-    const d = new Date(mon); d.setDate(mon.getDate() + i);
-    const fut = d > now && dk(d) !== dk(now), st = fut ? 'fut' : habDay(d), cur = dk(d) === dk(now);
-    const lab = { full: 'semua selesai', part: 'sebagian', none: 'belum ada', off: 'libur', fut: 'belum lewat' }[st];
-    return `<div class="hab-d ${st}${cur ? ' cur' : ''}" role="img" aria-label="${dayFull(d)}: ${lab}"><span>${DAYS_S[d.getDay()]}</span><i></i></div>`;
-  }).join('');
-  const row = r => {
-    const tg = habTarget(r), c = habCnt(r), ok = c >= tg, st = streakOf(r.name), h = habitOf(r.name);
-    const meta = tg > 1 ? `${fmtQ(c)} / ${fmtQ(tg)}${r.unit ? ' ' + esc(r.unit) : ''} · ${st} hari beruntun` : `${st} hari beruntun${h.best > st ? ' · rekor ' + h.best : ''}`;
-    const ctl = tg > 1 && !ok ? `<button class="hab-step" type="button" data-act="habstep" data-id="${r.id}" aria-label="Tambah ${fmtQ(habInc(r))}: ${esc(r.name)}">+${fmtQ(habInc(r))}</button>`
-      : `<button class="hab-tick${ok ? ' on' : ''}" type="button" data-act="habtick" data-id="${r.id}" aria-pressed="${ok}" aria-label="${ok ? 'Batalkan' : 'Tandai selesai'}: ${esc(r.name)}">${ico('check')}</button>`;
-    return `<li class="hab-row${ok ? ' ok' : ''}"><span class="hab-c">${miniRing(c / tg)}${artFor(r.name, 'habit')}</span><button class="hab-t" type="button" data-act="habedit" data-id="${r.id}"><span class="t">${esc(r.name)}</span><span class="m">${r.start} · ${meta}</span></button>${ctl}</li>`;
-  };
-  const offRow = r => `<li class="hab-row off"><span class="hab-c">${miniRing(0)}${artFor(r.name, 'habit')}</span><button class="hab-t" type="button" data-act="habedit" data-id="${r.id}"><span class="t">${esc(r.name)}</span><span class="m">${daysLabel(r.days)} · ${streakOf(r.name)} hari beruntun</span></button><span></span></li>`;
-  const allDone = tod.length && done === tod.length;
-  return `<div class="focus-col">${head}
-    <div class="hab-wk">${wk}</div>
-    <p class="hab-cap">${allDone ? 'Semua habit hari ini selesai.' : 'Hari dengan semua habit selesai ditandai penuh.'}</p>
-    ${tod.length ? `<div class="hab-sec">Hari ini <span>ketuk untuk centang</span></div><ul class="hab-list">${tod.map(row).join('')}</ul>` : ''}
-    ${off.length ? `<div class="hab-sec">Libur hari ini <span>tidak memutus streak</span></div><ul class="hab-list">${off.map(offRow).join('')}</ul>` : ''}
-    <div class="tfoot">${on('statistik') ? '<button class="lnk small" type="button" data-act="hmgo" data-v="statistik">Riwayat 30 hari</button>' : ''}<button class="lnk small" type="button" data-act="rut">Kelola habit</button></div></div>`;
 }
 
 /* ---------- v2.3 grafik batang arsir (Fokus + Statistik) ---------- */
@@ -3393,11 +3512,11 @@ function hmBody(p) {
   const minis = p.minis.length ? `<div class="hm-mini">${p.minis.join('')}</div>` : '';
   let body;
   if (HCH === 'todo') body = `${p.wk}${hmFlow()}${hmPri()}${p.next}${p.tasks}`;
-  else if (HCH === 'habit') body = `${shelfHabits(true)}<div class="tfoot"><button class="lnk small" type="button" data-act="hmgo" data-v="habit">${L('Buka halaman Habit', 'Open Habit page')}</button></div>`;
+  else if (HCH === 'habit') body = habChip();
   else if (HCH === 'fokus') body = `${shelfFocus()}<section class="hm-card" style="margin-top:var(--s-lg)"><div class="cc-h"><b>${L('7 hari terakhir', 'Last 7 days')}</b><span>${fmtDur(focusDays(7).reduce((a, d) => a + d.v, 0))}</span></div>${hatchBars(focusDays(7), 'hmf', L('menit', 'min'))}</section><button class="btn btn-primary" type="button" data-act="hmgo" data-v="fokus" style="margin-top:var(--s-md)">${L('Buka timer', 'Open timer')}</button>`;
   else if (HCH === 'uang') { const recent = S.tx.slice().sort((a, b) => b.at - a.at).slice(0, 6); body = `${minis}${shelfMoney()}<section class="hm-card" style="margin-top:var(--s-lg)"><div class="cc-h"><b>${L('Transaksi terakhir', 'Recent transactions')}</b><button class="lnk small" type="button" data-act="hmgo" data-v="keuangan">${L('Semua', 'All')}</button></div><ul class="mo-tx">${recent.map(t => `<li>${artFor(t.cat + ' ' + t.note, 'uang')}<div><span class="t">${esc(t.note)}</span><span class="s">${dayLabel(t.at)} · ${esc(t.cat)}</span></div><b class="num${t.type === 'in' ? ' g' : ''}">${t.type === 'in' ? '+' : '−'}${mny(t.amt)}</b></li>`).join('')}</ul></section>`; }
-  else body = `${hmShort()}${p.wk}${p.prog}${hmFlow()}${hmPri()}${p.next}${p.tasks}${shelfHabits()}${shelfFocus()}${shelfNotes()}${minis}`;
-  return bar + body;
+  else body = `${hmShort()}${p.wk}${p.prog}${hmFlow()}${hmPri()}${p.next}${p.tasks}${shelfFocus()}${shelfNotes()}${minis}`;
+  return bar + (HCH === 'semua' || HCH === 'habit' ? habTop() : '') + body;
 }
 
 /* mini player: timer fokus menempel di atas menu bawah */
@@ -3555,11 +3674,253 @@ function remHTML() {
   </div><p class="hint">${L('Satu arah: perubahan di app dikirim ke kalender "project001-Planner". Kalender utamamu tidak dibaca atau diubah.', 'One way: changes in the app go to the "project001-Planner" calendar. Your main calendar is never read or changed.')}${calLink() ? ` <a class="lnk small" href="${calLink()}" target="_blank" rel="noopener">${L('Buka kalender', 'Open calendar')}</a>` : ''}</p></section>`;
 }
 
+/* ---------- v3.3 Habit: bulatan di Beranda (A), halaman progres + peta setahun + lencana (C), rekap Wrapped (D) ---------- */
+let HSEL = null; /* id habit untuk peta setahun */
+let WR = null;   /* rekap yang sedang dibuka */
+const MON3 = i => MONTHS[i].slice(0, 3);
+const wSeen = () => S.wrapSeen || (S.wrapSeen = {});
+const habToday = (now = new Date()) => S.routines.filter(r => r.days.includes(now.getDay()));
+
+/* data contoh: isi celah hari -10..-13, jam centang, hitungan sebagian (prototipe saja) */
+function habHist(o) {
+  let sd = 33; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  for (let d = -10; d >= -13; d--) { const day = at(d, 0); o.routines.forEach(r => { const h = o.habits[r.name]; if (h && r.days.includes(day.getDay()) && rnd() < 0.75) h.days[dk(day)] = true; }); }
+  o.routines.forEach(r => {
+    const h = o.habits[r.name]; if (!h) return;
+    const tg = Math.max(1, +r.target || 1), h0 = +r.start.slice(0, 2); h.at = h.at || {}; h.cnt = h.cnt || {};
+    for (let d = -95; d <= -1; d++) { const day = at(d, 0), k = dk(day); if (h.days[k]) h.at[k] = tg > 1 ? 9 + Math.floor(rnd() * 9) : Math.min(23, h0 + (rnd() < 0.7 ? 0 : 1)); else if (tg > 1 && r.days.includes(day.getDay()) && rnd() < 0.6) h.cnt[k] = 2 + Math.floor(rnd() * (tg - 2)); }
+  });
+}
+
+/* streak hari "semua selesai": hari tanpa jadwal dilewati, hari ini dihitung bila sudah penuh */
+function allStreak() {
+  if (!S.routines.length) return 0;
+  const d = day0(); let n = 0, g = 0;
+  if (habDay(d) !== 'full') d.setDate(d.getDate() - 1);
+  while (g++ < 400) { const st = habDay(d); if (st === 'full') n++; else if (st !== 'off') break; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function rate30() {
+  let s = 0, n = 0;
+  for (let i = 1; i <= 30; i++) { const d = at(-i, 0), k = dk(d); S.routines.forEach(r => { if (r.days.includes(d.getDay())) { s++; if (habitOf(r.name).days[k]) n++; } }); }
+  return s ? Math.round(n / s * 100) : 0;
+}
+/* rekor: rangkaian terpanjang sepanjang riwayat (hari libur tidak memutus) */
+function bestRun(r) {
+  const h = habitOf(r.name), ks = Object.keys(h.days).sort(); if (!ks.length) return h.best || 0;
+  const [y, m, dd] = ks[0].split('-').map(Number), d = new Date(y, m - 1, dd), end = day0(), te = dk(end); let run = 0, best = 0, g = 0;
+  for (; d <= end && g++ < 2000; d.setDate(d.getDate() + 1)) { const k = dk(d); if (h.days[k]) { run++; if (run > best) best = run; } else if (r.days.includes(d.getDay()) && k !== te) run = 0; }
+  return Math.max(best, h.best || 0);
+}
+const ringSvg = (sz, R, w, p, cls) => { const c = sz / 2, C = 2 * Math.PI * R, q = Math.max(0, Math.min(1, p || 0)); return `<svg viewBox="0 0 ${sz} ${sz}" aria-hidden="true"><circle cx="${c}" cy="${c}" r="${R}" class="hx-tr" style="stroke-width:${w}"/>${q > 0 ? `<circle cx="${c}" cy="${c}" r="${R}" class="hx-pr ${cls}" style="stroke-width:${w}" stroke-dasharray="${(C * q).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${c} ${c})"/>` : ''}</svg>`; };
+const streakTxt = n => n ? L(`<b>${n} hari</b> semua selesai`, `<b>${n}-day</b> all-done streak`) : L('Selesaikan semua untuk mulai streak', 'Finish all to start a streak');
+
+/* A. bulatan habit di atas Beranda */
+function habBub(r) {
+  const tg = habTarget(r), c = habCnt(r), ok = c >= tg, step = tg > 1 && !ok;
+  const lab = step ? L(`Tambah ${fmtQ(habInc(r))}: ${r.name}, ${fmtQ(c)} dari ${fmtQ(tg)}`, `Add ${fmtQ(habInc(r))}: ${r.name}, ${fmtQ(c)} of ${fmtQ(tg)}`) : ok ? L(`Batalkan centang: ${r.name}`, `Undo: ${r.name}`) : L(`Tandai selesai: ${r.name}`, `Mark done: ${r.name}`);
+  return `<button type="button" class="hb-b${ok ? ' on' : ''}" data-act="hbtap" data-id="${r.id}"${step ? '' : ` aria-pressed="${ok}"`} aria-label="${esc(lab)}" title="${esc(r.name)}"><span class="hb-ring">${ringSvg(60, 28, 3, c / tg, '')}${artFor(r.name, 'habit', 'art-round')}<span class="hb-ok" aria-hidden="true">${ico('check')}</span></span><small class="hb-n">${esc(r.name)}</small>${tg > 1 ? `<small class="hb-q">${fmtQ(c)}/${fmtQ(tg)}</small>` : ''}</button>`;
+}
+function habTop() {
+  if (!on('habit') || !S.routines.length) return '';
+  const rs = habToday();
+  return `<section class="hb" aria-labelledby="hb-t"><div class="shelf-h"><h2 id="hb-t">${L('Habit hari ini', 'Today’s habits')}</h2><span class="hb-st">${ico('habit')}<span>${streakTxt(allStreak())}</span></span></div>
+    <div class="hb-row">${rs.map(habBub).join('')}<button type="button" class="hb-b hb-add" data-act="habadd" aria-label="${L('Tambah habit', 'Add habit')}"><span class="hb-ring"><span class="hb-plus">${ico('plus')}</span></span><small class="hb-n">${L('Tambah', 'Add')}</small></button></div>
+    ${rs.length ? '' : `<p class="hb-off">${L('Tidak ada habit terjadwal hari ini. Hari libur tidak memutus streak.', 'No habits scheduled today. Days off don’t break a streak.')}</p>`}</section>${wrapCard()}`;
+}
+function habWeek() {
+  const now = new Date(), d0 = day0(), mon = new Date(d0); mon.setDate(d0.getDate() - ((d0.getDay() + 6) % 7));
+  return `<div class="hab-wk">${[...Array(7)].map((_, i) => {
+    const d = new Date(mon); d.setDate(mon.getDate() + i);
+    const fut = d > now && dk(d) !== dk(now), st = fut ? 'fut' : habDay(d), cur = dk(d) === dk(now);
+    const lab = { full: L('semua selesai', 'all done'), part: L('sebagian', 'partly done'), none: L('belum ada', 'none yet'), off: L('libur', 'day off'), fut: L('belum lewat', 'upcoming') }[st];
+    return `<div class="hab-d ${st}${cur ? ' cur' : ''}" role="img" aria-label="${dayFull(d)}: ${lab}"><span>${DAYS_S[d.getDay()]}</span><i></i></div>`;
+  }).join('')}</div>`;
+}
+function habChip() {
+  return `<div class="hab-sec">${L('Minggu ini', 'This week')}<span>${L('penuh = semua selesai', 'full = all done')}</span></div>${habWeek()}<div class="tfoot"><button class="lnk small" type="button" data-act="hmgo" data-v="habit">${L('Buka halaman Habit', 'Open Habit page')}</button></div>`;
+}
+
+/* C. halaman Habit: cincin besar, 7 hari per habit, peta setahun, lencana */
+function habDots(r) {
+  const h = habitOf(r.name); let n = 0;
+  const c = [...Array(7)].map((_, i) => { const d = at(i - 6, 0), y = !!h.days[dk(d)], sc = r.days.includes(d.getDay()); if (y) n++; return `<i class="${y ? 'ok' : !sc ? 'off' : i === 6 ? 'td' : ''}"></i>`; }).join('');
+  return `<span class="hd7" role="img" aria-label="${L(`7 hari terakhir: ${n} selesai`, `Last 7 days: ${n} done`)}">${c}</span>`;
+}
+function habRow(r) {
+  const tg = habTarget(r), c = habCnt(r), ok = c >= tg, st = streakOf(r.name), b = bestRun(r);
+  const meta = tg > 1 ? `${fmtQ(c)} / ${fmtQ(tg)}${r.unit ? ' ' + esc(r.unit) : ''} · ${L(`${st} hari beruntun`, `${st}-day streak`)}` : `${L(`${st} hari beruntun`, `${st}-day streak`)}${b > st ? ' · ' + L(`rekor ${b}`, `record ${b}`) : ''}`;
+  const ctl = tg > 1 && !ok ? `<button class="hab-step" type="button" data-act="habstep" data-id="${r.id}" aria-label="${L('Tambah', 'Add')} ${fmtQ(habInc(r))}: ${esc(r.name)}">+${fmtQ(habInc(r))}</button>`
+    : `<button class="hab-tick${ok ? ' on' : ''}" type="button" data-act="habtick" data-id="${r.id}" aria-pressed="${ok}" aria-label="${ok ? L('Batalkan', 'Undo') : L('Tandai selesai', 'Mark done')}: ${esc(r.name)}">${ico('check')}</button>`;
+  return `<li class="hab-row${ok ? ' ok' : ''}"><span class="hab-c">${miniRing(c / tg)}${artFor(r.name, 'habit')}</span><button class="hab-t" type="button" data-act="habedit" data-id="${r.id}"><span class="t">${esc(r.name)}</span><span class="m">${r.start} · ${meta}</span>${habDots(r)}</button>${ctl}</li>`;
+}
+function habYear(r) {
+  const h = habitOf(r.name), tg = habTarget(r), d0 = day0(), td = dk(d0), mon = new Date(d0);
+  mon.setDate(d0.getDate() - ((d0.getDay() + 6) % 7) - 52 * 7);
+  let cells = '', mos = '', lastM = -1, lastC = -9, nDone = 0;
+  for (let w = 0; w < 53; w++) {
+    const wm = new Date(mon); wm.setDate(mon.getDate() + w * 7);
+    if (wm.getMonth() !== lastM) { if (w - lastC >= 3) { mos += `<span style="grid-column:${w + 1}/span 3">${MON3(wm.getMonth())}</span>`; lastC = w; } lastM = wm.getMonth(); }
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(wm); d.setDate(wm.getDate() + i); const k = dk(d);
+      if (d > d0) { cells += '<i class="fu"></i>'; continue; }
+      const ok = !!h.days[k], sc = r.days.includes(d.getDay()), n = tg > 1 && !ok ? Math.min(tg, (h.cnt && h.cnt[k]) || 0) : 0, q = n / tg;
+      if (ok) nDone++;
+      const lv = ok ? 'l3' : q >= 0.5 ? 'l2' : q > 0 ? 'l1' : sc ? '' : 'off';
+      const tl = ok ? L('selesai', 'done') : n ? `${fmtQ(n)}/${fmtQ(tg)}` : sc ? L('belum', 'not done') : L('libur', 'day off');
+      cells += `<i class="${lv}${k === td ? ' td' : ''}" title="${d.getDate()} ${MON3(d.getMonth())} ${d.getFullYear()}: ${tl}"></i>`;
+    }
+  }
+  const dl = DAYS_S;
+  return `<div class="hy"><div class="hy-d" aria-hidden="true"><span></span><span>${dl[1]}</span><span></span><span>${dl[3]}</span><span></span><span>${dl[5]}</span><span></span><span></span></div>
+    <div class="hy-sc"><div class="hy-in"><div class="hy-m" aria-hidden="true">${mos}</div><div class="hy-g" role="img" aria-label="${esc(L(`Peta setahun ${r.name}: ${nDone} hari selesai`, `${r.name} year map: ${nDone} days done`))}">${cells}</div></div></div></div>
+    <div class="hy-f"><span>${L(`${nDone} hari selesai dalam 12 bulan`, `${nDone} days done in 12 months`)}</span><span class="hy-lg" aria-hidden="true">${L('Sedikit', 'Less')}<i></i><i class="l1"></i><i class="l2"></i><i class="l3"></i>${L('Banyak', 'More')}</span></div>`;
+}
+function habBadges(r) {
+  const b = bestRun(r);
+  return `<div class="hbd">${[7, 30, 100].map(n => { const ok = b >= n; return `<div class="hbd-i${ok ? ' on' : ''}"><span class="hbd-c" aria-hidden="true">${ico(ok ? 'habit' : 'lock')}</span><b>${n}</b><small>${L('hari', 'days')}</small><em>${ok ? L('Terbuka', 'Unlocked') : `<span class="sr">${L('Terkunci', 'Locked')}, </span>${Math.min(b, n)}/${n}`}</em></div>`; }).join('')}</div>
+    <p class="hab-cap">${L(`Rekor ${esc(r.name)}: ${b} hari berturut-turut`, `${esc(r.name)} record: ${b} days in a row`)}</p>`;
+}
+function vHabit3() {
+  const now = new Date(), tod = habToday(now), off = S.routines.filter(r => !r.days.includes(now.getDay()));
+  const done = tod.filter(r => habCnt(r) >= habTarget(r)).length;
+  const head = `<div class="vh vh-act"><div><h1>Habit</h1><p class="lead">${tod.length ? L(`${done} dari ${tod.length} selesai hari ini`, `${done} of ${tod.length} done today`) : S.routines.length ? L('Tidak ada habit terjadwal hari ini', 'No habits scheduled today') : L('Kebiasaan harian dan streak', 'Daily habits and streaks')}</p></div><button class="btn btn-primary btn-sm" type="button" data-act="habadd">${ico('plus')}Habit</button></div>`;
+  if (!S.routines.length) return `<div class="focus-col">${head}<div class="hm-card hh-empty">${art('habit', '#12B886', 'art-lg')}<b>${L('Belum ada habit', 'No habits yet')}</b><p>${L('Tambah kebiasaan yang mau dijaga, misalnya olahraga pagi atau minum air 8 gelas. Progres harian, peta setahun, lencana, dan rekap mingguan muncul di sini.', 'Add a habit you want to keep, like a morning workout or 8 glasses of water. Daily progress, a year map, badges and weekly recaps show up here.')}</p><button class="btn btn-primary" type="button" data-act="habadd">${ico('plus')}${L('Tambah habit pertama', 'Add your first habit')}</button></div></div>`;
+  const sel = S.routines.find(r => r.id === HSEL) || S.routines[0];
+  const hero = `<section class="hh" aria-label="${L('Progres habit', 'Habit progress')}"><div class="hh-r">${ringSvg(120, 52, 10, tod.length ? done / tod.length : 0, '')}<span><b>${done}/${tod.length}</b><small>${L('hari ini', 'today')}</small></span></div>
+    <div class="hh-kv"><span><b>${ico('habit')}${L(`${allStreak()} hari`, `${allStreak()} days`)}</b><small>${L('streak semua selesai', 'all-done streak')}</small></span><span><b>${rate30()}%</b><small>${L('selesai, 30 hari terakhir', 'done, last 30 days')}</small></span></div></section>`;
+  const wr = ['w', 'm'].map(k => { const d = wrapData(k); return d.has ? `<button type="button" class="hw-t" data-act="wrapopen" data-k="${k}">${art(k === 'w' ? 'month' : 'star', k === 'w' ? '#12B886' : '#2E9BD6', 'art-sm')}<span><b>${k === 'w' ? L('Minggu lalu', 'Last week') : MONTHS[d.s.getMonth()]}</b><small>${k === 'w' ? d.label : d.s.getFullYear()} · ${d.pct}%</small></span>${ico('chev')}</button>` : ''; }).join('');
+  return `<div class="focus-col">${head}${hero}
+    ${wr ? `<div class="hab-sec">${L('Rekap', 'Recap')}<span>${L('gaya story, bisa dibagikan', 'story style, shareable')}</span></div><div class="hw">${wr}</div>` : ''}
+    <div class="hab-sec">${L('Minggu ini', 'This week')}<span>${L('penuh = semua selesai', 'full = all done')}</span></div>${habWeek()}
+    ${tod.length ? `<div class="hab-sec">${L('Hari ini', 'Today')}<span>${L('ketuk untuk centang', 'tap to check off')}</span></div><ul class="hab-list">${tod.map(habRow).join('')}</ul>` : ''}
+    ${off.length ? `<div class="hab-sec">${L('Libur hari ini', 'Off today')}<span>${L('tidak memutus streak', 'won’t break the streak')}</span></div><ul class="hab-list">${off.map(r => `<li class="hab-row off"><span class="hab-c">${miniRing(0)}${artFor(r.name, 'habit')}</span><button class="hab-t" type="button" data-act="habedit" data-id="${r.id}"><span class="t">${esc(r.name)}</span><span class="m">${daysLabel(r.days)} · ${L(`${streakOf(r.name)} hari beruntun`, `${streakOf(r.name)}-day streak`)}</span>${habDots(r)}</button><span></span></li>`).join('')}</ul>` : ''}
+    <div class="hab-sec">${L('Setahun', 'Past year')}<span>${esc(sel.name)}</span></div>
+    ${S.routines.length > 1 ? `<div class="hm-chips hy-ch" role="group" aria-label="${L('Pilih habit untuk peta setahun', 'Pick a habit for the year map')}">${S.routines.map(r => `<button type="button" data-act="hsel" data-id="${r.id}" aria-pressed="${r.id === sel.id}">${esc(r.name)}</button>`).join('')}</div>` : ''}
+    ${habYear(sel)}
+    <div class="hab-sec">${L('Lencana', 'Badges')}<span>${L('dari streak terpanjang', 'from the longest streak')}</span></div>${habBadges(sel)}
+    <div class="tfoot"><button class="lnk small" type="button" data-act="rut">${L('Kelola habit', 'Manage habits')}</button>${on('statistik') ? `<button class="lnk small" type="button" data-act="hmgo" data-v="statistik">${L('Statistik', 'Stats')}</button>` : ''}</div></div>`;
+}
+
+/* D. rekap "Wrapped": mingguan (Senin, minggu lalu Sen–Min) dan bulanan (tanggal 1, bulan lalu) */
+function wrapRange(k) {
+  const d0 = day0();
+  if (k === 'w') { const mon = new Date(d0); mon.setDate(d0.getDate() - ((d0.getDay() + 6) % 7)); const s = new Date(mon), e = new Date(mon); s.setDate(mon.getDate() - 7); e.setDate(mon.getDate() - 1); return { s, e, id: 'w' + dk(s) }; }
+  const s = new Date(d0.getFullYear(), d0.getMonth() - 1, 1), e = new Date(d0.getFullYear(), d0.getMonth(), 0); return { s, e, id: 'm' + dk(s).slice(0, 7) };
+}
+function wrapData(k) {
+  const { s, e, id } = wrapRange(k), days = [];
+  for (const d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) days.push(new Date(d));
+  let sched = 0, done = 0, nh = 0; const hrs = Array(24).fill(0);
+  const per = S.routines.map(r => {
+    const h = habitOf(r.name), tg = habTarget(r); let ss = 0, dd = 0, run = 0, best = 0, qty = 0;
+    days.forEach(d => {
+      const kk = dk(d), sc = r.days.includes(d.getDay()), ok = !!h.days[kk];
+      if (ok && h.at && h.at[kk] != null && hrs[h.at[kk]] != null) { hrs[h.at[kk]]++; nh++; }
+      if (tg > 1) qty += habCnt(r, kk);
+      if (ok) { run++; if (run > best) best = run; } else if (sc) run = 0;
+      if (sc) { ss++; if (ok) dd++; }
+    });
+    sched += ss; done += dd; return { r, s: ss, d: dd, best, qty };
+  });
+  const full = days.filter(d => habDay(d) === 'full').length;
+  const top = per.filter(p => p.s).sort((a, b) => (b.d / b.s - a.d / a.s) || (b.d - a.d)).slice(0, 3);
+  const lng = per.slice().sort((a, b) => b.best - a.best)[0];
+  const same = s.getMonth() === e.getMonth();
+  const label = k === 'w' ? (same ? L(`${s.getDate()}–${e.getDate()} ${MON3(e.getMonth())}`, `${MON3(e.getMonth())} ${s.getDate()}–${e.getDate()}`) : L(`${s.getDate()} ${MON3(s.getMonth())} – ${e.getDate()} ${MON3(e.getMonth())}`, `${MON3(s.getMonth())} ${s.getDate()} – ${MON3(e.getMonth())} ${e.getDate()}`)) : `${MONTHS[s.getMonth()]} ${s.getFullYear()}`;
+  const title = k === 'w' ? L(`Minggu lalu · ${label}`, `Last week · ${label}`) : label;
+  return { k, id, s, e, per, top, lng, sched, done, full, hrs, nh, label, title, pct: sched ? Math.round(done / sched * 100) : 0, has: done > 0 };
+}
+function wrapCard() {
+  if (!on('habit')) return '';
+  const k = ['m', 'w'].find(x => !wSeen()[wrapRange(x).id] && wrapData(x).has); if (!k) return '';
+  const d = wrapData(k), t = k === 'w' ? L('Rekap minggu lalu siap', 'Last week’s recap is ready') : L(`Rekap ${MONTHS[d.s.getMonth()]} siap`, `Your ${MONTHS[d.s.getMonth()]} recap is ready`);
+  return `<div class="hm-card wr-card"><button type="button" class="wr-cb" data-act="wrapopen" data-k="${k}">${art('star', '#12B886', 'art-lg')}<span><b>${t}</b><small>${d.label} · ${L(`${d.pct}% selesai`, `${d.pct}% done`)}</small></span></button><button type="button" class="wr-cx" data-act="wrapseen" data-k="${k}" aria-label="${L('Tutup kartu rekap', 'Dismiss recap card')}">${ico('x')}</button></div>`;
+}
+const wrQty = p => habTarget(p.r) > 1 && p.qty ? ` · ${fmtQ(p.qty)}${p.r.unit ? ' ' + esc(p.r.unit) : ''}` : '';
+function wrSlide(s, d) {
+  const mn = MONTHS[d.s.getMonth()];
+  if (s === 'sum') return `<p class="wr-k">${d.k === 'w' ? L('Minggu lalu kamu menyelesaikan', 'Last week you completed') : L(`Di bulan ${mn} kamu menyelesaikan`, `In ${mn} you completed`)}</p><div class="wr-hero">${d.pct}<span>%</span></div><p class="wr-p">${L(`${d.done} dari ${d.sched} centang habit terjadwal`, `${d.done} of ${d.sched} scheduled habit check-ins`)}</p><div class="wr-chips"><span><b>${d.full}</b> ${L('hari semua selesai', 'all-done days')}</span><span><b>${d.top.length}</b> habit</span></div>`;
+  if (s === 'top') { const t = d.top; return `<p class="wr-k">${L('Habit paling konsisten', 'Most consistent habit')}</p><div class="wr-hero">${t[0].d}<span>/${t[0].s} ${L('hari', 'days')}</span></div><ol class="wr-lst">${t.map((p, j) => `<li><span class="wr-num">${j + 1}</span>${artFor(p.r.name, 'habit')}<span class="wr-t"><b>${esc(p.r.name)}</b><small>${L(`${p.d}/${p.s} hari`, `${p.d}/${p.s} days`)}${wrQty(p)} · ${L(`streak ${p.best}`, `streak ${p.best}`)}</small></span></li>`).join('')}</ol>`; }
+  if (s === 'streak') { const p = d.lng; return `<p class="wr-k">${L('Streak terpanjang', 'Longest streak')}</p><div class="wr-ic">${ico('habit')}</div><div class="wr-hero">${p.best}<span> ${L('hari', 'days')}</span></div><p class="wr-p">${L(`berturut-turut untuk ${esc(p.r.name)}`, `in a row for ${esc(p.r.name)}`)}</p><div class="wr-one">${artFor(p.r.name, 'habit', 'art-lg')}<span><b>${esc(p.r.name)}</b><small>${L(`rekor sepanjang masa ${bestRun(p.r)} hari`, `all-time record ${bestRun(p.r)} days`)}</small></span></div>`; }
+  if (s === 'hour') {
+    const hr = d.hrs.indexOf(Math.max(...d.hrs)), B = [[L('Pagi', 'Morning'), [4, 5, 6, 7, 8, 9, 10]], [L('Siang', 'Midday'), [11, 12, 13, 14]], [L('Sore', 'Afternoon'), [15, 16, 17]], [L('Malam', 'Evening'), [18, 19, 20, 21, 22, 23, 0, 1, 2, 3]]].map(([n, hs]) => [n, hs.reduce((a, h) => a + d.hrs[h], 0)]), mx = Math.max(1, ...B.map(b => b[1]));
+    return `<p class="wr-k">${L('Jam paling rajin', 'Your power hour')}</p><div class="wr-hero">${pad(hr)}${L('.', ':')}00</div><p class="wr-p">${L(`Paling sering centang sekitar jam ini, dari ${d.nh} centang yang tercatat jamnya.`, `You check off most often around this hour, from ${d.nh} check-ins with a time.`)}</p><ul class="wr-bars">${B.map(([n, v]) => `<li><span>${n}</span><i><i style="width:${Math.round(v / mx * 100)}%"></i></i><b>${v}</b></li>`).join('')}</ul>`;
+  }
+  const msg = d.pct >= 80 ? L('Mantap, pertahankan!', 'Great work, keep it up!') : d.pct >= 50 ? L('Lumayan, tinggal sedikit lagi.', 'Not bad, almost there.') : L('Pelan-pelan, mulai lagi hari ini.', 'Take it slow and start again today.');
+  return `<p class="wr-k">${d.k === 'w' ? L('Minggu lalu dalam satu layar', 'Last week at a glance') : L(`${mn} dalam satu layar`, `${mn} at a glance`)}</p><h2 class="wr-h" id="wr-end">${msg}</h2><ul class="wr-sum"><li><b>${d.pct}%</b><span>${L('habit selesai', 'habits done')}</span></li><li><b>${d.lng.best}</b><span>${L('hari streak terpanjang', 'day longest streak')}</span></li><li><b>${esc(d.top[0].r.name)}</b><span>${L('paling konsisten', 'most consistent')}</span></li></ul><button type="button" class="wr-big" data-wr="share">${ico('share')}${L('Bagikan ringkasan', 'Share summary')}</button>`;
+}
+function wrText(d) {
+  const t = d.top[0];
+  return L(`Rekap habit ${d.k === 'w' ? 'minggu lalu (' + d.label + ')' : d.label}: ${d.pct}% selesai (${d.done}/${d.sched}). Paling konsisten: ${t.r.name} (${t.d}/${t.s} hari). Streak terpanjang: ${d.lng.best} hari. Dicatat di project001-Planner.`,
+    `Habit recap ${d.k === 'w' ? 'for last week (' + d.label + ')' : 'for ' + d.label}: ${d.pct}% done (${d.done}/${d.sched}). Most consistent: ${t.r.name} (${t.d}/${t.s} days). Longest streak: ${d.lng.best} days. Tracked in project001-Planner.`);
+}
+function wrHTML() {
+  const { d, i, slides } = WR, last = i === slides.length - 1;
+  return `<div class="wr-in"><div class="wr-prog" aria-hidden="true">${slides.map((_, j) => `<i class="${j <= i ? 'on' : ''}"></i>`).join('')}</div>
+    <div class="wr-top"><span class="wr-eb">${esc(d.title)}</span><button type="button" class="wr-x" data-wr="x" aria-label="${L('Tutup rekap', 'Close recap')}">${ico('x')}</button></div>
+    <div class="wr-body${WR.anim ? ' wr-anim' : ''}" data-wr="tap" aria-live="polite">${wrSlide(slides[i], d)}</div>
+    <div class="wr-nav"><button type="button" class="wr-ar wr-l" data-wr="prev" aria-label="${L('Layar sebelumnya', 'Previous screen')}"${i ? '' : ' disabled'}>${ico('chev')}</button><span class="wr-n">${L(`${i + 1} dari ${slides.length}`, `${i + 1} of ${slides.length}`)}</span>${last ? '' : `<button type="button" class="wr-sh" data-wr="share">${ico('share')}${L('Bagikan', 'Share')}</button>`}<button type="button" class="wr-ar" data-wr="next" aria-label="${last ? L('Tutup rekap', 'Close recap') : L('Layar berikutnya', 'Next screen')}">${ico(last ? 'check' : 'chev')}</button></div></div>`;
+}
+function wrDraw(sel) {
+  const el = $('#wr'); el.dataset.s = WR.slides[WR.i]; el.innerHTML = wrHTML();
+  const b = el.querySelector(sel || '[data-wr="next"]'); (b && !b.disabled ? b : el.querySelector('[data-wr="next"]')).focus({ preventScroll: true });
+}
+function wrGo(n, sel) { if (!WR) return; const j = WR.i + n; if (j < 0) return; if (j >= WR.slides.length) return wrClose(); WR.i = j; WR.anim = true; wrDraw(sel); }
+function wrOpen(k) {
+  const d = wrapData(k); if (!d.has) return;
+  wSeen()[d.id] = true; saveData();
+  WR = { k, i: 0, d, anim: false, slides: ['sum', 'top', 'streak', d.nh >= 3 && 'hour', 'end'].filter(Boolean), back: V === 'habit' ? `#view [data-act="wrapopen"][data-k="${k}"]` : '#view .hb-row .hb-b' };
+  let el = $('#wr');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'wr'; el.className = 'wr'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); document.body.appendChild(el);
+    let px = null;
+    el.addEventListener('pointerdown', e => { px = e.clientX; });
+    el.addEventListener('pointerup', e => { if (px == null || !WR) return; const dx = e.clientX - px; px = null; if (Math.abs(dx) > 50 && !e.target.closest('button')) { WR.swiped = Date.now(); wrGo(dx < 0 ? 1 : -1); } });
+    el.addEventListener('click', e => {
+      const b = e.target.closest('[data-wr]'); if (!b || !WR) return; const a = b.dataset.wr;
+      if (a === 'x') return wrClose(); if (a === 'prev') return wrGo(-1, '[data-wr="prev"]'); if (a === 'next') return wrGo(1, '[data-wr="next"]'); if (a === 'share') return wrShare();
+      if (a === 'tap') { if (Date.now() - (WR.swiped || 0) < 450) return; const r = b.getBoundingClientRect(); wrGo(e.clientX - r.left < r.width * 0.3 ? -1 : 1); }
+    });
+  }
+  el.setAttribute('aria-label', L(`Rekap habit: ${d.title}`, `Habit recap: ${d.title}`)); el.hidden = false;
+  document.body.classList.add('wr-open'); document.body.style.overflow = 'hidden'; document.documentElement.style.overflow = 'hidden';
+  wrDraw();
+}
+function wrClose() {
+  const el = $('#wr'); if (!el || !WR) return; const back = WR.back; WR = null;
+  el.hidden = true; el.innerHTML = ''; document.body.classList.remove('wr-open'); document.body.style.overflow = ''; document.documentElement.style.overflow = '';
+  render(); const b = document.querySelector(back) || document.querySelector('#view [data-act="hch"][aria-pressed="true"]'); if (b) b.focus({ preventScroll: true });
+}
+async function wrShare() {
+  if (!WR) return; const t = wrText(WR.d), ok = L('Ringkasan rekap disalin', 'Recap summary copied');
+  if (navigator.share) { try { await navigator.share({ text: t }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  try { await navigator.clipboard.writeText(t); toast(ok); }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); let r = false; try { r = document.execCommand('copy'); } catch (x) { r = false; } ta.remove(); toast(r ? ok : L('Tidak bisa menyalin di browser ini', 'Copying isn’t available in this browser')); }
+}
+document.addEventListener('keydown', e => {
+  if (!WR) return;
+  const k = e.key; let hit = true;
+  if (k === 'Escape') wrClose(); else if (k === 'ArrowRight') wrGo(1); else if (k === 'ArrowLeft') wrGo(-1);
+  else if (k === 'Tab') { const f = [...$('#wr').querySelectorAll('button:not([disabled])')]; if (!f.length) return; const i = f.indexOf(document.activeElement); const n = e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i === f.length - 1 || i < 0 ? 0 : i + 1); f[n].focus(); }
+  else hit = false;
+  if (hit) { e.preventDefault(); e.stopImmediatePropagation(); }
+}, true);
+
+/* aksi baru (dipanggil dari listener klik utama) */
+function habAct(act, a, id) {
+  if (act === 'hbtap') { const r = S.routines.find(x => x.id === id); if (!r) return true; if (habTarget(r) > 1 && habCnt(r) < habTarget(r)) habStep(r); else habTick(r); const b = document.querySelector(`#view .hb-b[data-id="${id}"]`); if (b) b.focus({ preventScroll: true }); return true; }
+  if (act === 'hsel') { HSEL = id; render(); const b = document.querySelector(`#view [data-act="hsel"][data-id="${id}"]`); if (b) b.focus({ preventScroll: true }); return true; }
+  if (act === 'wrapopen') { wrOpen(a.dataset.k); return true; }
+  if (act === 'wrapseen') { wSeen()[wrapRange(a.dataset.k).id] = true; render(); const b = document.querySelector('#view [data-act="hch"][aria-pressed="true"]'); if (b) b.focus({ preventScroll: true }); return true; }
+  return false;
+}
+
 /* ---------- render + navigasi ---------- */
 function render() {
   if (V !== 'hari-ini' && !on(V)) { V = 'hari-ini'; setHash('hari-ini'); }
   if (V === 'hari-ini') delete document.documentElement.dataset.view; else document.documentElement.dataset.view = V;
-  viewEl.innerHTML = V === 'hari-ini' ? vHome() : V === 'kalender' ? vCal() : V === 'todo' ? vTodo() : V === 'catatan' ? vNotes() : V === 'fokus' ? vFocus() : V === 'habit' ? vHabit() : V === 'cari' ? vSearch() : V === 'statistik' ? vStats() : vMoney();
+  viewEl.innerHTML = V === 'hari-ini' ? vHome() : V === 'kalender' ? vCal() : V === 'todo' ? vTodo() : V === 'catatan' ? vNotes() : V === 'fokus' ? vFocus() : V === 'habit' ? vHabit3() : V === 'cari' ? vSearch() : V === 'statistik' ? vStats() : vMoney();
   document.querySelectorAll('.nav a').forEach(a => { a.setAttribute('aria-current', a.dataset.v === V ? 'page' : 'false'); a.parentElement.hidden = a.dataset.v !== 'hari-ini' && !on(a.dataset.v); });
   if (V === 'catatan') renderNoteList();
   if (V === 'keuangan' && on('kalkulator') && CT !== 'biasa') calcTool();
@@ -3985,9 +4346,10 @@ document.addEventListener('click', e => {
   if (act === 'closemvall') { const l = S.todos.filter(t => !t.done && t.due && dayDiff(t.due) <= 0), snap = l.map(t => [t, t.due]); l.forEach(t => moveTodo(t, 1)); rePanel(); render(); toast(L(`${l.length} to-do dipindah ke besok`, `${l.length} to-dos moved to tomorrow`), () => { snap.forEach(([t, d]) => { t.due = d; }); if (PANEL === 'close') rePanel(); refresh(); }); return; }
   if (act === 'closedone') { S.closed = S.closed || {}; S.closed[todayK()] = true; closePanel(); render(); toast(L('Hari ditutup. Sampai besok', 'Day closed. See you tomorrow')); return; }
   if (act === 'lang') { try { localStorage.setItem('p001-lang', a.dataset.k); } catch (e) { /* abaikan */ } location.reload(); return; }
-  if (act === 'habtick' || act === 'habstep') { const r = S.routines.find(x => x.id === id); if (!r) return; act === 'habtick' ? habTick(r) : habStep(r); const b = document.querySelector(`#view [data-id="${id}"].hb-tick, #view [data-id="${id}"].hb-step`); if (b) b.focus(); return; }
+  if (act === 'habtick' || act === 'habstep') { const r = S.routines.find(x => x.id === id); if (!r) return; act === 'habtick' ? habTick(r) : habStep(r); const b = document.querySelector(`#view [data-id="${id}"].hab-tick, #view [data-id="${id}"].hab-step, #view .hb-b[data-id="${id}"]`); if (b) b.focus(); return; }
   if (act === 'habadd' || act === 'habedit') { RED = act === 'habedit' ? id : null; openPanel('Rutinitas', rutHTML(), 'rut'); const n = $('#rut-name'); if (n) n.focus(); return; }
   if (act === 'fzdone') return finishEarly();
+  if (habAct(act, a, id)) return;
   if (act === 'hmgo') return go(a.dataset.v);
   if (act === 'hmday') { CSEL = a.dataset.k; const kd = keyDate(CSEL), n0 = new Date(); CMO = (kd.getFullYear() - n0.getFullYear()) * 12 + kd.getMonth() - n0.getMonth(); return go(on('kalender') ? 'kalender' : 'todo'); }
   if (act === 'hmfocus') { e.stopPropagation(); startTimer('fokus', a.dataset.t); return go('fokus'); }
