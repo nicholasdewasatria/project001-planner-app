@@ -1519,6 +1519,34 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 .hp-none { padding: var(--s-sm) 0; font-size: var(--t-xs); color: var(--c-dim); }
 .hp-note { display: flex; align-items: center; gap: 8px; }
 .hp-open { justify-self: start; }
+/* v3.5 piringan hitam di layar Fokus */
+.vy-wrap { position: relative; width: min(300px, 74vw); aspect-ratio: 1; margin-top: var(--s-lg); --vy-on: var(--p-acc); }
+.vy-wrap.brk { --vy-on: #5B5BD6; }
+.vy-ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.vy-ring line { stroke: var(--hx-track); stroke-linecap: round; }
+.vy-ring line.on { stroke: var(--vy-on); }
+.vy-trk { fill: none; stroke: var(--hx-track); stroke-width: 1; }
+.vy-arc { fill: none; stroke: var(--vy-on); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dasharray 0.25s linear; }
+.vy { position: absolute; inset: 12%; border-radius: 50%; transform: rotate(var(--rot, 0deg)); transition: transform 0.25s linear; will-change: transform;
+  background: repeating-radial-gradient(circle at center, transparent 0 3px, color-mix(in srgb, var(--p-4) 6%, transparent) 3px 4px), var(--p-0);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--p-4) 16%, transparent), inset 0 0 0 6px var(--p-0), 0 18px 40px -18px var(--c-shadow); }
+.vy-lab { position: absolute; inset: 31%; border-radius: 50%; background: var(--a); color: var(--ai); box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--ai) 14%, transparent); }
+.vy-lab .ic { position: absolute; left: 50%; top: 13%; width: 32%; height: 32%; transform: translateX(-50%); stroke-width: 1.8; }
+.vy-mk { position: absolute; inset: 31%; transform: rotate(var(--mk, 0deg)); }
+.vy-mk i { position: absolute; left: 50%; bottom: 7%; width: 8%; height: 8%; margin-left: -4%; border-radius: 50%; background: var(--ai); }
+.vy-hole { position: absolute; left: 50%; top: 50%; width: 5%; height: 5%; transform: translate(-50%, -50%); border-radius: 50%; background: var(--p-0); box-shadow: 0 0 0 2px color-mix(in srgb, var(--ai) 35%, transparent); }
+.vy-sheen { position: absolute; inset: 12%; border-radius: 50%; pointer-events: none;
+  background: conic-gradient(from 300deg, transparent 0deg, color-mix(in srgb, var(--p-4) 9%, transparent) 30deg, transparent 70deg 180deg, color-mix(in srgb, var(--p-4) 6%, transparent) 210deg, transparent 250deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 37%, var(--p-0) 38%); mask: radial-gradient(circle, transparent 0 37%, var(--p-0) 38%); }
+.np-clock { margin-top: var(--s-sm); font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--c-ink); }
+/* mini player: piringan mini */
+.mini-b .vy-mini { position: relative; inset: auto; width: 40px; height: 40px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--p-4) 22%, transparent); }
+.vy-mini .vy-lab { inset: 30%; padding: 0; box-shadow: none; }
+.vy-mini .vy-mk { inset: 30%; }
+.vy-mini .vy-mk i { width: 22%; height: 22%; margin-left: -11%; bottom: 4%; }
+.vy-mini .vy-hole { width: 8%; height: 8%; box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .vy, .vy-arc { transition: none; } }
+.vy-arc[stroke-dasharray^="0.00 "] { visibility: hidden; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2410,6 +2438,7 @@ function tick() {
   document.querySelectorAll('[data-end]').forEach(e => { e.textContent = fzState(); });
   document.querySelectorAll('[data-ring]').forEach(e => { e.setAttribute('stroke-dasharray', fzDash()); });
   document.querySelectorAll('[data-elapsed]').forEach(e => { e.textContent = fmtClock(T.total - T.left); });
+  vyTick();
   $('#nav-fokus').textContent = T.running ? c : 'Fokus';
 }
 let AC = null;
@@ -3559,7 +3588,7 @@ function renderMini() {
   if (!show) { el.innerHTML = ''; return; }
   const brk = T.mode !== 'fokus';
   el.dataset.mode = brk ? 'brk' : 'fok';
-  el.innerHTML = `<button class="mini-b" type="button" data-act="hmgo" data-v="fokus">${brk ? art('moon', '#5B5BD6', 'art-sm') : artFor(T.task, 'fokus', 'art-sm')}<span class="mini-t"><b>${esc(brk ? MODES[T.mode].label : T.task || L('Tanpa judul', 'Untitled'))}</b><small>${brk ? L('Istirahat', 'Break') : L('Fokus', 'Focus')} · <span data-clock>${fmtClock(T.left)}</span> ${L('tersisa', 'left')}</small></span></button><button class="mini-p" type="button" data-act="${T.running ? 'pause' : 'start'}" aria-label="${T.running ? L('Jeda', 'Pause') : L('Lanjutkan', 'Resume')}">${ico(T.running ? 'pause' : 'play')}</button><i class="mini-bar" aria-hidden="true"><i data-prog style="width:${((1 - T.left / T.total) * 100).toFixed(1)}%"></i></i>`;
+  el.innerHTML = `<button class="mini-b" type="button" data-act="hmgo" data-v="fokus">${vyMini(brk)}<span class="mini-t"><b>${esc(brk ? MODES[T.mode].label : T.task || L('Tanpa judul', 'Untitled'))}</b><small>${brk ? L('Istirahat', 'Break') : L('Fokus', 'Focus')} · <span data-clock>${fmtClock(T.left)}</span> ${L('tersisa', 'left')}</small></span></button><button class="mini-p" type="button" data-act="${T.running ? 'pause' : 'start'}" aria-label="${T.running ? L('Jeda', 'Pause') : L('Lanjutkan', 'Resume')}">${ico(T.running ? 'pause' : 'play')}</button><i class="mini-bar" aria-hidden="true"><i data-prog style="width:${((1 - T.left / T.total) * 100).toFixed(1)}%"></i></i>`;
 }
 
 /* layar timer gaya "now playing" */
@@ -3567,7 +3596,8 @@ function npCard(ss, n, brk, mid) {
   const p = ((1 - T.left / T.total) * 100).toFixed(1);
   return `<section class="fz-card np" aria-label="Timer">
     <div class="seg seg-s fz-mode" role="group" aria-label="Mode">${Object.entries(MODES).map(([k, m]) => `<button type="button" data-act="mode" data-mode="${k}" aria-pressed="${T.mode === k}">${k === 'panjang' ? L('Panjang', 'Long') : k === 'pendek' ? L('Istirahat', 'Break') : L('Fokus', 'Focus')} ${m.min}</button>`).join('')}</div>
-    <div class="np-art">${brk ? art('moon', '#5B5BD6', 'art-xl') : artFor(T.task, 'fokus', 'art-xl')}</div>
+    ${vinyl(brk)}
+    <p class="np-clock"><span data-clock>${fmtClock(T.left)}</span></p>
     <div class="np-meta"><label class="np-lab" for="task-in">${brk ? L('Setelah istirahat lanjut', 'After the break') : L('Sedang dikerjakan', 'Working on')}</label><input class="np-task" id="task-in" value="${esc(T.task)}" placeholder="${L('Tulis tugasnya', 'Name the task')}" autocomplete="off"><span class="np-sub">${brk ? MODES[T.mode].label : L(`Sesi ke-${ss.length + 1} hari ini`, `Session ${ss.length + 1} today`)} · <span data-end>${fzState()}</span></span></div>
     <div class="np-prog"><div class="np-bar"><i data-prog style="width:${p}%"></i></div><div class="np-time"><span data-elapsed>${fmtClock(T.total - T.left)}</span><span>−<span data-clock>${fmtClock(T.left)}</span></span></div></div>
     <div class="np-ctl">
@@ -4058,6 +4088,32 @@ function hyFit(sc) { const r = sc.getBoundingClientRect(), rg = document.createR
 function hyFitAll() { document.querySelectorAll('#view .hy-sc').forEach(hyFit); }
 document.addEventListener('scroll', e => { const t = e.target; if (t && t.classList && t.classList.contains('hy-sc')) hyFit(t); }, true);
 window.addEventListener('resize', () => requestAnimationFrame(hyFitAll));
+
+/* ---------- v3.5 layar Fokus: piringan hitam berputar + strip menit ---------- */
+/* Sudut dihitung dari waktu timer (T.total - T.left): 1 putaran = 60 detik, jadi piringan sekaligus jarum detik. */
+const RMQ = matchMedia('(prefers-reduced-motion: reduce)');
+function vyState() {
+  const el = Math.max(0, T.total - T.left), rm = RMQ.matches;
+  return { el, rot: rm ? 0 : +(el * 6).toFixed(1), mk: rm ? Math.floor(el) * 6 : 0, m: Math.floor(el / 60), p: Math.min(100, el / T.total * 100) };
+}
+function vyLabel(brk) { const [ic, col] = brk ? ['moon', '#5B5BD6'] : artPick(T.task, 'fokus'); return { ic, style: `--a:${col};--ai:${artInk(col)}` }; }
+function vinyl(brk) {
+  const st = vyState(), lb = vyLabel(brk), N = Math.max(1, Math.round(T.total / 60)), thin = N > 30;
+  const strips = Array.from({ length: N }, (_, i) => { const major = N >= 15 && i % 5 === 0; return `<line data-vstrip="${i}" class="${i < st.m ? 'on' : ''}${major ? ' mj' : ''}" x1="0" y1="-${major ? 95 : 94}" x2="0" y2="-${major ? 82 : 85}" stroke-width="${major ? 3 : thin ? 1.4 : 2.2}" transform="rotate(${(i * 360 / N).toFixed(2)})"/>`; }).join('');
+  return `<div class="vy-wrap${brk ? ' brk' : ''}" aria-hidden="true">
+    <svg class="vy-ring" viewBox="-100 -100 200 200" focusable="false">${strips}<circle class="vy-trk" r="98.5"/><circle class="vy-arc" r="98.5" pathLength="100" stroke-dasharray="${st.p.toFixed(2)} 100" transform="rotate(-90)" data-varc/></svg>
+    <div class="vy" data-vy style="${lb.style};--rot:${st.rot}deg;--mk:${st.mk}deg"><span class="vy-lab">${ico(lb.ic)}</span><span class="vy-mk"><i></i></span><span class="vy-hole"></span></div>
+    <span class="vy-sheen"></span>
+  </div>`;
+}
+function vyMini(brk) { const st = vyState(), lb = vyLabel(brk); return `<span class="vy vy-mini" data-vy aria-hidden="true" style="${lb.style};--rot:${st.rot}deg;--mk:${st.mk}deg"><span class="vy-lab"></span><span class="vy-mk"><i></i></span><span class="vy-hole"></span></span>`; }
+function vyTick() {
+  const st = vyState();
+  document.querySelectorAll('[data-vy]').forEach(e => { e.style.setProperty('--rot', st.rot + 'deg'); e.style.setProperty('--mk', st.mk + 'deg'); });
+  document.querySelectorAll('[data-vstrip]').forEach(e => e.classList.toggle('on', +e.dataset.vstrip < st.m));
+  document.querySelectorAll('[data-varc]').forEach(e => e.setAttribute('stroke-dasharray', st.p.toFixed(2) + ' 100'));
+}
+RMQ.addEventListener && RMQ.addEventListener('change', () => vyTick());
 
 /* ---------- render + navigasi ---------- */
 function render() {
