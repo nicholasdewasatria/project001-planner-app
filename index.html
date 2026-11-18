@@ -1341,6 +1341,10 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 .pal-dot i { width: 10px; height: 10px; border-radius: 50%; margin-left: -3px; box-shadow: 0 0 0 1.5px var(--c-bg); }
 .pal-dot i:first-child { margin-left: 0; }
 .seg-s.pal-seg .pal-dot { display: none; }
+
+/* ---------- v3.2 pengingat Calendar ---------- */
+.rem-seg { display: flex; margin: -2px 0 var(--s-sm); }
+.rem-seg button { flex: 1 1 0; min-width: 0; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1543,7 +1547,7 @@ const MODS = [
   ['kalkulator', 'Hitung', 'calc', 'Kalkulator, cicilan, bagi tagihan di halaman Keuangan'],
   ['statistik', 'Statistik', 'chart', 'Grafik to-do, fokus, habit, dan pengeluaran']
 ];
-const SET_DEF = () => ({ show: Object.fromEntries(MODS.map(m => [m[0], true])), hideAmt: false, daily: { on: true, limit: 150000 }, tg: { on: false, notif: {} }, theme: 'auto' });
+const SET_DEF = () => ({ show: Object.fromEntries(MODS.map(m => [m[0], true])), hideAmt: false, daily: { on: true, limit: 150000 }, tg: { on: false, notif: {} }, theme: 'auto', cal: { on: true, ev: true, td: true, hab: true, evMin: 10, tdMin: 0, habMin: 0 } });
 let PALK = (() => { try { const v = localStorage.getItem('p001-pal'); return ['planner', 'netral', 'hijau'].includes(v) ? v : 'netral'; } catch (e) { return 'netral'; } })();
 const applyPal = () => {
   if (PALK === 'planner') delete document.documentElement.dataset.pal; else document.documentElement.dataset.pal = PALK;
@@ -1552,7 +1556,7 @@ const applyPal = () => {
 applyPal();
 const PALS = () => [['netral', L('Netral', 'Neutral'), ['#121212', '#2563EB']], ['planner', 'Planner', ['#2563EB', '#00E2BA']], ['hijau', L('Hijau', 'Green'), ['#121212', '#1ED760']]];
 const palSeg = cls => `<div class="seg pal-seg ${cls}" role="group" aria-label="${L('Palet warna', 'Color palette')}">${PALS().map(([k, n, c]) => `<button type="button" data-act="pal" data-k="${k}" aria-pressed="${PALK === k}"><span class="pal-dot" aria-hidden="true">${c.map(x => `<i style="background:${x}"></i>`).join('')}</span><span data-raw>${n}</span></button>`).join('')}</div>`;
-let SET = (() => { const d = SET_DEF(); try { const v = JSON.parse(localStorage.getItem('p001-set') || 'null'); if (v) return { show: { ...d.show, ...(v.show || {}) }, hideAmt: !!v.hideAmt, daily: { ...d.daily, ...(v.daily || {}) }, tg: { on: !!(v.tg && v.tg.on), notif: { ...((v.tg && v.tg.notif) || {}) } }, theme: ['dark', 'light'].includes(v.theme) ? v.theme : 'auto' }; } catch (e) { /* tanpa penyimpanan */ } return d; })();
+let SET = (() => { const d = SET_DEF(); try { const v = JSON.parse(localStorage.getItem('p001-set') || 'null'); if (v) return { show: { ...d.show, ...(v.show || {}) }, hideAmt: !!v.hideAmt, daily: { ...d.daily, ...(v.daily || {}) }, tg: { on: !!(v.tg && v.tg.on), notif: { ...((v.tg && v.tg.notif) || {}) } }, theme: ['dark', 'light'].includes(v.theme) ? v.theme : 'auto', cal: { ...d.cal, ...(v.cal || {}) } }; } catch (e) { /* tanpa penyimpanan */ } return d; })();
 const tgOn = () => SET.tg.on;
 const showSrc = x => tgOn() || x !== "Web", srcL = x => showSrc(x) ? " · dari " + x : "", srcS = x => showSrc(x) ? " · " + x : "";
 let SRC = 'Web'; /* asal catatan: Web (tulis cepat / form) atau Telegram */
@@ -1663,12 +1667,13 @@ const DKEY = 'p001-data';
 const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 const revive = (k, v) => typeof v === 'string' && ISO.test(v) ? new Date(v) : v;
 function dataBlob() { /* coretan tanpa foto tidak perlu menyimpan PNG: bisa digambar ulang dari goresan */
-  return { app: 'project001-planner', v: 1, savedAt: new Date(), S: { ...S, sketches: S.sketches.map(k => ({ ...k, png: k.bg ? k.png : null })) }, budget: BUDGET, nodaily: [...NODAILY] };
+  return { app: 'project001-planner', v: 1, savedAt: new Date(), S: { ...S, sketches: S.sketches.map(k => ({ ...k, png: k.bg ? k.png : null })) }, budget: BUDGET, nodaily: [...NODAILY], set: { show: SET.show, daily: SET.daily, cal: SET.cal } };
 }
 function applyBlob(o) {
   if (!o || o.app !== 'project001-planner' || !o.S) throw new Error('bukan data project001-Planner');
   Object.keys(BUDGET).forEach(k => delete BUDGET[k]); Object.assign(BUDGET, o.budget || {});
   NODAILY.clear(); (o.nodaily || []).forEach(k => NODAILY.add(k));
+  if (o.set && typeof SET !== 'undefined') { if (o.set.show) Object.assign(SET.show, o.set.show); if (o.set.daily) Object.assign(SET.daily, o.set.daily); if (o.set.cal) Object.assign(SET.cal, o.set.cal); saveSet(); }
   return { ...emptyData(), ...o.S };
 }
 function loadData() { try { const raw = localStorage.getItem(DKEY); return raw ? applyBlob(JSON.parse(raw, revive)) : null; } catch (e) { return null; } }
@@ -3456,6 +3461,100 @@ function vSearch() {
 }
 document.addEventListener('input', e => { if (e.target && e.target.id === 'sr-in') { SQ = e.target.value; const r = $('#sr-res'); if (r) r.innerHTML = searchRes(); } });
 
+/* ---------- v3.2 Google Calendar: satu arah Planner → kalender khusus "project001-Planner" + pengingat ---------- */
+const CAL = 'https://www.googleapis.com/calendar/v3', G_CAL_SCOPE = 'https://www.googleapis.com/auth/calendar.app.created';
+const calTZ = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Jakarta'; } catch (e) { return 'Asia/Jakarta'; } };
+const calDT = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+const calD = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const calHash = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+/* id acara harus base32hex (0-9, a-v): awalan "pln" + jenis + id lokal (angka) */
+const calId = (kind, id) => 'pln' + kind + String(id).toLowerCase().replace(/[^0-9a-v]/g, '');
+const BYDAY = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+const calRem = min => ({ useDefault: false, overrides: min == null ? [] : [{ method: 'popup', minutes: min }] });
+function calDesired() {
+  const out = new Map(), tz = calTZ(), now = Date.now(), lo = now - 30 * 864e5, hi = now + 400 * 864e5, C = SET.cal;
+  const put = (id, body) => { body.extendedProperties = { private: { p001: '1' } }; const h = calHash(JSON.stringify(body)); body.extendedProperties.private.h = h; out.set(id, body); };
+  const desc = L('Dibuat oleh project001-Planner. Ubah atau hapus dari app, bukan dari sini.', 'Created by project001-Planner. Edit or delete it in the app, not here.');
+  if (C.ev) S.events.forEach(e => {
+    if (isRoutine(e) || !(e.start instanceof Date) || e.start.getTime() < lo || e.start.getTime() > hi) return;
+    const end = e.end instanceof Date && e.end > e.start ? e.end : new Date(e.start.getTime() + 30 * 60000);
+    put(calId('e', e.id), { summary: e.title, description: desc, start: { dateTime: calDT(e.start), timeZone: tz }, end: { dateTime: calDT(end), timeZone: tz }, reminders: calRem(e.start.getTime() > now ? C.evMin : null) });
+  });
+  if (C.td) S.todos.forEach(t => {
+    if (t.done || !(t.due instanceof Date) || t.due.getTime() < lo || t.due.getTime() > hi) return;
+    const s = L('To-do: ', 'To-do: ') + t.text;
+    if (t.allDay) { const e = new Date(t.due); e.setDate(e.getDate() + 1); put(calId('t', t.id), { summary: s, description: desc, start: { date: calD(t.due) }, end: { date: calD(e) }, transparency: 'transparent', reminders: calRem(null) }); }
+    else put(calId('t', t.id), { summary: s, description: desc, start: { dateTime: calDT(t.due), timeZone: tz }, end: { dateTime: calDT(new Date(t.due.getTime() + 15 * 60000)), timeZone: tz }, transparency: 'transparent', reminders: calRem(t.due.getTime() > now ? C.tdMin : null) });
+  });
+  if (C.hab) S.routines.forEach(r => {
+    if (!r.days || !r.days.length || !/^\d{1,2}:\d{2}$/.test(r.start || '')) return;
+    if (!r.cal0) r.cal0 = calD(new Date());
+    const [y, m, d] = r.cal0.split('-').map(Number), [hh, mi] = r.start.split(':').map(Number), s = new Date(y, m - 1, d, hh, mi), e = new Date(s.getTime() + (r.dur || 15) * 60000);
+    put(calId('h', r.id), { summary: L('Habit: ', 'Habit: ') + r.name, description: desc, start: { dateTime: calDT(s), timeZone: tz }, end: { dateTime: calDT(e), timeZone: tz }, recurrence: ['RRULE:FREQ=WEEKLY;BYDAY=' + r.days.slice().sort().map(x => BYDAY[x]).join(',')], transparency: 'transparent', reminders: calRem(C.habMin) });
+  });
+  return out;
+}
+const calKey = m => calHash([...m].map(([k, v]) => k + v.extendedProperties.private.h).join('|') + '|' + (G.ids && G.ids.cal));
+async function calEnsure() {
+  if (G.ids.cal) { try { await gApi('GET', `${CAL}/calendars/${encodeURIComponent(G.ids.cal)}?fields=id`); return; } catch (e) { if (e.auth || (e.status !== 404 && e.status !== 403)) throw e; G.ids.cal = null; } }
+  if (S.gcal) { try { await gApi('GET', `${CAL}/calendars/${encodeURIComponent(S.gcal)}?fields=id`); G.ids.cal = S.gcal; gSave(); return; } catch (e) { if (e.auth || (e.status !== 404 && e.status !== 403)) throw e; } }
+  const c = await gApi('POST', `${CAL}/calendars`, { summary: 'project001-Planner', description: L('Jadwal, to-do, dan habit dari project001-Planner', 'Schedule, to-dos and habits from project001-Planner'), timeZone: calTZ() });
+  G.ids.cal = c.id; S.gcal = c.id; G.calKey = null; gSave();
+}
+async function calList() {
+  const items = []; let tok = '';
+  do {
+    const r = await gApi('GET', `${CAL}/calendars/${encodeURIComponent(G.ids.cal)}/events?showDeleted=true&maxResults=2500&privateExtendedProperty=p001%3D1&fields=items(id,status,extendedProperties),nextPageToken${tok ? '&pageToken=' + tok : ''}`);
+    items.push(...(r.items || [])); tok = r.nextPageToken || '';
+  } while (tok);
+  return items;
+}
+async function calPool(jobs, n = 4) { let i = 0; const run = async () => { while (i < jobs.length) { const j = jobs[i++]; await j(); } }; await Promise.all(Array.from({ length: Math.min(n, jobs.length) }, run)); }
+async function gCal(force) {
+  if (!SET.cal.on) { G.calSt = 'off'; return; }
+  if (G.calScope === false) { G.calSt = 'scope'; return; }
+  const want = calDesired(), k = calKey(want);
+  if (!force && G.calKey === k && G.ids.cal) { G.calSt = 'ok'; return; }
+  try {
+    await calEnsure();
+    const have = new Map((await calList()).map(x => [x.id, x])), base = `${CAL}/calendars/${encodeURIComponent(G.ids.cal)}/events`, jobs = [];
+    want.forEach((body, id) => {
+      const h = have.get(id);
+      if (!h) jobs.push(async () => { try { await gApi('POST', base, { id, ...body }); } catch (e) { if (e.status === 409) await gApi('PUT', `${base}/${id}`, { ...body, status: 'confirmed' }); else throw e; } });
+      else if (h.status === 'cancelled' || ((h.extendedProperties || {}).private || {}).h !== body.extendedProperties.private.h) jobs.push(() => gApi('PUT', `${base}/${id}`, { ...body, status: 'confirmed' }));
+    });
+    have.forEach((h, id) => { if (!want.has(id) && h.status !== 'cancelled') jobs.push(async () => { try { await gApi('DELETE', `${base}/${id}`); } catch (e) { if (e.status !== 404 && e.status !== 410) throw e; } }); });
+    await calPool(jobs);
+    G.calKey = calKey(want); G.calN = want.size; G.calSt = 'ok'; G.calErr = ''; gSave();
+  } catch (e) {
+    if (e.auth) throw e;
+    const msg = String(e.message || e);
+    if (e.status === 403 && /has not been used|accessNotConfigured|is disabled/i.test(msg)) G.calSt = 'api';
+    else if (e.status === 403 && /insufficient|scope/i.test(msg)) { G.calScope = false; G.calSt = 'scope'; }
+    else { G.calSt = 'error'; G.calErr = msg.slice(0, 120); }
+    gSave();
+  }
+}
+function calStText() {
+  if (!SET.cal.on) return L('Mati. Jadwal tidak dikirim ke Google Calendar.', 'Off. Nothing is sent to Google Calendar.');
+  return { ok: L(`${G.calN || 0} acara di kalender project001-Planner`, `${G.calN || 0} events in the project001-Planner calendar`), api: L('Google Calendar API belum diaktifkan di Google Cloud (proyek project001-planner).', 'Google Calendar API is not enabled in Google Cloud (project project001-planner).'), scope: L('Izin Google Calendar belum diberikan. Masuk lagi dan centang izin kalender.', 'Google Calendar permission is missing. Sign in again and tick the calendar permission.'), error: L('Gagal kirim ke Calendar', 'Could not update Calendar') + (G.calErr ? ': ' + G.calErr : '') }[G.calSt] || L('Menunggu sinkron pertama', 'Waiting for the first sync');
+}
+const calLink = () => G.ids && G.ids.cal ? `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(G.ids.cal)}` : '';
+const REM_MIN = () => [[0, L('Tepat waktu', 'On time')], [10, L('10 menit', '10 min')], [30, L('30 menit', '30 min')], [60, L('1 jam', '1 hour')]];
+const remSeg = (k, v) => `<div class="seg seg-s rem-seg" role="group" aria-label="${L('Waktu pengingat', 'Reminder time')}">${REM_MIN().map(([m, n]) => `<button type="button" data-act="calmin" data-k="${k}" data-m="${m}" aria-pressed="${v === m}">${n}</button>`).join('')}</div>`;
+function remHTML() {
+  const C = SET.cal;
+  return `<section class="pn-sec"><h3>${L('Pengingat lewat Google Calendar', 'Reminders via Google Calendar')}</h3><div>
+    <div class="set">${ico('month')}<div><b>${L('Kirim ke Google Calendar', 'Send to Google Calendar')}</b><small>${G.email ? esc(calStText()) : L('Masuk dengan Google dulu. Notifikasi muncul dari app Google Calendar di HP, juga saat Planner tertutup.', 'Sign in with Google first. Notifications come from the Google Calendar app, even when Planner is closed.')}</small></div>${sw('calsw', 'on', C.on, L('Kirim ke Google Calendar', 'Send to Google Calendar'))}</div>
+    ${C.on ? `<div class="set">${ico('today')}<div><b>${L('Jadwal', 'Schedule')}</b><small>${L('Ingatkan sebelum mulai', 'Remind before it starts')}</small></div>${sw('calsw', 'ev', C.ev, L('Jadwal', 'Schedule'))}</div>
+    ${C.ev ? remSeg('evMin', C.evMin) : ''}
+    <div class="set">${ico('check')}<div><b>${L('To-do berjam', 'Timed to-dos')}</b><small>${L('To-do sepanjang hari tampil tanpa notifikasi. Yang sudah selesai dihapus dari kalender.', 'All-day to-dos show without a notification. Done ones are removed from the calendar.')}</small></div>${sw('calsw', 'td', C.td, L('To-do berjam', 'Timed to-dos'))}</div>
+    ${C.td ? remSeg('tdMin', C.tdMin) : ''}
+    <div class="set">${ico('habit')}<div><b>Habit</b><small>${L('Acara berulang sesuai hari dan jam habit', 'Repeating events on each habit’s days and time')}</small></div>${sw('calsw', 'hab', C.hab, 'Habit')}</div>
+    ${C.hab ? remSeg('habMin', C.habMin) : ''}` : ''}
+  </div><p class="hint">${L('Satu arah: perubahan di app dikirim ke kalender "project001-Planner". Kalender utamamu tidak dibaca atau diubah.', 'One way: changes in the app go to the "project001-Planner" calendar. Your main calendar is never read or changed.')}${calLink() ? ` <a class="lnk small" href="${calLink()}" target="_blank" rel="noopener">${L('Buka kalender', 'Open calendar')}</a>` : ''}</p></section>`;
+}
+
 /* ---------- render + navigasi ---------- */
 function render() {
   if (V !== 'hari-ini' && !on(V)) { V = 'hari-ini'; setHash('hari-ini'); }
@@ -3544,9 +3643,10 @@ function settingsHTML() {
   <section class="pn-sec"><h3>Integrasi</h3><div>
     ${APP ? `<div class="set">${ico('cloud')}<div><b>Akun Google</b><small>${G.email ? esc(G.email) + ' · ' + esc(gStText()) : 'Belum masuk. Data hanya di HP ini'}</small></div><button class="btn btn-quiet btn-sm" type="button" data-act="gpanel">${G.email ? 'Atur' : 'Masuk'}</button></div>`
       : `<div class="set">${ico('sheet')}<div><b>Google Sheets</b><small>Catatan, to-do, keuangan, rutinitas</small></div>${okPill.replace('CHECK', ico('check'))}</div>`}
-    <div class="set">${ico('month')}<div><b>Google Calendar</b><small>Jadwal dan pengingat</small></div>${okPill.replace('CHECK', ico('check'))}</div>
+    <div class="set">${ico('month')}<div><b>Google Calendar</b><small>${APP ? (G.email ? esc(calStText()) : L('Masuk dengan Google untuk mengirim jadwal dan pengingat', 'Sign in with Google to send schedule and reminders')) : 'Jadwal dan pengingat'}</small></div>${APP ? (G.email && SET.cal.on && G.calSt === 'ok' ? `<span class="pill">${ico('check')}${L('Tersambung', 'Connected')}</span>` : `<span class="pill">${G.email ? (SET.cal.on ? L('Menunggu', 'Pending') : L('Mati', 'Off')) : L('Nanti', 'Later')}</span>`) : okPill.replace('CHECK', ico('check'))}</div>
     <div class="set">${ico('tg')}<div><b>Telegram${tgOn() ? '' : '<span class="part">Part 2</span>'}</b><small>${tgOn() ? 'Tersambung · @project001_planner_bot' : 'Catat lewat chat dan terima pengingat'}</small></div><button class="btn btn-quiet btn-sm" type="button" data-act="tg">${tgOn() ? 'Atur' : 'Lihat'}</button></div>
   </div></section>
+  ${remHTML()}
   <section class="pn-sec"><h3>Data</h3><div>
     <div class="set">${ico('check')}<div><b>Rutinitas</b><small>${S.routines.length} rutinitas · dasar streak</small></div><button class="btn btn-quiet btn-sm" type="button" data-act="rut">Kelola</button></div>
     <div class="set">${ico('wallet')}<div><b>Budget dan kategori</b><small>${Object.keys(BUDGET).length} kategori · ${rp(Object.values(BUDGET).reduce((a, b) => a + b, 0))} per bulan</small></div><button class="btn btn-quiet btn-sm" type="button" data-act="bud">Kelola</button></div>
@@ -3648,15 +3748,15 @@ const G_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 const G_SCOPES = 'openid email profile ' + G_DRIVE_SCOPE + ' https://www.googleapis.com/auth/calendar.app.created';
 const GKEY = 'p001-g', DRIVE = 'https://www.googleapis.com/drive/v3/files', UPL = 'https://www.googleapis.com/upload/drive/v3/files', SHEETS = 'https://sheets.googleapis.com/v4/spreadsheets';
 const FOLDER_MIME = 'application/vnd.google-apps.folder', SHEET_MIME = 'application/vnd.google-apps.spreadsheet';
-const TABS = ['Catatan', 'Todo', 'Transaksi', 'Budget', 'Rutinitas', 'Centang', 'Jadwal', 'Fokus', 'Coretan'];
+const TABS = ['Catatan', 'Todo', 'Transaksi', 'Budget', 'Rutinitas', 'Centang', 'Jadwal', 'Fokus', 'Coretan', 'Rencana'];
 const G = (() => { try { return JSON.parse(localStorage.getItem(GKEY) || 'null') || {}; } catch (e) { return {}; } })();
 let GST = 'off', gTC = null, gTimer = null, gBusy = false, gAgain = false;
 const gSave = () => { try { localStorage.setItem(GKEY, JSON.stringify(G)); } catch (e) { /* abaikan */ } };
 const gOn = () => APP && !!G.email;
 const gValid = () => !!G.token && G.exp > Date.now() + 30000;
-const gKey = b => JSON.stringify({ S: b.S, b: b.budget, n: b.nodaily });
+const gKey = b => JSON.stringify({ S: b.S, b: b.budget, n: b.nodaily, s: b.set });
 const gWhen = () => G.lastSync ? when(new Date(G.lastSync)).toLowerCase() : '';
-function gStText() { return { off: 'Belum masuk. Data hanya ada di HP ini.', busy: 'Sedang sinkron…', ok: 'Tersinkron ' + gWhen(), expired: 'Sesi login habis. Masuk lagi untuk lanjut sinkron.', error: 'Sinkron gagal' + (G.err ? ': ' + G.err : '') + '. Data aman di HP ini.', offline: 'Offline. Sinkron otomatis saat online.' }[GST] || ''; }
+function gStText() { return { off: 'Belum masuk. Data hanya ada di HP ini.', busy: 'Sedang sinkron…', ok: L('Tersinkron ', 'Synced ') + gWhen(), expired: 'Sesi login habis. Masuk lagi untuk lanjut sinkron.', error: 'Sinkron gagal' + (G.err ? ': ' + G.err : '') + '. Data aman di HP ini.', offline: 'Offline. Sinkron otomatis saat online.' }[GST] || ''; }
 function gSet(st) {
   GST = st;
   const b = $('#gbtn'); if (b) { b.dataset.st = G.email ? st : 'off'; b.setAttribute('aria-label', 'Akun Google: ' + gStText()); b.title = gStText(); }
@@ -3683,6 +3783,7 @@ async function gGotToken(r) {
   if (!r || r.error || !r.access_token) { G.err = (r && r.error) || 'tanpa token'; gSet(G.email ? 'error' : 'off'); toast('Login Google gagal'); return; }
   if (!google.accounts.oauth2.hasGrantedAllScopes(r, G_DRIVE_SCOPE)) { gSet(G.email ? 'error' : 'off'); toast('Izin Google Drive belum dicentang. Masuk lagi dan centang izinnya'); return; }
   G.token = r.access_token; G.exp = Date.now() + (+r.expires_in || 3600) * 1000;
+  { const ok = google.accounts.oauth2.hasGrantedAllScopes(r, G_CAL_SCOPE); if (ok && G.calScope === false) G.calKey = null; G.calScope = ok; }
   try {
     const u = await gApi('GET', 'https://www.googleapis.com/oauth2/v3/userinfo');
     if (G.email && G.email !== u.email) { G.ids = {}; G.syncKey = null; G.lastSync = 0; }
@@ -3725,6 +3826,12 @@ async function gSetup() {
       ids.sheet = sh.spreadsheetId;
       try { await gApi('PATCH', DRIVE + '/' + ids.sheet + '?addParents=' + ids.folder + '&removeParents=root&fields=id', {}); } catch (e) { /* tetap di Drive utama, tidak masalah */ }
     }
+    G.tabsV = 0;
+  }
+  if (G.tabsV !== TABS.join()) {
+    const sh = await gApi('GET', `${SHEETS}/${ids.sheet}?fields=sheets.properties.title`), have = (sh.sheets || []).map(x => x.properties.title), miss = TABS.filter(t => !have.includes(t));
+    if (miss.length) await gApi('POST', `${SHEETS}/${ids.sheet}:batchUpdate`, { requests: miss.map(title => ({ addSheet: { properties: { title } } })) });
+    G.tabsV = TABS.join();
   }
   gSave();
 }
@@ -3735,10 +3842,11 @@ function gTables() {
     Todo: [['id', 'teks', 'tenggat', 'selesai', 'selesai_pada', 'sumber', 'coretan'], ...S.todos.map(t => [t.id, t.text, gFmt(t.due), t.done ? 'ya' : '', gFmt(t.doneAt), t.src, (t.sk || []).join(' ')])],
     Transaksi: [['id', 'waktu', 'jenis', 'kategori', 'jumlah', 'catatan', 'sumber'], ...S.tx.map(t => [t.id, gFmt(t.at), t.type === 'in' ? 'masuk' : 'keluar', t.cat, t.amt, t.note, t.src])],
     Budget: [['kategori', 'budget_bulanan', 'dihitung_batas_harian'], ...Object.keys(BUDGET).map(k => [k, BUDGET[k], inDaily(k) ? 'ya' : 'tidak'])],
-    Rutinitas: [['id', 'nama', 'mulai', 'durasi_menit', 'hari', 'streak', 'rekor'], ...S.routines.map(r => [r.id, r.name, r.start, r.dur, daysLabel(r.days), streakOf(r.name), habitOf(r.name).best])],
-    Centang: [['tanggal', 'rutinitas'], ...Object.entries(S.habits).flatMap(([n, h]) => Object.keys(h.days || {}).sort().map(d => [d, n]))],
+    Rutinitas: [['id', 'nama', 'mulai', 'durasi_menit', 'hari', 'target', 'satuan', 'streak', 'rekor'], ...S.routines.map(r => [r.id, r.name, r.start, r.dur, daysLabel(r.days), r.target || 1, r.unit || '', streakOf(r.name), habitOf(r.name).best])],
+    Centang: [['tanggal', 'rutinitas', 'jumlah', 'selesai'], ...Object.entries(S.habits).flatMap(([n, h]) => [...new Set([...Object.keys(h.days || {}), ...Object.keys(h.cnt || {})])].sort().map(d => [d, n, (h.cnt && h.cnt[d]) || (h.days[d] ? 1 : 0), h.days[d] ? 'ya' : '']))],
     Jadwal: [['id', 'judul', 'mulai', 'selesai', 'kalender', 'status'], ...S.events.filter(e => !isRoutine(e)).map(e => [e.id, e.title, gFmt(e.start), gFmt(e.end), e.cal, e.done === true ? 'selesai' : e.done === false ? 'dilewati' : ''])],
     Fokus: [['tugas', 'menit', 'selesai'], ...S.sessions.map(x => [x.task, x.min, gFmt(x.end)])],
+    Rencana: [['tanggal', 'prioritas', 'hari_ditutup'], ...[...new Set([...Object.keys(S.plans || {}), ...Object.keys(S.closed || {})])].sort().map(d => [d, ((S.plans || {})[d] || []).map(id => (S.todos.find(t => t.id === id) || {}).text).filter(Boolean).join(' | '), (S.closed || {})[d] ? 'ya' : ''])],
     Coretan: [['id', 'judul', 'tag', 'waktu', 'file_drive'], ...S.sketches.map(k => [k.id, k.title, k.tags.join(' '), gFmt(k.at), k.driveId ? 'https://drive.google.com/file/d/' + k.driveId + '/view' : ''])]
   };
 }
@@ -3778,6 +3886,8 @@ async function gSync(pull) {
       } else { G.syncKey = rk; G.lastSync = Math.max(G.lastSync || 0, rt); gSave(); }
     }
     if (!pushed) { const k = gKey(dataBlob()); if (k !== G.syncKey || !G.ids.data || S.sketches.some(x => !x.driveId || x.driveRev !== (x.rev || 0))) await gPush(); }
+    await gCal(pull);
+    if (gKey(dataBlob()) !== G.syncKey) await gPush();
     G.err = ''; gSet('ok');
   } catch (e) { gFail(e); }
   gBusy = false;
@@ -3794,14 +3904,16 @@ function gHTML() {
     <div class="acts"><button class="btn btn-primary btn-sm" type="button" data-act="gsignin">Masuk dengan Google</button></div>
     <section class="pn-sec"><h3>Yang dibuat di akun Google kamu</h3><div>
       <div class="set">${ico('folder')}<div><b>Folder "project001-Planner"</b><small>Berisi data.json (data utama) dan folder Coretan (gambar PNG)</small></div><span></span></div>
-      <div class="set">${ico('sheet')}<div><b>Spreadsheet "project001-Planner"</b><small>Tab Catatan, Todo, Transaksi, Budget, Rutinitas, Centang, Jadwal, Fokus, Coretan</small></div><span></span></div>
+      <div class="set">${ico('sheet')}<div><b>Spreadsheet "project001-Planner"</b><small>Tab Catatan, Todo, Transaksi, Budget, Rutinitas, Centang, Jadwal, Fokus, Coretan, Rencana</small></div><span></span></div>
+      <div class="set">${ico('month')}<div><b>${L('Kalender "project001-Planner"', 'Calendar "project001-Planner"')}</b><small>${L('Jadwal, to-do berjam, dan habit beserta notifikasi pengingatnya', 'Schedule, timed to-dos and habits, with reminder notifications')}</small></div><span></span></div>
     </div><p class="hint">App hanya bisa membuka file yang dibuatnya sendiri, bukan seluruh Drive kamu. Selama uji coba, login berlaku sekitar 7 hari, setelah itu cukup masuk lagi.</p></section>`;
   const ids = G.ids || {};
   return `<div class="tg-st ${GST === 'ok' ? 'on' : ''}">${ico('cloud')}<div><b>${esc(G.email)}</b><small>${esc(gStText())}</small></div></div>
     <div class="acts">${GST === 'expired' || GST === 'error' ? '<button class="btn btn-primary btn-sm" type="button" data-act="gsignin">Masuk lagi</button>' : `<button class="btn btn-primary btn-sm" type="button" data-act="gsyncnow" ${GST === 'busy' ? 'disabled' : ''}>Sinkron sekarang</button>`}<button class="btn btn-quiet btn-sm" type="button" data-act="gout">${L('Keluar', 'Sign out')}</button></div>
     <section class="pn-sec"><h3>File di Google Drive</h3><div class="more-list" style="margin-top:0">
-      ${ids.sheet ? `<a class="more-row" href="https://docs.google.com/spreadsheets/d/${ids.sheet}/edit" target="_blank" rel="noopener">${ico('sheet')}<span>Spreadsheet project001-Planner<small>tabel</small></span>${ico('arrow')}</a>` : ''}
+      ${ids.sheet ? `<a class="more-row" href="https://docs.google.com/spreadsheets/d/${ids.sheet}/edit" target="_blank" rel="noopener">${ico('sheet')}<span>Spreadsheet project001-Planner<small>${L('tabel', 'table')}</small></span>${ico('arrow')}</a>` : ''}
       ${ids.folder ? `<a class="more-row" href="https://drive.google.com/drive/folders/${ids.folder}" target="_blank" rel="noopener">${ico('folder')}<span>Folder project001-Planner<small>data.json + Coretan</small></span>${ico('arrow')}</a>` : ''}
+      ${calLink() ? `<a class="more-row" href="${calLink()}" target="_blank" rel="noopener">${ico('month')}<span>${L('Kalender project001-Planner', 'project001-Planner calendar')}<small>${esc(G.calSt === 'ok' ? L(`${G.calN || 0} acara`, `${G.calN || 0} events`) : calStText())}</small></span>${ico('arrow')}</a>` : (SET.cal.on ? `<div class="more-row">${ico('month')}<span>${L('Kalender project001-Planner', 'project001-Planner calendar')}<small>${esc(calStText())}</small></span><span></span></div>` : '')}
     </div><p class="hint">Data utama ada di data.json dan ikut ke semua perangkat yang masuk dengan akun ini. Spreadsheet diperbarui otomatis setiap sinkron. Mengedit langsung di Spreadsheet belum masuk kembali ke app.</p></section>`;
 }
 function fdHTML() {
@@ -3934,6 +4046,8 @@ document.addEventListener('click', e => {
   if (act === 'qcclose') { QCI = null; renderQC(); $('#qc-in').focus(); return; }
   if (act === 'eye') { const s = selOf(a); SET.hideAmt = !SET.hideAmt; applySet(a.closest('#more') ? null : s); if (SHEET === 'more') renderMore(); toast(SET.hideAmt ? 'Angka uang disembunyikan' : 'Angka uang ditampilkan'); return; }
   if (act === 'mod') { const s = selOf(a); SET.show[a.dataset.k] = !on(a.dataset.k); applySet(s); return; }
+  if (act === 'calsw') { const k = a.dataset.k; SET.cal[k] = !SET.cal[k]; if (k === 'on' && SET.cal.on) G.calKey = null; applySet(selOf(a)); if (gOn()) gQueue(); return; }
+  if (act === 'calmin') { SET.cal[a.dataset.k] = +a.dataset.m; applySet(`#panel [data-act="calmin"][data-k="${a.dataset.k}"][data-m="${a.dataset.m}"]`); if (gOn()) gQueue(); return; }
   if (act === 'daily') { const s = selOf(a); SET.daily.on = !SET.daily.on; applySet(s); return; }
   if (act === 'limsug') { SET.daily = { on: true, limit: limSuggest() }; applySet(); toast('Batas harian ' + rp(SET.daily.limit)); return; }
   if (act === 'toggle') { const t = S.todos.find(x => x.id === id); if (t) { t.done = !t.done; t.doneAt = t.done ? new Date() : null; if (PANEL === 'td') closePanel(); render(); if (t.done) toast(L('To-do selesai', 'To-do done')); const b = document.querySelector(`#view [data-act="toggle"][data-id="${id}"]`); if (b) b.focus(); } return; }
