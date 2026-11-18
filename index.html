@@ -1547,6 +1547,16 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 .vy-mini .vy-hole { width: 8%; height: 8%; box-shadow: none; }
 @media (prefers-reduced-motion: reduce) { .vy, .vy-arc { transition: none; } }
 .vy-arc[stroke-dasharray^="0.00 "] { visibility: hidden; }
+/* v3.6 layar timer HP: kontrol terlihat di atas menu bawah tanpa geser (390x844), tombol play tidak tertutup di 360x740 */
+@media (max-width: 560px) {
+  .np { padding-top: var(--s-xs); }
+  .np .vy-wrap { width: min(228px, 60vw, calc(100dvh - 530px)); margin-top: var(--s-sm); }
+  .np .np-clock { margin-top: 2px; font-size: 2rem; }
+  .np .np-meta { margin-top: var(--s-xs); }
+  .np .np-task { font-size: 1.125rem; }
+  .np .np-prog { margin-top: var(--s-xs); }
+  .np .np-ctl { margin-top: 2px; }
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4115,6 +4125,74 @@ function vyTick() {
 }
 RMQ.addEventListener && RMQ.addEventListener('change', () => vyTick());
 
+/* ---------- v3.6 riwayat + tombol back HP ---------- */
+/* Riwayat: [base #hari-ini] [Beranda #hari-ini] [halaman ...] [lapisan terbuka ...].
+   Pindah halaman = pushState (bukan replace). Lapisan (lembar/panel, onboarding, Wrapped, papan coretan) = satu entri {p1:'o'};
+   back menutup lapisan paling atas; tutup lewat X/Esc/scrim = history.back() yang diabaikan popstate.
+   Di base (Beranda, tanpa lapisan): toast "tekan sekali lagi", back kedua dalam 2 detik keluar app. */
+const H = { ok: false, st: [], ign: 0, q: [], atBase: false, tm: 0, busy: false };
+const hLayers = () => { const w = $('#wr'), p = $('#pad'), o = $('#onb'); return [(SHEET || PANEL) && 'sp', o && !o.hidden && 'onb', w && !w.hidden && 'wr', p && !p.hidden && 'pad'].filter(Boolean); };
+function hRaw(st, url) {
+  if (H.atBase) { H.atBase = false; clearTimeout(H.tm); history.pushState({ p1: 'v' }, '', '#hari-ini'); }
+  history.pushState(st, '', url);
+}
+function hPush(st, url) { if (H.ign) H.q.push([st, url]); else hRaw(st, url); }
+function hBack() { H.ign++; history.back(); }
+function hFlush() { const q = H.q; H.q = []; q.forEach(([st, url]) => hRaw(st, url)); }
+function hsync() {
+  if (!H.ok || H.busy) return;
+  const cur = hLayers();
+  while (H.st.length && !cur.includes(H.st[H.st.length - 1])) { H.st.pop(); hBack(); }
+  H.st = H.st.filter(k => cur.includes(k));
+  cur.forEach(k => { if (!H.st.includes(k)) { H.st.push(k); hPush({ p1: 'o', k }, '#' + V); } });
+}
+/* dipanggil go() saat pindah halaman */
+function navPush(v) {
+  if (!H.ok) return setHash(v);
+  if (PANEL) closePanel();
+  hsync(); hPush({ p1: 'v' }, '#' + v);
+}
+function hCloseTop() {
+  const cur = hLayers(), k = cur[cur.length - 1];
+  if (k === 'pad') padClose(false);
+  else if (k === 'wr') wrClose();
+  else if (k === 'onb') closeOnb();
+  else if (k === 'sp') { if (SHEET) closeSheet(); else closePanel(); }
+}
+let hSyncT = 0;
+const hSoon = () => { clearTimeout(hSyncT); hSyncT = setTimeout(hsync, 0); };
+function hInit() {
+  try {
+    const cur = '#' + V;
+    history.replaceState({ p1: 'base' }, '', location.pathname + location.search + '#hari-ini');
+    history.pushState({ p1: 'v' }, '', '#hari-ini');
+    if (V !== 'hari-ini') history.pushState({ p1: 'v' }, '', cur);
+    H.ok = true;
+  } catch (e) { H.ok = false; return; }
+  addEventListener('popstate', e => {
+    if (H.ign > 0) { H.ign--; if (!H.ign) hFlush(); return; }
+    const s = e.state || {};
+    if (H.st.length) {
+      /* back saat ada lapisan: tutup yang paling atas (papan belum disimpan: peringatan, lalu entri dipasang lagi) */
+      H.st.pop(); H.busy = true; try { hCloseTop(); } finally { H.busy = false; }
+      hSoon(); return;
+    }
+    if (s.p1 === 'base') {
+      if (V !== 'hari-ini') { V = 'hari-ini'; render(); window.scrollTo({ top: 0 }); }
+      H.atBase = true; toast(L('Tekan kembali sekali lagi untuk keluar', 'Press back again to exit'));
+      clearTimeout(H.tm); H.tm = setTimeout(() => { if (H.atBase) { H.atBase = false; history.pushState({ p1: 'v' }, '', '#hari-ini'); } }, 2000);
+      return;
+    }
+    const v = location.hash.slice(1);
+    if (VIEWS.includes(v) && v !== V && (v === 'hari-ini' || on(v))) { V = v; render(); window.scrollTo({ top: 0 }); }
+  });
+  const mo = new MutationObserver(hSoon);
+  [document.documentElement, $('#panel'), $('#onb'), $('#pad'), $('#more'), $('#uang'), $('#hpick')].forEach(el => { if (el) mo.observe(el, { attributes: true, attributeFilter: ['hidden', 'class', 'data-sheet'] }); });
+  const w = $('#wr'); if (w) mo.observe(w, { attributes: true, attributeFilter: ['hidden'] });
+  hsync();
+}
+['click', 'keydown', 'submit'].forEach(t => document.addEventListener(t, hSoon));
+
 /* ---------- render + navigasi ---------- */
 function render() {
   if (V !== 'hari-ini' && !on(V)) { V = 'hari-ini'; setHash('hari-ini'); }
@@ -4135,7 +4213,7 @@ function refresh() {
   if (a && viewEl.contains(a) && a.matches('input, textarea') && a.value) return tick();
   render();
 }
-function go(v) { if (SHEET) closeSheet(); QCOFF = false; const toCalc = v === 'kalkulator' || v === 'hitung'; v = alias(v); if (toCalc) { V = v; KT = 'hitung'; setHash('keuangan'); render(); setPane('web'); const h = $('#hitung'); if (h) h.scrollIntoView({ block: 'start' }); return; } if (!VIEWS.includes(v) || (v !== 'hari-ini' && !on(v))) v = 'hari-ini'; V = v; if (location.hash !== '#' + v) setHash(v); render(); setPane('web'); window.scrollTo({ top: 0 }); }
+function go(v) { if (SHEET) closeSheet(); QCOFF = false; const toCalc = v === 'kalkulator' || v === 'hitung'; v = alias(v); if (toCalc) { V = v; KT = 'hitung'; if (location.hash !== '#keuangan') navPush('keuangan'); render(); setPane('web'); const h = $('#hitung'); if (h) h.scrollIntoView({ block: 'start' }); return; } if (!VIEWS.includes(v) || (v !== 'hari-ini' && !on(v))) v = 'hari-ini'; V = v; if (location.hash !== '#' + v) navPush(v); render(); setPane('web'); window.scrollTo({ top: 0 }); }
 function setPane(p) {
   if (window.matchMedia('(max-width: 860px)').matches) { $('#stage').dataset.pane = p; document.querySelectorAll('[data-pane]').forEach(b => { if (b.tagName === 'BUTTON') b.setAttribute('aria-pressed', b.dataset.pane === p); }); }
 }
@@ -4866,6 +4944,7 @@ $('#d-file').addEventListener('change', e => {
 })();
 try { if (!localStorage.getItem('p001-onb')) openOnb(); } catch (e) { /* tanpa penyimpanan: lewati panduan */ }
 trStart();
+hInit();
 })();
 </script>
 
