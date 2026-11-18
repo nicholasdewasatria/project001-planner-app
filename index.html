@@ -5,7 +5,7 @@
 <title>project001-Planner</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Planner harian: jadwal, to-do, catatan, coretan, fokus, dan keuangan.">
-<meta name="theme-color" content="#121212" data-def="#121212" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#000000" data-def="#000000" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#FFFFFF" data-def="#FFFFFF" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
@@ -1557,6 +1557,13 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
   .np .np-prog { margin-top: var(--s-xs); }
   .np .np-ctl { margin-top: 2px; }
 }
+/* v3.7 Netral/Hijau mode gelap = abu Spotify: latar hitam murni, kartu #1F1F1F (mode terang tidak berubah) */
+:root[data-pal] { --p-0: #000000; --c-card: #1F1F1F; --c-card-hi: #2A2A2A; --c-card-noir: #1F1F1F; --p-track: #333333; }
+@media (prefers-color-scheme: light) { :root[data-pal]:not([data-theme="dark"]) { --p-0: #121212; } }
+:root[data-pal][data-theme="light"] { --p-0: #121212; }
+/* kotak cari pop up: abu kartu di gelap, bukan hitam bergaris */
+@media (prefers-color-scheme: dark) { :root[data-pal]:not([data-theme="light"]) .hp-q { background: var(--c-card); border-color: transparent; } }
+:root[data-pal][data-theme="dark"] .hp-q { background: var(--c-card); border-color: transparent; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1763,13 +1770,13 @@ const MODS = [
   ['statistik', 'Statistik', 'chart', 'Grafik to-do, fokus, habit, dan pengeluaran']
 ];
 const SET_DEF = () => ({ show: Object.fromEntries(MODS.map(m => [m[0], true])), hideAmt: false, daily: { on: true, limit: 150000 }, tg: { on: false, notif: {} }, theme: 'auto', cal: { on: true, ev: true, td: true, hab: true, evMin: 10, tdMin: 0, habMin: 0 } });
-let PALK = (() => { try { const v = localStorage.getItem('p001-pal'); return ['planner', 'netral', 'hijau'].includes(v) ? v : 'netral'; } catch (e) { return 'netral'; } })();
+let PALK = (() => { try { if (localStorage.getItem('p001-pal-mig') !== '1') { localStorage.removeItem('p001-pal'); localStorage.setItem('p001-pal-mig', '1'); } const v = localStorage.getItem('p001-pal'); return ['planner', 'netral', 'hijau'].includes(v) ? v : 'netral'; } catch (e) { return 'netral'; } })();
 const applyPal = () => {
   if (PALK === 'planner') delete document.documentElement.dataset.pal; else document.documentElement.dataset.pal = PALK;
-  document.querySelectorAll('meta[name="theme-color"]').forEach(m => { const lt = /light/.test(m.media); m.dataset.def = PALK === 'planner' ? (lt ? '#F5F6F8' : '#0F1115') : (lt ? '#FFFFFF' : '#121212'); if (!document.documentElement.dataset.theme) m.content = m.dataset.def; });
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => { const lt = /light/.test(m.media); m.dataset.def = PALK === 'planner' ? (lt ? '#F5F6F8' : '#0F1115') : (lt ? '#FFFFFF' : '#000000'); if (!document.documentElement.dataset.theme) m.content = m.dataset.def; });
 };
 applyPal();
-const PALS = () => [['netral', L('Netral', 'Neutral'), ['#121212', '#2563EB']], ['planner', 'Planner', ['#2563EB', '#00E2BA']], ['hijau', L('Hijau', 'Green'), ['#121212', '#1ED760']]];
+const PALS = () => [['netral', L('Netral', 'Neutral'), ['#000000', '#2563EB']], ['planner', 'Planner', ['#2563EB', '#00E2BA']], ['hijau', L('Hijau', 'Green'), ['#000000', '#1ED760']]];
 const palSeg = cls => `<div class="seg pal-seg ${cls}" role="group" aria-label="${L('Palet warna', 'Color palette')}">${PALS().map(([k, n, c]) => `<button type="button" data-act="pal" data-k="${k}" aria-pressed="${PALK === k}"><span class="pal-dot" aria-hidden="true">${c.map(x => `<i style="background:${x}"></i>`).join('')}</span><span data-raw>${n}</span></button>`).join('')}</div>`;
 let SET = (() => { const d = SET_DEF(); try { const v = JSON.parse(localStorage.getItem('p001-set') || 'null'); if (v) return { show: { ...d.show, ...(v.show || {}) }, hideAmt: !!v.hideAmt, daily: { ...d.daily, ...(v.daily || {}) }, tg: { on: !!(v.tg && v.tg.on), notif: { ...((v.tg && v.tg.notif) || {}) } }, theme: ['dark', 'light'].includes(v.theme) ? v.theme : 'auto', cal: { ...d.cal, ...(v.cal || {}) } }; } catch (e) { /* tanpa penyimpanan */ } return d; })();
 const tgOn = () => SET.tg.on;
