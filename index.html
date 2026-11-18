@@ -1318,7 +1318,7 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 .hm > .hm-chips, .shelf > .shelf-row:not(.wrap) { width: 0; min-width: 100%; }
 
 /* ---------- v3.0 pilihan palet: planner (bawaan) / netral (ala pemutar musik, aksen biru) / hijau ---------- */
-:root { --p-acc: #2563EB; --p-acc2: #00E2BA; --p-0: #0F1115; --p-1: #2A2E37; --p-4: #F5F6F8; --p-on-acc: #F5F6F8; }
+:root { --p-acc: #2563EB; --p-acc2: #1ED760; --p-0: #0F1115; --p-1: #2A2E37; --p-4: #F5F6F8; --p-on-acc: #F5F6F8; }
 /* netral + hijau: hitam dan abu netral, kartu abu (aksen dipakai hemat) */
 :root[data-pal] { --p-0: #121212; --p-1: #2A2A2A; --p-4: #FFFFFF; --p-on-acc: #FFFFFF; --c-card: #232323; --c-card-hi: #2E2E2E; --c-dim: #B3B3B3; --c-card-noir: #232323; --c-blue-hi: #5B8DEF; --p-track: #383838; }
 @media (prefers-color-scheme: light) { :root[data-pal]:not([data-theme="dark"]) { --c-card: #EDEDED; --c-card-hi: #E1E1E1; --c-dim: #6A6A6A; --c-card-noir: #EDEDED; --c-blue-hi: #1D4FD8; --p-track: #D4D4D4; } }
@@ -1435,7 +1435,7 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 .hbd-i small { font-size: var(--t-2xs); color: var(--c-dim); }
 .hbd-i em { font-style: normal; font-size: var(--t-2xs); font-weight: 600; margin-top: 4px; color: var(--c-ink); font-variant-numeric: tabular-nums; }
 /* D. rekap Wrapped (layar penuh gaya story) */
-.wr { --wb: #0B3D35; --wf: #FFFFFF; --wd: #CFEFE8; --wa: #00E2BA; position: fixed; inset: 0; z-index: 60; background: var(--wb); color: var(--wf); display: grid; justify-items: center; }
+.wr { --wb: #0B3D35; --wf: #FFFFFF; --wd: #CFEFE8; --wa: #1ED760; position: fixed; inset: 0; z-index: 60; background: var(--wb); color: var(--wf); display: grid; justify-items: center; }
 .wr[hidden] { display: none; }
 .wr[data-s="top"] { --wb: #2E2563; --wd: #C9CCF5; }
 .wr[data-s="streak"] { --wb: #F59F00; --wf: #121212; --wd: #121212; --wa: #121212; }
@@ -1776,7 +1776,7 @@ const applyPal = () => {
   document.querySelectorAll('meta[name="theme-color"]').forEach(m => { const lt = /light/.test(m.media); m.dataset.def = PALK === 'planner' ? (lt ? '#F5F6F8' : '#0F1115') : (lt ? '#FFFFFF' : '#000000'); if (!document.documentElement.dataset.theme) m.content = m.dataset.def; });
 };
 applyPal();
-const PALS = () => [['netral', L('Netral', 'Neutral'), ['#000000', '#2563EB']], ['planner', 'Planner', ['#2563EB', '#00E2BA']], ['hijau', L('Hijau', 'Green'), ['#000000', '#1ED760']]];
+const PALS = () => [['netral', L('Netral', 'Neutral'), ['#000000', '#2563EB']], ['planner', 'Planner', ['#2563EB', '#1ED760']], ['hijau', L('Hijau', 'Green'), ['#000000', '#1ED760']]];
 const palSeg = cls => `<div class="seg pal-seg ${cls}" role="group" aria-label="${L('Palet warna', 'Color palette')}">${PALS().map(([k, n, c]) => `<button type="button" data-act="pal" data-k="${k}" aria-pressed="${PALK === k}"><span class="pal-dot" aria-hidden="true">${c.map(x => `<i style="background:${x}"></i>`).join('')}</span><span data-raw>${n}</span></button>`).join('')}</div>`;
 let SET = (() => { const d = SET_DEF(); try { const v = JSON.parse(localStorage.getItem('p001-set') || 'null'); if (v) return { show: { ...d.show, ...(v.show || {}) }, hideAmt: !!v.hideAmt, daily: { ...d.daily, ...(v.daily || {}) }, tg: { on: !!(v.tg && v.tg.on), notif: { ...((v.tg && v.tg.notif) || {}) } }, theme: ['dark', 'light'].includes(v.theme) ? v.theme : 'auto', cal: { ...d.cal, ...(v.cal || {}) } }; } catch (e) { /* tanpa penyimpanan */ } return d; })();
 const tgOn = () => SET.tg.on;
@@ -2666,7 +2666,7 @@ function vCal() {
 const PAD = { id: null, strokes: [], undo: [], redo: [], tool: 'pen', color: 'ink', size: 3, cur: null, bw: 0, bh: 0, dirty: false, warnClose: false };
 const padCv = () => $('#pad-cv');
 const isLight = () => getComputedStyle(document.body).backgroundColor.replace(/\s/g, '') !== 'rgb(2,2,2)';
-const PAL = light => { const cs = getComputedStyle(document.documentElement), g = (k, d) => cs.getPropertyValue(k).trim() || d; return { ink: light ? g('--p-0', '#0F1115') : g('--p-4', '#F5F6F8'), blue: g('--p-acc', '#2563EB'), yellow: g('--p-acc2', '#00E2BA') }; };
+const PAL = light => { const cs = getComputedStyle(document.documentElement), g = (k, d) => cs.getPropertyValue(k).trim() || d; return { ink: light ? g('--p-0', '#0F1115') : g('--p-4', '#F5F6F8'), blue: g('--p-acc', '#2563EB'), yellow: g('--p-acc2', '#1ED760') }; };
 function drawStroke(ctx, st, pal, k) {
   const p = st.pts; if (!p.length) return;
   ctx.globalCompositeOperation = st.e ? 'destination-out' : 'source-over';
