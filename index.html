@@ -1564,6 +1564,28 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 /* kotak cari pop up: abu kartu di gelap, bukan hitam bergaris */
 @media (prefers-color-scheme: dark) { :root[data-pal]:not([data-theme="light"]) .hp-q { background: var(--c-card); border-color: transparent; } }
 :root[data-pal][data-theme="dark"] .hp-q { background: var(--c-card); border-color: transparent; }
+/* v3.10 layar Fokus: latar ikut warna tugas (gaya now playing) + aksen sisa waktu (hijau > 50%, kuning, merah di ambang akhir) */
+:root { --fz-ok: #1ED760; --fz-mid: #F59F00; --fz-low: #E5484D; --fz-hot: #FF8A8E; }
+/* terang: turunan lebih gelap dari warna yang sama (color-mix 60-75% hitam) supaya >= 3:1 di latar putih */
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --fz-ok: #117A37; --fz-mid: #935F00; --fz-low: #AC363A; --fz-hot: #AC363A; } }
+:root[data-theme="light"] { --fz-ok: #117A37; --fz-mid: #935F00; --fz-low: #AC363A; --fz-hot: #AC363A; }
+:root[data-fzs="ok"] { --fz-st: var(--fz-ok); --fz-st-d: #1ED760; }
+:root[data-fzs="mid"] { --fz-st: var(--fz-mid); --fz-st-d: #F59F00; }
+:root[data-fzs="low"] { --fz-st: var(--fz-low); --fz-st-d: #E5484D; }
+/* latar halaman Fokus menggantikan --vg: warna tugas -> lebih gelap di kartu -> latar */
+:root[data-view="fokus"][data-fzs] body { background-image: linear-gradient(180deg, var(--fz-top, transparent) 0, var(--fz-ring, transparent) 150px, transparent 720px); }
+:root[data-view="fokus"] .fz-card.np { background: rgb(255 255 255 / 0.05) !important; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"])[data-view="fokus"] .fz-card.np { background: rgb(0 0 0 / 0.04) !important; } }
+:root[data-theme="light"][data-view="fokus"] .fz-card.np { background: rgb(0 0 0 / 0.04) !important; }
+/* aksen sisa waktu: strip menit, busur, bar progres (label piringan tetap warna tugas) */
+.np .vy-wrap, .np .vy-wrap.brk { --vy-on: var(--fz-st, var(--p-acc)); }
+.np-bar i { background: var(--fz-st, var(--c-ink)); }
+.mini-bar i { background: var(--fz-st-d, var(--p-4)); }
+/* 60 detik terakhir: angka merah muda, angka + busur berkedip pelan saat jalan */
+:root[data-fzh] .np-clock { color: var(--fz-hot); }
+:root[data-fzh][data-fzr] .np-clock, :root[data-fzh][data-fzr] .np .vy-arc { animation: fzBlink 1.4s ease-in-out infinite; }
+@keyframes fzBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) { :root[data-fzh][data-fzr] .np-clock, :root[data-fzh][data-fzr] .np .vy-arc { animation: none; } }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4129,6 +4151,7 @@ function vyTick() {
   document.querySelectorAll('[data-vy]').forEach(e => { e.style.setProperty('--rot', st.rot + 'deg'); e.style.setProperty('--mk', st.mk + 'deg'); });
   document.querySelectorAll('[data-vstrip]').forEach(e => e.classList.toggle('on', +e.dataset.vstrip < st.m));
   document.querySelectorAll('[data-varc]').forEach(e => e.setAttribute('stroke-dasharray', st.p.toFixed(2) + ' 100'));
+  fzTone();
 }
 RMQ.addEventListener && RMQ.addEventListener('change', () => vyTick());
 
@@ -4199,6 +4222,42 @@ function hInit() {
   hsync();
 }
 ['click', 'keydown', 'submit'].forEach(t => document.addEventListener(t, hSoon));
+
+/* ---------- v3.10 layar Fokus: latar ikut warna tugas + aksen sisa waktu ---------- */
+/* Latar: warna tugas (artPick) di atas, menggelap ke latar. Persentase campuran dihitung supaya teks tetap AA dan strip/busur >= 3:1. */
+function fzRGB(s) { s = String(s || '').trim(); if (s[0] === '#') { const h = s.length === 4 ? s.slice(1).split('').map(c => c + c).join('') : s.slice(1, 7); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); } const m = s.match(/[\d.]+/g); return m ? m.slice(0, 3).map(Number) : [0, 0, 0]; }
+function fzLum(c) { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); }
+function fzCr(a, b) { const x = fzLum(a), y = fzLum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+function fzMix(a, b, p) { return a.map((v, i) => Math.round(v * p / 100 + b[i] * (1 - p / 100))); }
+/* hijau > 50% sisa, kuning sampai ambang merah, merah = 20% terakhir atau maksimal 3 menit (yang lebih kecil) */
+function fzLevel() { return T.left > T.total / 2 ? 'ok' : T.left > Math.min(180, T.total * 0.2) ? 'mid' : 'low'; }
+function fzCol() { return T.mode !== 'fokus' ? '#5B5BD6' : artPick(T.task, 'fokus')[1]; }
+function fzTone() {
+  const R = document.documentElement, lv = fzLevel(), hot = T.left > 0 && T.left <= 60;
+  if (R.dataset.fzs !== lv) R.dataset.fzs = lv;
+  if (hot) R.dataset.fzh = '1'; else delete R.dataset.fzh;
+  if (hot && T.running) R.dataset.fzr = '1'; else delete R.dataset.fzr;
+  if (V !== 'fokus') return;
+  const cs = getComputedStyle(R), bb = getComputedStyle(document.body), q = sel => { const e = viewEl.querySelector(sel); return e ? getComputedStyle(e).color : bb.color; };
+  const col = fzCol(), base = bb.backgroundColor, ink = bb.color, lead = q('.vh .lead'), dim = q('.np-lab');
+  const sts = ['--fz-ok', '--fz-mid', '--fz-low', '--fz-hot'].map(k => cs.getPropertyValue(k));
+  const key = [col, base, ink, lead, dim, ...sts].join('|'); if (key === fzTone.key) return; fzTone.key = key;
+  const B = fzRGB(base), C = fzRGB(col), I = fzRGB(ink), Ld = fzRGB(lead), D = fzRGB(dim), ST = sts.map(fzRGB), light = fzLum(B) > 0.4;
+  /* kartu = permukaan tipis: putih 5% (gelap) / hitam 4% (terang) */
+  const card = c => light ? fzMix([0, 0, 0], c, 4) : fzMix([255, 255, 255], c, 5);
+  let pt = light ? 30 : 75, top = B;
+  for (; pt > 0; pt--) { top = fzMix(C, B, pt); if (fzCr(I, top) >= 4.6 && fzCr(Ld, top) >= 4.6) break; }
+  let pr = light ? 12 : 40, ring = B;
+  for (; pr > 0; pr--) { ring = fzMix(C, B, pr); const c = card(ring); if (fzCr(I, c) >= 4.6 && fzCr(D, c) >= 4.6 && ST.every(s => fzCr(s, c) >= 3.1)) break; }
+  if (pt <= 0) top = B; if (pr <= 0) ring = B;
+  R.style.setProperty('--fz-top', `rgb(${top.join(' ')})`); R.style.setProperty('--fz-ring', `rgb(${ring.join(' ')})`);
+}
+/* tugas diketik: label piringan + latar ikut */
+function fzRelabel() {
+  const lb = vyLabel(T.mode !== 'fokus');
+  viewEl.querySelectorAll('.vy-wrap [data-vy]').forEach(e => { e.style.setProperty('--a', fzCol()); e.style.setProperty('--ai', artInk(fzCol())); const l = e.querySelector('.vy-lab'); if (l) l.innerHTML = ico(lb.ic); });
+  fzTone();
+}
 
 /* ---------- render + navigasi ---------- */
 function render() {
@@ -4866,7 +4925,7 @@ document.addEventListener('input', e => {
   if (e.target.id === 'td-due') delete e.target.dataset.q;
   if (e.target.id === 'nq') { NQ = e.target.value; renderNoteList(); }
   if (e.target.closest('[data-form="tool"]')) calcTool();
-  if (e.target.id === 'task-in') T.task = e.target.value;
+  if (e.target.id === 'task-in') { T.task = e.target.value; fzRelabel(); }
   if (e.target.id === 'qc-in') { QTYPE = null; qcPrev(); }
   if (e.target.id === 'u-note') UM.note = e.target.value;
 });
