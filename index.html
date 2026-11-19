@@ -1595,6 +1595,8 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 .bt b { font-size: 1.1875rem; }
 /* v3.13 sidebar 9 item (Cari ditambah): muat di layar 561–940px */
 @media (min-width: 561px) and (max-width: 940px) { .nav ul { width: 100%; } .nav li { flex: 1 1 0; min-width: 0; } .nav a { min-width: 0; padding-left: 2px; padding-right: 2px; } }
+/* v3.14 ubin Cari: teks + ikon putih di semua palet/tema (gaya Spotify, keputusan Nicholas) */
+.bt { color: #FFFFFF; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2144,14 +2146,13 @@ function renderMNav() {
   el.innerHTML = `<div class="mnav-in">${main.slice(0, 2).map(a).join('')}<button type="button" class="fab" data-act="qcopen" aria-label="Tulis cepat" aria-expanded="${SHEET === 'qc'}">${ico('plus')}</button>${main.slice(2).map(a).join('')}${a('cari')}</div>`;
 }
 /* teks ubin: tinta artInk (gelap/terang) yang kontrasnya paling tinggi terhadap warna ubin */
-const btInk = c => { const lum = h => { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0); }; if (!/^#[0-9a-f]{6}$/i.test(c || '')) return ''; const l = lum(c), d = lum('#0F1115'), w = lum('#F5F6F8'); return (l + 0.05) / (d + 0.05) > (w + 0.05) / (l + 0.05) ? '#0F1115' : '#F5F6F8'; };
 /* Cari = pusat navigasi: ubin bagian (Uang paling depan) membuka halamannya, ubin kategori uang mencari transaksi */
 function srBrowse() {
   const views = [['keuangan', L('Uang', 'Money')], ['todo', 'To-do'], ['fokus', L('Fokus', 'Focus')], ['catatan', L('Catatan', 'Notes')], ['kalender', L('Kalender', 'Calendar')], ['statistik', L('Statistik', 'Stats')], ['habit', 'Habit']].filter(([v]) => on(v));
   const cats = on('keuangan') ? Object.keys(BUDGET) : [];
-  const tile = ([v, n]) => `<button type="button" class="bt" style="--a:${ARTK[v][1]};color:${btInk(ARTK[v][1])}" data-act="hmgo" data-v="${v}"><b>${n}</b>${v === 'fokus' && T.running ? `<small class="bt-clock">${ico('timer')}<span data-clock>${fmtClock(T.left)}</span></small>` : ''}${ico(ARTK[v][0])}</button>`;
+  const tile = ([v, n]) => `<button type="button" class="bt" style="--a:${ARTK[v][1]}" data-act="hmgo" data-v="${v}"><b>${n}</b>${v === 'fokus' && T.running ? `<small class="bt-clock">${ico('timer')}<span data-clock>${fmtClock(T.left)}</span></small>` : ''}${ico(ARTK[v][0])}</button>`;
   return (views.length ? `<h2 class="sr-h">${L('Jelajahi', 'Browse all')}</h2><div class="sr-grid">${views.map(tile).join('')}</div>` : '')
-    + (cats.length ? `<h2 class="sr-h">${L('Kategori uang', 'Money categories')}</h2><div class="sr-grid">${cats.map(c => { const [i, col] = artPick(c, 'uang'); return `<button type="button" class="bt" style="--a:${col};color:${btInk(col)}" data-act="srq" data-q="${esc(catName(c))}"><b>${esc(c)}</b>${ico(i)}</button>`; }).join('')}</div>` : '');
+    + (cats.length ? `<h2 class="sr-h">${L('Kategori uang', 'Money categories')}</h2><div class="sr-grid">${cats.map(c => { const [i, col] = artPick(c, 'uang'); return `<button type="button" class="bt" style="--a:${col}" data-act="srq" data-q="${esc(catName(c))}"><b>${esc(c)}</b>${ico(i)}</button>`; }).join('')}</div>` : '');
 }
 function quick(text, force) { const t = text.trim(); if (!t) return; QCI = chat.length; handle(t, 'Web', force); if (chat[QCI]) chat[QCI].web = true; renderChat(); }
 
