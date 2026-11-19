@@ -1586,6 +1586,9 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 :root[data-fzh][data-fzr] .np-clock, :root[data-fzh][data-fzr] .np .vy-arc { animation: fzBlink 1.4s ease-in-out infinite; }
 @keyframes fzBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 @media (prefers-reduced-motion: reduce) { :root[data-fzh][data-fzr] .np-clock, :root[data-fzh][data-fzr] .np .vy-arc { animation: none; } }
+/* v3.11 kolom budget muat 10.000.000 setelah angka berpemisah */
+.bset { grid-template-columns: minmax(0, 1fr) 7rem auto auto; }
+.bset .inp { padding-inline: .625rem; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2611,7 +2614,7 @@ function dailyBody(list) {
     <div class="bar ${cls || 'safe'}" style="margin-top:var(--s-md)"><i style="width:${Math.min(100, r * 100)}%"></i></div>
     <p class="f-cap" style="margin-top:var(--s-xs)">Terpakai ${rp(used)} dari ${rp(lim)}${r >= 0.85 && r <= 1 ? ' · <b style="color:var(--c-warn);font-weight:500">hampir habis</b>' : ''} · tagihan tidak dihitung</p>
     ${list ? `<ul class="rows" style="margin-top:var(--s-sm)">${items.map(t => `<li class="row"><span class="tm" style="min-width:3.5rem">${hm(t.at)}</span><div><span class="t1">${esc(t.note)}</span><span class="t2">${t.cat}</span></div><b class="num" style="font-weight:500;white-space:nowrap">${rp(t.amt)}</b></li>`).join('') || '<li><div class="empty"><b>Belum ada pengeluaran hari ini</b>Ketik di Tulis cepat: makan 35rb.</div></li>'}</ul>
-    <form class="inl" data-form="limit" style="margin-top:var(--s-md)"><label class="sr" for="lim-in">Batas harian</label><input class="inp num" id="lim-in" value="${SET.hideAmt ? '' : Math.round(lim / 1000) + 'rb'}" placeholder="150rb" autocomplete="off"><button class="btn btn-quiet btn-sm">Ubah batas</button></form>
+    <form class="inl" data-form="limit" style="margin-top:var(--s-md)"><label class="sr" for="lim-in">Batas harian</label><input class="inp num" id="lim-in" data-money inputmode="numeric" value="${mVal(lim)}" placeholder="${mFmt(150000)}" autocomplete="off"><button class="btn btn-quiet btn-sm">Ubah batas</button></form>
     <p class="hint" style="margin-top:var(--s-xs)">Saran dari sisa budget: ${rp(limSuggest())} per hari. <button class="lnk small" data-act="limsug">Pakai saran</button></p>` : ''}`;
 }
 function budgetRow(k) {
@@ -2904,7 +2907,7 @@ function vMoney() {
   </div></section>`;
   const form = folder('Catat', `<form class="form" data-form="tx">
     <div class="seg" role="group" aria-label="Jenis"><button type="button" data-act="txtype" data-t="out" aria-pressed="${TXT === 'out'}">Keluar</button><button type="button" data-act="txtype" data-t="in" aria-pressed="${TXT === 'in'}">Masuk</button></div>
-    <div class="grid2f"><div class="field"><label class="lab" for="tx-amt">Jumlah <small>boleh 35rb, 1,5jt</small></label><input class="inp num" id="tx-amt" placeholder="35rb" autocomplete="off" inputmode="text"></div>
+    <div class="grid2f"><div class="field"><label class="lab" for="tx-amt">Jumlah <small>boleh 35rb, 1,5jt</small></label><input class="inp num" id="tx-amt" data-money placeholder="35rb" autocomplete="off" inputmode="text"></div>
     <div class="field"><label class="lab" for="tx-note">Catatan</label><input class="inp" id="tx-note" placeholder="Nasi padang" autocomplete="off"></div></div>
     ${TXT === 'out' ? `<div class="field"><span class="lab">Kategori</span><div class="chips">${[...Object.keys(BUDGET), 'Lainnya'].map(c => `<button type="button" class="chip" data-act="txcat" data-c="${c}" aria-pressed="${TXC === c}">${c}</button>`).join('')}</div></div>` : ''}
     <div class="acts"><button class="btn btn-primary">Simpan ke Sheets</button><span class="hint" id="tx-hint"></span></div></form>`);
@@ -2940,7 +2943,7 @@ function vCalc() {
 let CM = 'flat';
 const TOOLV = {};
 function toolForm(k, fields, extra = '') {
-  return `<div class="calc-wrap">${folder({ cicilan: 'Cicilan', bagi: 'Bagi tagihan', persen: 'Persen' }[k], `<form class="form" data-form="tool" data-k="${k}">${fields.map(([id, l, d]) => `<div class="field"><label class="lab" for="${id}">${l}</label><input class="inp num" id="${id}" value="${esc(TOOLV[id] ?? d)}" autocomplete="off"></div>`).join('')}${extra}</form>`)}
+  return `<div class="calc-wrap">${folder({ cicilan: 'Cicilan', bagi: 'Bagi tagihan', persen: 'Persen' }[k], `<form class="form" data-form="tool" data-k="${k}">${fields.map(([id, l, d]) => `<div class="field"><label class="lab" for="${id}">${l}</label><input class="inp num" id="${id}"${['c-p', 'b-t', 'p-a'].includes(id) ? ' data-money' : ''} value="${esc(TOOLV[id] ?? d)}" autocomplete="off"></div>`).join('')}${extra}</form>`)}
   ${folder('Hasil', `<div class="out" id="t-out" style="margin-top:0"></div>`)}</div>`;
 }
 function calcTool() {
@@ -3494,12 +3497,12 @@ function tplApply() {
   T0.fd.forEach(n => { if (!fds.some(f => f.name.toLowerCase() === n.toLowerCase())) { const id = 'f' + nid(); fds.push({ id, name: n }); OB.addedFd.push(id); } });
 }
 const tplDoneHTML = () => `<div class="set">${ico(OB.T.ic)}<div><b>${L('Template', 'Template')}: ${esc(OB.T.n)}</b><small>${L('Folder catatan', 'Note folders')}: ${OB.T.fd.map(esc).join(', ')}</small></div><span></span></div>`;
-const tplIncHTML = () => OB && OB.T ? `<div class="field tp-inc"><label class="lab" for="ob-inc">${L('Pemasukan per bulan', 'Monthly income')} <small>${L('budget dan batas harian dihitung otomatis dari sini', 'budgets and the daily limit are calculated from this')}</small></label><input class="inp num" id="ob-inc" value="${SET.hideAmt ? '' : shortN(OB.inc)}" placeholder="${L('8jt', '8M')}" autocomplete="off" inputmode="decimal"></div>` : '';
+const tplIncHTML = () => OB && OB.T ? `<div class="field tp-inc"><label class="lab" for="ob-inc">${L('Pemasukan per bulan', 'Monthly income')} <small>${L('budget dan batas harian dihitung otomatis dari sini', 'budgets and the daily limit are calculated from this')}</small></label><input class="inp num" id="ob-inc" data-money value="${mVal(OB.inc)}" placeholder="${mFmt(8000000)}" autocomplete="off" inputmode="numeric"></div>` : '';
 function tplIncome() {
   const n = numOf($('#ob-inc').value); if (!(n > 0) || !OB || !OB.T) return;
   OB.inc = n; tplBudget(n);
-  document.querySelectorAll('#onb [data-bk]').forEach(i => { if (BUDGET[i.dataset.bk] != null) i.value = shortN(BUDGET[i.dataset.bk]); });
-  const lim = $('#ob-lim'); if (lim) lim.value = shortN(SET.daily.limit);
+  document.querySelectorAll('#onb [data-bk]').forEach(i => { if (BUDGET[i.dataset.bk] != null) i.value = mFmt(BUDGET[i.dataset.bk]); });
+  const lim = $('#ob-lim'); if (lim) lim.value = mFmt(SET.daily.limit);
 }
 document.addEventListener('input', e => { if (e.target && e.target.id === 'ob-inc') tplIncome(); });
 function tplHabHTML() {
@@ -4259,6 +4262,70 @@ function fzRelabel() {
   fzTone();
 }
 
+/* ---------- v3.11 input uang: pemisah ribuan otomatis ---------- */
+/* Pola wajib untuk kolom nominal: <input class="inp num" data-money ...>. Satu listener untuk semua.
+   - isi murni angka/pemisah → dikelompokkan saat diketik (ID 1.500.000, EN 1,500,000), kursor tetap di digit yang sama;
+   - ada huruf/operator (150rb, 1,5jt, 15jt/12) → dibiarkan, dibaca parser lama (numOf/calc);
+   - backspace/delete pada pemisah menghapus digit di sebelahnya; tempel "Rp 1.250.000" → 1.250.000.
+   Nilai disimpan lewat numOf(), yang sudah membuang pemisah sesuai bahasa. */
+function mSep() { return LANG === 'en' ? ',' : '.'; }
+function mGroup(d) { return String(d).replace(/\B(?=(\d{3})+(?!\d))/g, mSep()); }
+function mFmt(n) { return mGroup(String(Math.round(Math.abs(+n || 0)))); }
+function mVal(n) { return SET.hideAmt || n == null || !isFinite(+n) ? '' : mFmt(n); }
+function mIsFmt(p) {
+  if (p === '') return true;
+  const d = p.split(mSep()).join('');
+  return /^\d+$/.test(d) && mGroup(d.replace(/^0+(?=\d)/, '')) === p;
+}
+/* isi kolom → deretan digit, atau null bila harus dibiarkan apa adanya */
+function mDigits(v, prev, paste) {
+  const sep = mSep(), rp = /^\s*rp\.?\s*/i.test(v);
+  const s = v.replace(/^\s*rp\.?\s*/i, '').replace(/\s+/g, '');
+  if (s === '') return '';
+  if (/^\d+$/.test(s)) return s;
+  if (/[.,]$/.test(s)) return null;                       /* "1." / "1," = mungkin desimal/singkatan */
+  const own = new RegExp('^\\d+(\\' + sep + '\\d+)*$');
+  if (own.test(s)) {
+    const g = s.split(sep);
+    if ((!paste && mIsFmt(prev)) || (/^\d{1,3}$/.test(g[0]) && g.slice(1).every(x => x.length === 3))) return g.join('');
+    return null;                                          /* "1.5" di ID = desimal, biarkan */
+  }
+  let m = s.match(/^\d{1,3}([.,])\d{3}(?:\1\d{3})+$/);  /* ≥2 kelompok, pemisah bahasa lain */
+  if (m) return s.replace(/[.,]/g, '');
+  if (paste || rp) {
+    m = s.match(/^(\d{1,3}(?:([.,])\d{3})+)([.,])\d{1,2}$/);  /* "1.250.000,00" */
+    if (m && m[2] !== m[3]) return m[1].replace(/[.,]/g, '');
+    if (rp && /^\d{1,3}(\.\d{3})+$/.test(s)) return s.replace(/\./g, '');  /* "Rp 1.250" */
+  }
+  return null;
+}
+function moneyInput(el, e) {
+  const sep = mSep(), prev = el._mv != null ? el._mv : el.defaultValue;
+  let v = el.value, c = el.selectionStart == null ? v.length : el.selectionStart;
+  const it = (e && e.inputType) || '', paste = /paste|drop/i.test(it);
+  /* pemisah terhapus → hapus digit di sebelahnya */
+  if (mIsFmt(prev) && v.length === prev.length - 1) {
+    let i = 0; while (i < v.length && v[i] === prev[i]) i++;
+    if (prev[i] === sep && prev.slice(0, i) + prev.slice(i + 1) === v) {
+      if (it === 'deleteContentForward') { if (/\d/.test(v[i] || '')) v = v.slice(0, i) + v.slice(i + 1); c = i; }
+      else if (i > 0) { v = v.slice(0, i - 1) + v.slice(i); c = i - 1; }
+    }
+  }
+  const d0 = mDigits(v, prev, paste);
+  if (d0 == null) { if (v !== el.value) el.value = v; el._mv = el.value; return; }
+  const before = (v.slice(0, c).match(/\d/g) || []).length;
+  const lz = (d0.match(/^0+(?=\d)/) || [''])[0].length;
+  const d = d0.slice(lz, lz + 15), out = mGroup(d);
+  let n = Math.min(Math.max(0, before - lz), d.length), pos = 0;
+  if (n > 0) { for (let k = 0; k < out.length; k++) if (/\d/.test(out[k]) && --n === 0) { pos = k + 1; break; } }
+  if (out !== el.value) el.value = out;
+  if (document.activeElement === el) try { el.setSelectionRange(pos, pos); } catch (er) { }
+  el._mv = out;
+}
+document.addEventListener('input', e => { const t = e.target; if (t && t.matches && t.matches('[data-money]') && !e.isComposing) moneyInput(t, e); }, true);
+document.addEventListener('compositionend', e => { const t = e.target; if (t && t.matches && t.matches('[data-money]')) { moneyInput(t, null); t.dispatchEvent(new Event('input', { bubbles: true })); } }, true);
+document.addEventListener('focusin', e => { const t = e.target; if (t && t.matches && t.matches('[data-money]')) t._mv = t.value; }, true);
+
 /* ---------- render + navigasi ---------- */
 function render() {
   if (V !== 'hari-ini' && !on(V)) { V = 'hari-ini'; setHash('hari-ini'); }
@@ -4334,9 +4401,9 @@ function rutHTML() {
 }
 function budHTML() {
   const keys = Object.keys(BUDGET), tot = keys.reduce((a, k) => a + BUDGET[k], 0);
-  return backSet + `<form class="form" data-form="bud" style="gap:var(--s-lg)"><section class="pn-sec"><h3>Budget per bulan</h3><div>${keys.map(k => `<div class="bset"><div><b title="${esc(k)}">${esc(k)}</b><small>Terpakai ${rpS(spent(k))}</small></div><label class="sr" for="b-${esc(k)}">Budget ${esc(k)}</label><input class="inp num" id="b-${esc(k)}" data-bk="${esc(k)}" value="${SET.hideAmt ? '' : shortN(BUDGET[k])}" placeholder="${SET.hideAmt ? '••••' : '0'}" autocomplete="off">${sw('bdaily', esc(k), inDaily(k), 'Hitung ' + esc(k) + ' di batas harian')}<button type="button" class="iconbtn" data-act="buddel" data-k="${esc(k)}" aria-label="Hapus kategori ${esc(k)}">${ico('x')}</button></div>`).join('') || '<div class="empty"><b>Belum ada kategori</b>Tambahkan di bawah.</div>'}</div>
+  return backSet + `<form class="form" data-form="bud" style="gap:var(--s-lg)"><section class="pn-sec"><h3>Budget per bulan</h3><div>${keys.map(k => `<div class="bset"><div><b title="${esc(k)}">${esc(k)}</b><small>Terpakai ${rpS(spent(k))}</small></div><label class="sr" for="b-${esc(k)}">Budget ${esc(k)}</label><input class="inp num" id="b-${esc(k)}" data-bk="${esc(k)}" data-money inputmode="numeric" value="${mVal(BUDGET[k])}" placeholder="${SET.hideAmt ? '••••' : '0'}" autocomplete="off">${sw('bdaily', esc(k), inDaily(k), 'Hitung ' + esc(k) + ' di batas harian')}<button type="button" class="iconbtn" data-act="buddel" data-k="${esc(k)}" aria-label="Hapus kategori ${esc(k)}">${ico('x')}</button></div>`).join('') || '<div class="empty"><b>Belum ada kategori</b>Tambahkan di bawah.</div>'}</div>
     <p class="hint">Saklar biru = ikut dihitung di batas harian. Tagihan biasanya dimatikan.</p></section>
-    <section class="pn-sec"><h3>Tambah kategori</h3><div class="grid2f"><div class="field"><label class="lab" for="nb-name">Nama</label><input class="inp" id="nb-name" placeholder="Nama kategori baru" autocomplete="off"></div><div class="field"><label class="lab" for="nb-amt">Budget <small>per bulan</small></label><input class="inp num" id="nb-amt" placeholder="300rb" autocomplete="off"></div></div></section>
+    <section class="pn-sec"><h3>Tambah kategori</h3><div class="grid2f"><div class="field"><label class="lab" for="nb-name">Nama</label><input class="inp" id="nb-name" placeholder="Nama kategori baru" autocomplete="off"></div><div class="field"><label class="lab" for="nb-amt">Budget <small>per bulan</small></label><input class="inp num" id="nb-amt" data-money inputmode="numeric" placeholder="${mFmt(300000)}" autocomplete="off"></div></div></section>
     <div class="acts"><button class="btn btn-primary btn-sm">Simpan budget</button><span class="hint">Total ${rp(tot)} per bulan</span></div></form>
     <p class="hint">Disimpan di Google Sheets › Budget. Kalau nama kategori muncul di Tulis cepat (misalnya "kesehatan 120rb vitamin"), transaksi otomatis masuk ke kategori itu.</p>`;
 }
@@ -4363,7 +4430,7 @@ function settingsHTML() {
   <section class="pn-sec"><h3>Bagian yang ditampilkan</h3><div>${MODS.map(([k, n, ic, d]) => `<div class="set">${ico(ic)}<div><b>${n}</b><small>${d}</small></div>${sw('mod', k, on(k), 'Tampilkan ' + n)}</div>`).join('')}</div><p class="hint">Bagian yang disembunyikan hilang dari menu, Hari ini, contoh Tulis cepat, dan ringkasan. Datanya tetap ada dan tetap bisa dicatat.</p></section>
   <section class="pn-sec"><h3>Privasi</h3><div class="set">${ico(SET.hideAmt ? 'eyeoff' : 'eye')}<div><b>Sembunyikan angka uang</b><small>Saldo, budget, dan transaksi jadi Rp ••••••, juga di hasil Tulis cepat dan pesan Telegram. Kalkulator tidak ikut.</small></div>${sw('eye', '', SET.hideAmt, 'Sembunyikan angka uang')}</div></section>
   <section class="pn-sec"><h3>Batas pengeluaran harian</h3><div class="set">${ico('wallet')}<div><b>Aktifkan batas harian</b><small>Ada peringatan saat jatah hampir habis atau terlewati</small></div>${sw('daily', '', SET.daily.on, 'Aktifkan batas harian')}</div>
-  ${SET.daily.on ? `<form class="form" data-form="limit"><div class="field"><label class="lab" for="lim-set">Maksimal per hari <small>boleh 150rb</small></label><div class="inl"><input class="inp num" id="lim-set" value="${SET.hideAmt ? '' : Math.round(SET.daily.limit / 1000) + 'rb'}" placeholder="150rb" autocomplete="off"><button class="btn btn-quiet btn-sm">Simpan</button></div></div></form>
+  ${SET.daily.on ? `<form class="form" data-form="limit"><div class="field"><label class="lab" for="lim-set">Maksimal per hari <small>${L('mis. ', 'e.g. ') + mFmt(150000)}</small></label><div class="inl"><input class="inp num" id="lim-set" data-money inputmode="numeric" value="${mVal(SET.daily.limit)}" placeholder="${mFmt(150000)}" autocomplete="off"><button class="btn btn-quiet btn-sm">Simpan</button></div></div></form>
   <p class="hint">Saran: sisa budget (tanpa tagihan) dibagi ${daysLeft()} hari = ${rp(limSuggest())} per hari. <button class="lnk small" data-act="limsug">Pakai saran</button><br>Lewat Tulis cepat juga bisa: <code>/batas 150rb</code> atau <code>/batas mati</code>.</p>` : ''}</section>`;
 }
 function openPanel(title, html, mode) {
@@ -4409,8 +4476,8 @@ function renderOnb() {
     body = `<div>${MODS.map(([mk, n, ic, d]) => `<div class="set">${ico(ic)}<div><b>${n}</b><small>${d}</small></div>${sw('mod', mk, on(mk), 'Pakai ' + n)}</div>`).join('')}</div><p class="hint">Bisa diubah kapan saja di Pengaturan.</p>`;
   } else if (k === 'uang') {
     title = 'Keuangan';
-    body = tplIncHTML() + `<div class="field"><label class="lab" for="ob-lim">Batas belanja per hari <small>tagihan tidak dihitung</small></label><input class="inp num" id="ob-lim" value="${SET.daily.on && !SET.hideAmt ? shortN(SET.daily.limit) : ''}" placeholder="150rb, kosongkan kalau tidak perlu" autocomplete="off"></div>
-      <div class="field"><span class="lab">Budget per bulan</span><div class="grid2f">${Object.keys(BUDGET).map(c => `<div class="field"><label class="lab" for="ob-b-${esc(c)}" style="font-weight:400;font-size:var(--t-xs)">${esc(c)}</label><input class="inp num" id="ob-b-${esc(c)}" data-bk="${esc(c)}" value="${SET.hideAmt ? '' : shortN(BUDGET[c])}" autocomplete="off"></div>`).join('')}</div></div>
+    body = tplIncHTML() + `<div class="field"><label class="lab" for="ob-lim">Batas belanja per hari <small>tagihan tidak dihitung</small></label><input class="inp num" id="ob-lim" data-money inputmode="numeric" value="${SET.daily.on && !SET.hideAmt ? mFmt(SET.daily.limit) : ''}" placeholder="${mFmt(150000) + L(', kosongkan kalau tidak perlu', ', leave empty if not needed')}" autocomplete="off"></div>
+      <div class="field"><span class="lab">Budget per bulan</span><div class="grid2f">${Object.keys(BUDGET).map(c => `<div class="field"><label class="lab" for="ob-b-${esc(c)}" style="font-weight:400;font-size:var(--t-xs)">${esc(c)}</label><input class="inp num" id="ob-b-${esc(c)}" data-bk="${esc(c)}" data-money inputmode="numeric" value="${mVal(BUDGET[c])}" autocomplete="off"></div>`).join('')}</div></div>
       <p class="hint">Kategori bisa ditambah atau dihapus nanti di Keuangan › Atur budget.</p>`;
   } else if (k === 'tpl') {
     title = L('Pilih template', 'Pick a template');
