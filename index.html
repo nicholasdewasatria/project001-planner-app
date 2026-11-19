@@ -2235,7 +2235,7 @@ function uSave() {
   const out = UM.type === 'out', cat = out ? UM.cat : 'Pemasukan';
   const tx = { id: nid(), at: new Date(), type: out ? 'out' : 'in', cat, amt: n, note: cap(UM.note.trim() || cat), src: 'Web' };
   S.tx.push(tx); UM.amt = ''; UM.note = ''; closeSheet(); refresh();
-  toast(`Tercatat ${rp(n)} · ${out ? cat : 'masuk'}`);
+  toast(L('Tercatat ', 'Logged ') + `${rp(n)} · ${out ? cat : L('masuk', 'income')}`);
 }
 function handle(text, src = 'Telegram', force = null) {
   const t = text.trim(); if (!t) return;
@@ -2349,7 +2349,7 @@ function addTx(t, amt) {
   if (c.type === 'out' && BUDGET[c.cat]) { const left = BUDGET[c.cat] - spent(c.cat); extra = `<br>Sisa budget ${c.cat.toLowerCase()}: <b>${rp(left)}</b>${left < BUDGET[c.cat] * 0.15 ? ' (hampir habis)' : ''}`; }
   if (c.type === 'out' && inDaily(c.cat) && SET.daily.on) { const left = SET.daily.limit - todayOut(); extra += left >= 0 ? `<br>Jatah hari ini: sisa <b>${rp(left)}</b> dari ${rp(SET.daily.limit)}${left < SET.daily.limit * 0.15 ? ' · hampir habis' : ''}` : `<br><b>Batas harian terlewati ${rp(-left)}</b> (batas ${rp(SET.daily.limit)}).`; }
   extra += hiddenNote('keuangan', 'Keuangan');
-  botSay(`Tercatat: ${c.type === 'in' ? 'masuk' : c.cat} <b>${rp(amt.n)}</b> (${esc(note)}).<br>Disimpan ke Sheets › Transaksi.${extra}`, [[{ t: 'Ganti kategori', a: 'txcat:' + tx.id }, { t: 'Batalkan', a: 'deltx:' + tx.id }]]);
+  botSay(`Tercatat: ${c.type === 'in' ? L('masuk', 'income') : c.cat} <b>${rp(amt.n)}</b> (${esc(note)}).<br>Disimpan ke Sheets › Transaksi.${extra}`, [[{ t: 'Ganti kategori', a: 'txcat:' + tx.id }, { t: 'Batalkan', a: 'deltx:' + tx.id }]]);
   toast('Transaksi masuk ke Google Sheets');
 }
 function budgetReply(l) {
@@ -4823,7 +4823,7 @@ document.addEventListener('click', e => {
   if (act === 'calsw') { const k = a.dataset.k; SET.cal[k] = !SET.cal[k]; if (k === 'on' && SET.cal.on) G.calKey = null; applySet(selOf(a)); if (gOn()) gQueue(); return; }
   if (act === 'calmin') { SET.cal[a.dataset.k] = +a.dataset.m; applySet(`#panel [data-act="calmin"][data-k="${a.dataset.k}"][data-m="${a.dataset.m}"]`); if (gOn()) gQueue(); return; }
   if (act === 'daily') { const s = selOf(a); SET.daily.on = !SET.daily.on; applySet(s); return; }
-  if (act === 'limsug') { SET.daily = { on: true, limit: limSuggest() }; applySet(); toast('Batas harian ' + rp(SET.daily.limit)); return; }
+  if (act === 'limsug') { SET.daily = { on: true, limit: limSuggest() }; applySet(); toast(L('Batas harian ', 'Daily limit ') + rp(SET.daily.limit)); return; }
   if (act === 'toggle') { const t = S.todos.find(x => x.id === id); if (t) { t.done = !t.done; t.doneAt = t.done ? new Date() : null; if (PANEL === 'td') closePanel(); render(); if (t.done) toast(L('To-do selesai', 'To-do done')); const b = document.querySelector(`#view [data-act="toggle"][data-id="${id}"]`); if (b) b.focus(); } return; }
   if (act === 'tdf') { TDF = a.dataset.k; TDALL = false; render(); const b = document.querySelector(`#view [data-act="tdf"][data-k="${TDF}"]`); if (b) b.focus(); return; }
   if (act === 'tdall') { TDALL = !TDALL; render(); return; }
@@ -4963,7 +4963,7 @@ document.addEventListener('submit', e => {
     S.events.push({ id: nid(), title: w.title, start, end: new Date(start.getTime() + w.dur * 60000), cal: 'Life OS' });
     i.value = ''; render(); toast(`Masuk Google Calendar: ${dayFull(start)} ${hm(start)}`); return;
   }
-  if (kind === 'limit') { const i = f.querySelector('input'), n = numOf(i.value); if (!(n > 0)) { i.focus(); toast('Isi batas harian, misalnya 150rb'); return; } SET.daily = { on: true, limit: n }; applySet(); toast('Batas harian ' + rp(n)); return; }
+  if (kind === 'limit') { const i = f.querySelector('input'), n = numOf(i.value); if (!(n > 0)) { i.focus(); toast('Isi batas harian, misalnya 150rb'); return; } SET.daily = { on: true, limit: n }; applySet(); toast(L('Batas harian ', 'Daily limit ') + rp(n)); return; }
   if (kind === 'todo') { const i = $('#todo-in'), v = i.value.trim(); if (!v) return; const w = parseWhen(v); S.todos.push({ id: nid(), text: w ? w.title : cap(v), due: w ? w.date : null, done: false, src: 'Web' }); i.value = ''; render(); toast('To-do ditambahkan'); }
   if (kind === 'nedit') {
     const n = S.notes.find(x => x.id === +f.dataset.id); if (!n) return;
@@ -4985,7 +4985,7 @@ document.addEventListener('submit', e => {
     const n = numOf($('#tx-amt').value), note = $('#tx-note').value.trim();
     if (!(n > 0)) { $('#tx-hint').textContent = 'Isi jumlah dulu, misalnya 35rb.'; $('#tx-amt').focus(); return; }
     S.tx.push({ id: nid(), at: new Date(), type: TXT, cat: TXT === 'in' ? 'Pemasukan' : TXC, amt: n, note: cap(note || (TXT === 'in' ? 'Pemasukan' : TXC)), src: 'Web' });
-    render(); toast(`${rp(n)} tersimpan ke Sheets`);
+    render(); toast(rp(n) + L(' tersimpan ke Sheets', ' saved to Sheets'));
   }
 });
 document.addEventListener('input', e => {
