@@ -1589,6 +1589,12 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 /* v3.11 kolom budget muat 10.000.000 setelah angka berpemisah */
 .bset { grid-template-columns: minmax(0, 1fr) 7rem auto auto; }
 .bset .inp { padding-inline: .625rem; }
+/* v3.13 Cari = pusat navigasi: badge waktu timer di ubin Fokus */
+.bt .bt-clock { position: absolute; left: 12px; bottom: 12px; z-index: 1; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px 3px 6px; border-radius: 999px; background: var(--p-0); color: var(--p-4); font-size: var(--t-2xs); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.bt .bt-clock .ic { position: static; width: 14px; height: 14px; transform: none; opacity: 1; stroke-width: 2; }
+.bt b { font-size: 1.1875rem; }
+/* v3.13 sidebar 9 item (Cari ditambah): muat di layar 561–940px */
+@media (min-width: 561px) and (max-width: 940px) { .nav ul { width: 100%; } .nav li { flex: 1 1 0; min-width: 0; } .nav a { min-width: 0; padding-left: 2px; padding-right: 2px; } }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1673,7 +1679,6 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
     </div>
     <div class="top-r">
       <button class="iconbtn gbtn" type="button" id="gbtn" data-act="gpanel" data-st="off" aria-label="Akun Google" hidden><svg class="ic"><use href="#i-cloud"/></svg></button>
-      <button class="iconbtn" type="button" id="sr-btn" data-go="cari" aria-label="Cari"><svg class="ic"><use href="#i-search"/></svg></button>
       <button class="iconbtn" type="button" id="eye" data-act="eye" aria-pressed="false" aria-label="Sembunyikan angka uang"></button>
       <button class="iconbtn" type="button" id="set-btn" data-act="settings" aria-label="Pengaturan"><svg class="ic"><use href="#i-sliders"/></svg></button>
     </div>
@@ -1708,7 +1713,8 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
       <div id="view"></div>
       <nav class="nav" aria-label="Menu">
         <ul>
-          <li><a href="#hari-ini" data-v="hari-ini"><svg class="ic"><use href="#i-sun"/></svg>Home</a></li>
+          <li><a href="#hari-ini" data-v="hari-ini"><svg class="ic"><use href="#i-home"/></svg>Home</a></li>
+          <li><a href="#cari" data-v="cari"><svg class="ic"><use href="#i-search"/></svg>Cari</a></li>
           <li><a href="#kalender" data-v="kalender"><svg class="ic"><use href="#i-month"/></svg>Kalender</a></li>
           <li><a href="#todo" data-v="todo"><svg class="ic"><use href="#i-check"/></svg>To-do</a></li>
           <li><a href="#catatan" data-v="catatan"><svg class="ic"><use href="#i-note"/></svg>Catatan</a></li>
@@ -1726,7 +1732,6 @@ html[data-view="catatan"] { --vg: #F2762E48; } html[data-view="kalender"] { --vg
 
 <div class="scrim" id="scrim"></div>
 <div class="scrim" id="sscrim"></div>
-<div class="sheet" id="more" role="dialog" aria-modal="true" aria-label="Menu lainnya" hidden></div>
 <div class="usheet" id="uang" role="dialog" aria-modal="true" aria-label="Catat uang" hidden></div>
 <div class="sheet hpick" id="hpick" role="dialog" aria-modal="true" aria-labelledby="hp-t" hidden></div>
 <aside class="panel" id="panel" aria-labelledby="panel-t" aria-hidden="true">
@@ -2118,37 +2123,35 @@ function openSheet(k) {
   if (PANEL) closePanel();
   SHEET = k; document.documentElement.dataset.sheet = k; $('#sscrim').classList.add('open');
   if (k === 'qc') { QCTX = V === 'todo' && on('todo') ? 'todo' : V === 'catatan' && on('catatan') ? 'note' : null; QCI = null; renderQC(); setQcPh(); setTimeout(() => $('#qc-in').focus(), 60); }
-  if (k === 'more') { renderMore(); $('#more').hidden = false; const b = $('#more .iconbtn'); if (b) b.focus(); }
   if (k === 'uang') { renderUang(); $('#uang').hidden = false; const b = $('#uang .u-pad button'); if (b) b.focus(); }
   if (k === 'qc') qcPrev();
   renderMNav();
 }
 function closeSheet() {
   const was = SHEET; if (!was) return;
-  SHEET = ''; QCTX = null; QTYPE = null; delete document.documentElement.dataset.sheet; $('#sscrim').classList.remove('open'); $('#more').hidden = true; $('#uang').hidden = true; $('#hpick').hidden = true; setQcPh(); renderMNav();
+  SHEET = ''; QCTX = null; QTYPE = null; delete document.documentElement.dataset.sheet; $('#sscrim').classList.remove('open'); $('#uang').hidden = true; $('#hpick').hidden = true; setQcPh(); renderMNav();
   if (was === 'hpick') { if (!HPKEEP) hpBack(); return; }
-  const b = document.querySelector(was === 'qc' ? '#mnav .fab' : '#mnav [data-act="more"]'); if (b && isSm()) b.focus();
+  const b = was === 'qc' && $('#mnav .fab'); if (b && isSm()) b.focus();
 }
+/* ---------- v3.13 menu bawah: Search jadi tab, lembar More dihapus (Pengaturan dari header) ---------- */
 const MV = { cari: [L('Cari', 'Search'), 'search'], 'hari-ini': ['Home', 'home'], todo: ['To-do', 'check'], keuangan: ['Uang', 'wallet'], kalender: ['Kalender', 'month'], catatan: ['Catatan', 'note'], habit: ['Habit', 'habit'], fokus: ['Fokus', 'timer'], statistik: ['Statistik', 'chart'] };
-function mnavSplit() { const p = (on('habit') ? ['hari-ini', 'todo', 'habit', 'keuangan', 'kalender', 'catatan', 'fokus', 'statistik', 'cari'] : ['hari-ini', 'todo', 'keuangan', 'kalender', 'catatan', 'habit', 'fokus', 'statistik', 'cari']).filter(v => v === 'hari-ini' || on(v)); return { main: p.slice(0, 3), rest: p.slice(3) }; }
+/* 3 slot bagian (Home + 2 bagian aktif berikutnya) + tab Cari di ujung kanan */
+function mnavSplit() { const p = (on('habit') ? ['hari-ini', 'todo', 'habit', 'keuangan', 'kalender', 'catatan', 'fokus', 'statistik'] : ['hari-ini', 'todo', 'keuangan', 'kalender', 'catatan', 'habit', 'fokus', 'statistik']).filter(v => v === 'hari-ini' || on(v)); return { main: p.slice(0, 3), rest: p.slice(3) }; }
 function renderMNav() {
   const el = $('#mnav'); if (!el) return;
-  const { main, rest } = mnavSplit();
+  const { main } = mnavSplit();
   const a = v => `<a href="#${v}" data-v="${v}" aria-current="${V === v ? 'page' : 'false'}">${ico(MV[v][1])}<span>${MV[v][0]}</span></a>`;
-  el.innerHTML = `<div class="mnav-in">${main.slice(0, 2).map(a).join('')}<button type="button" class="fab" data-act="qcopen" aria-label="Tulis cepat" aria-expanded="${SHEET === 'qc'}">${ico('plus')}</button>${main.slice(2).map(a).join('')}<button type="button" data-act="more" class="${rest.includes(V) ? 'cur' : ''}" aria-expanded="${SHEET === 'more'}">${ico('apps')}<span>${L('Lainnya', 'More')}</span></button></div>`;
+  el.innerHTML = `<div class="mnav-in">${main.slice(0, 2).map(a).join('')}<button type="button" class="fab" data-act="qcopen" aria-label="Tulis cepat" aria-expanded="${SHEET === 'qc'}">${ico('plus')}</button>${main.slice(2).map(a).join('')}${a('cari')}</div>`;
 }
-function renderMore() {
-  const { rest } = mnavSplit();
-  $('#more').innerHTML = `<div class="grab" aria-hidden="true"></div><div class="sh-h"><b>${L('Lainnya', 'More')}</b><button class="iconbtn" type="button" data-act="sheetx" aria-label="Tutup">${ico('x')}</button></div>
-    ${rest.length ? `<div class="more-grid">${rest.map(v => `<a href="#${v}" class="more-it" data-v="${v}" aria-current="${V === v ? 'page' : 'false'}">${ARTK[v] ? art(ARTK[v][0], ARTK[v][1]) : ico(MV[v][1])}<span>${MV[v][0]}</span>${v === 'fokus' && T.running ? `<small data-clock>${fmtClock(T.left)}</small>` : ''}</a>`).join('')}</div>` : ''}
-    <div class="more-list">
-      <button class="more-row" type="button" data-act="settings">${ico('sliders')}<span>Pengaturan</span>${ico('chev')}</button>
-      <button class="more-row" type="button" data-act="tg">${ico('tg')}<span>Telegram<small>${tgOn() ? 'tersambung' : 'Part 2'}</small></span>${ico('chev')}</button>
-      <div class="more-row more-theme">${ico('sun')}<span>Tema</span>${themeSeg('seg-s')}</div>
-      <div class="more-row more-theme">${ico('note')}<span>${L('Bahasa', 'Language')}</span>${langSeg('seg-s')}</div>
-      <div class="more-row more-theme">${ico('sliders')}<span>${L('Palet', 'Palette')}</span>${palSeg('seg-s')}</div>
-      <button class="more-row" type="button" data-act="eye">${ico(SET.hideAmt ? 'eyeoff' : 'eye')}<span>${SET.hideAmt ? 'Tampilkan angka uang' : 'Sembunyikan angka uang'}</span><span></span></button>
-    </div>`;
+/* teks ubin: tinta artInk (gelap/terang) yang kontrasnya paling tinggi terhadap warna ubin */
+const btInk = c => { const lum = h => { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0); }; if (!/^#[0-9a-f]{6}$/i.test(c || '')) return ''; const l = lum(c), d = lum('#0F1115'), w = lum('#F5F6F8'); return (l + 0.05) / (d + 0.05) > (w + 0.05) / (l + 0.05) ? '#0F1115' : '#F5F6F8'; };
+/* Cari = pusat navigasi: ubin bagian (Uang paling depan) membuka halamannya, ubin kategori uang mencari transaksi */
+function srBrowse() {
+  const views = [['keuangan', L('Uang', 'Money')], ['todo', 'To-do'], ['fokus', L('Fokus', 'Focus')], ['catatan', L('Catatan', 'Notes')], ['kalender', L('Kalender', 'Calendar')], ['statistik', L('Statistik', 'Stats')], ['habit', 'Habit']].filter(([v]) => on(v));
+  const cats = on('keuangan') ? Object.keys(BUDGET) : [];
+  const tile = ([v, n]) => `<button type="button" class="bt" style="--a:${ARTK[v][1]};color:${btInk(ARTK[v][1])}" data-act="hmgo" data-v="${v}"><b>${n}</b>${v === 'fokus' && T.running ? `<small class="bt-clock">${ico('timer')}<span data-clock>${fmtClock(T.left)}</span></small>` : ''}${ico(ARTK[v][0])}</button>`;
+  return (views.length ? `<h2 class="sr-h">${L('Jelajahi', 'Browse all')}</h2><div class="sr-grid">${views.map(tile).join('')}</div>` : '')
+    + (cats.length ? `<h2 class="sr-h">${L('Kategori uang', 'Money categories')}</h2><div class="sr-grid">${cats.map(c => { const [i, col] = artPick(c, 'uang'); return `<button type="button" class="bt" style="--a:${col};color:${btInk(col)}" data-act="srq" data-q="${esc(catName(c))}"><b>${esc(c)}</b>${ico(i)}</button>`; }).join('')}</div>` : '');
 }
 function quick(text, force) { const t = text.trim(); if (!t) return; QCI = chat.length; handle(t, 'Web', force); if (chat[QCI]) chat[QCI].web = true; renderChat(); }
 
@@ -3658,9 +3661,7 @@ const srRow = (artHtml, t, s, attrs) => `<button type="button" class="sr-row" ${
 function searchRes() {
   const q = SQ.trim().toLowerCase();
   if (!q) {
-    const views = [['todo', 'To-do'], ['habit', 'Habit'], ['fokus', L('Fokus', 'Focus')], ['keuangan', L('Uang', 'Money')], ['catatan', L('Catatan', 'Notes')], ['kalender', L('Kalender', 'Calendar')], ['statistik', L('Statistik', 'Stats')]].filter(([v]) => on(v) && (v !== 'habit' || S.routines.length));
-    const cats = on('keuangan') ? Object.keys(BUDGET) : [];
-    return `<h2 class="sr-h">${L('Jelajahi', 'Browse all')}</h2><div class="sr-grid">${views.map(([v, n]) => `<button type="button" class="bt" style="--a:${ARTK[v][1]}" data-act="hmgo" data-v="${v}"><b>${n}</b>${ico(ARTK[v][0])}</button>`).join('')}${cats.map(c => { const [i, col] = artPick(c, 'uang'); return `<button type="button" class="bt" style="--a:${col}" data-act="srq" data-q="${esc(catName(c))}"><b>${esc(c)}</b>${ico(i)}</button>`; }).join('')}</div>`;
+    return srBrowse();
   }
   const has = s => String(s || '').toLowerCase().includes(q);
   const G = [];
@@ -4220,7 +4221,7 @@ function hInit() {
     if (VIEWS.includes(v) && v !== V && (v === 'hari-ini' || on(v))) { V = v; render(); window.scrollTo({ top: 0 }); }
   });
   const mo = new MutationObserver(hSoon);
-  [document.documentElement, $('#panel'), $('#onb'), $('#pad'), $('#more'), $('#uang'), $('#hpick')].forEach(el => { if (el) mo.observe(el, { attributes: true, attributeFilter: ['hidden', 'class', 'data-sheet'] }); });
+  [document.documentElement, $('#panel'), $('#onb'), $('#pad'), $('#uang'), $('#hpick')].forEach(el => { if (el) mo.observe(el, { attributes: true, attributeFilter: ['hidden', 'class', 'data-sheet'] }); });
   const w = $('#wr'); if (w) mo.observe(w, { attributes: true, attributeFilter: ['hidden'] });
   hsync();
 }
@@ -4730,7 +4731,7 @@ document.addEventListener('click', e => {
   const sg = e.target.closest('[data-sugg]'); if (sg) { if (sg.closest('#qc-sugg')) { const qi = $('#qc-in'); qi.value = sg.dataset.sugg; QTYPE = null; qcPrev(); qi.focus(); } else handle(sg.dataset.sugg); return; }
   const pn = e.target.closest('button[data-pane]'); if (pn) { $('#stage').dataset.pane = pn.dataset.pane; document.querySelectorAll('button[data-pane]').forEach(x => x.setAttribute('aria-pressed', x === pn)); return; }
   const gl = e.target.closest('[data-go]'); if (gl) return go(gl.dataset.go);
-  const nv = e.target.closest('.nav a, .mnav a, .more-it'); if (nv) { e.preventDefault(); return go(nv.dataset.v); }
+  const nv = e.target.closest('.nav a, .mnav a'); if (nv) { e.preventDefault(); return go(nv.dataset.v); }
   if (e.target.id === 'sscrim') return closeSheet();
   if (e.target.id === 'scrim') return closePanel();
   const k = e.target.closest('[data-key]'); if (k) return key(k.dataset.key);
@@ -4818,7 +4819,7 @@ document.addEventListener('click', e => {
   if (act === 'tgtest') { SEEDING = true; botSay('Tes dari project001-Planner. Bot tersambung dan siap mencatat.'); SEEDING = false; toast('Pesan tes terkirim ke Telegram'); return; }
   if (act === 'tgoff') { SET.tg.on = false; applySet(); toast('Telegram diputus'); return; }
   if (act === 'qcclose') { QCI = null; renderQC(); $('#qc-in').focus(); return; }
-  if (act === 'eye') { const s = selOf(a); SET.hideAmt = !SET.hideAmt; applySet(a.closest('#more') ? null : s); if (SHEET === 'more') renderMore(); toast(SET.hideAmt ? 'Angka uang disembunyikan' : 'Angka uang ditampilkan'); return; }
+  if (act === 'eye') { const s = selOf(a); SET.hideAmt = !SET.hideAmt; applySet(s); toast(SET.hideAmt ? 'Angka uang disembunyikan' : 'Angka uang ditampilkan'); return; }
   if (act === 'mod') { const s = selOf(a); SET.show[a.dataset.k] = !on(a.dataset.k); applySet(s); return; }
   if (act === 'calsw') { const k = a.dataset.k; SET.cal[k] = !SET.cal[k]; if (k === 'on' && SET.cal.on) G.calKey = null; applySet(selOf(a)); if (gOn()) gQueue(); return; }
   if (act === 'calmin') { SET.cal[a.dataset.k] = +a.dataset.m; applySet(`#panel [data-act="calmin"][data-k="${a.dataset.k}"][data-m="${a.dataset.m}"]`); if (gOn()) gQueue(); return; }
@@ -4831,8 +4832,8 @@ document.addEventListener('click', e => {
   if (act === 'tdopen') { const t = S.todos.find(x => x.id === id); if (t) openPanel('To-do', todoHTML(t), 'td'); return; }
   if (act === 'tdq') { const i = $('#td-due'); i.value = a.textContent; i.dataset.q = a.dataset.q; return; }
   if (act === 'tddel') { const t = S.todos.find(x => x.id === id); S.todos = S.todos.filter(x => x.id !== id); closePanel(); render(); toast(`To-do dihapus${t ? ': ' + t.text : ''}`); return; }
-  if (act === 'pal') { const k = a.dataset.k, inMore = !!a.closest('#more'); PALK = k; try { localStorage.setItem('p001-pal', k); } catch (e) { /* abaikan */ } applyPal(); applySet(inMore ? null : selOf(a) + `[data-k="${k}"]`); if (SHEET === 'more') { renderMore(); const b = $(`#more [data-act="pal"][data-k="${k}"]`); if (b) b.focus(); } toast(L('Palet ', 'Palette ') + PALS().find(p => p[0] === k)[1]); return; }
-  if (act === 'theme') { const k = a.dataset.k, inMore = !!a.closest('#more'); SET.theme = k; applySet(inMore ? null : selOf(a) + `[data-k="${k}"]`); if (SHEET === 'more') { renderMore(); const b = $(`#more [data-act="theme"][data-k="${k}"]`); if (b) b.focus(); } toast('Tema ' + THEMES.find(t => t[0] === k)[1].toLowerCase()); return; }
+  if (act === 'pal') { const k = a.dataset.k; PALK = k; try { localStorage.setItem('p001-pal', k); } catch (e) { /* abaikan */ } applyPal(); applySet(selOf(a) + `[data-k="${k}"]`); toast(L('Palet ', 'Palette ') + PALS().find(p => p[0] === k)[1]); return; }
+  if (act === 'theme') { const k = a.dataset.k; SET.theme = k; applySet(selOf(a) + `[data-k="${k}"]`); toast('Tema ' + THEMES.find(t => t[0] === k)[1].toLowerCase()); return; }
   if (act === 'dexport') {
     const d = new Date(), name = `project001-planner-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}.json`;
     const url = URL.createObjectURL(new Blob([JSON.stringify(dataBlob(), null, 1)], { type: 'application/json' }));
@@ -4852,7 +4853,6 @@ document.addEventListener('click', e => {
     render(); toast('Semua data di HP ini sudah dihapus'); return;
   }
   if (act === 'qcopen') return openSheet('qc');
-  if (act === 'more') return SHEET === 'more' ? closeSheet() : openSheet('more');
   if (act === 'sheetx') return closeSheet();
   if (act === 'qcmode') { if (SHEET === 'qc') QCTX = null; else QCOFF = true; setQcPh(); $('#qc-in').focus(); return; }
   if (act === 'kt') { KT = a.dataset.k; render(); const b = document.querySelector(`#view [data-act="kt"][data-k="${KT}"]`); if (b) b.focus(); return; }
